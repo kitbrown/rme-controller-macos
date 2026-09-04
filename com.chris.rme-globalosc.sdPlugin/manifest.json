@@ -3,7 +3,7 @@
   "UUID": "com.chris.rme-globalosc",
   "Name": "RME Global OSC",
   "Version": "1.0.0.0",
-  "Author": "Chris",
+  "Author": "FiO Network Solutions LLC",
   "Description": "Controls RME TotalMix FX 2.1 Global OSC on macOS with bidirectional state feedback.",
   "Icon": "imgs/plugin",
   "Category": "RME Global OSC",
