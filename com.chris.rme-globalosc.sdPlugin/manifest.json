@@ -18,20 +18,20 @@
       "UUID": "com.chris.rme-globalosc.outputvolume",
       "Name": "Output Volume",
       "Tooltip": "Direct TotalMix Global OSC hardware-output volume dial",
-      "Icon": "imgs/dial",
+      "Icon": "imgs/output-volume",
       "Controllers": ["Encoder"],
       "Encoder": { "layout": "$B1", "TriggerDescription": { "Rotate": "Adjust output volume", "Push": "Mute / unmute" } },
-      "States": [{ "Image": "imgs/dial" }],
+      "States": [{ "Image": "imgs/output-volume" }],
       "PropertyInspectorPath": "ui/output-volume.html"
     },
     {
       "UUID": "com.chris.rme-globalosc.mixfader",
       "Name": "Submix Fader",
       "Tooltip": "Direct Global OSC source-to-submix fader dial",
-      "Icon": "imgs/dial",
+      "Icon": "imgs/mix-fader",
       "Controllers": ["Encoder"],
       "Encoder": { "layout": "$B1", "TriggerDescription": { "Rotate": "Adjust send level" } },
-      "States": [{ "Image": "imgs/dial" }],
+      "States": [{ "Image": "imgs/mix-fader" }],
       "PropertyInspectorPath": "ui/mix-fader.html"
     },
     {

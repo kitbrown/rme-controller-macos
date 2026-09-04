@@ -5,5 +5,8 @@
 - CONFIRMED: direct addressing; no bank/page/pre-command architecture.
 - CONFIRMED: bidirectional UDP OSC receiver is included.
 - CONFIRMED: no third-party OSC npm package; OSC 1.0 float/int/string/bundle support implemented locally.
-- UNKNOWN: compile/runtime status until npm install/build/Elgato validate are run on the user's Mac.
+- CONFIRMED: Node.js 24 build succeeds in GitHub Actions on macOS.
+- CONFIRMED: current Elgato CLI validation succeeds after adding required PNG plugin icons.
+- CONFIRMED: Stream Deck+ starter-profile layout is specified for DeviceType 7.
+- UNKNOWN: live TotalMix FX / Stream Deck runtime behavior until tested on the user's Mac.
 - UNKNOWN: any RME path not explicitly included in v1 defaults.
