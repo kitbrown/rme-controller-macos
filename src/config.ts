@@ -1,4 +1,4 @@
-import type { JsonObject } from "@elgato/streamdeck";
+import type { JsonObject } from "@elgato/utils";
 
 export const DEFAULT_HOST = "127.0.0.1";
 export const DEFAULT_SEND_PORT = 7008;
