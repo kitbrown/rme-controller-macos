@@ -1,4 +1,4 @@
-import type { JsonObject, JsonValue } from "@elgato/streamdeck";
+import type { JsonObject, JsonValue } from "@elgato/utils";
 
 export type OscSettings = JsonObject & {
   host?: string;
