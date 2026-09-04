@@ -1,53 +1,81 @@
-# RME Global OSC Stream Deck v1
+# RME Controller for macOS
 
-A clean-room macOS Stream Deck plugin for TotalMix FX 2.1 Global OSC.
+A bidirectional Stream Deck plugin for controlling RME TotalMix FX through Global OSC. Built by FiO Networks for macOS and Stream Deck + XL, with support for both keys and rotary encoders.
 
-**Copyright and project owner:** FiO Network Solutions LLC  
-**Managing Partner:** Chris W. Brown
+## Install
 
-## Validation
-- Node.js 24 build validated on macOS via GitHub Actions.
-- Current Elgato Stream Deck CLI validation passes.
-- Stream Deck+ starter-profile layout is defined in `profiles/STREAM-DECK-PLUS-STARTER.md`.
-- The actual bundled `.streamDeckProfile` will be exported from the Stream Deck application during live-device testing.
+1. Download `release/com.fionetworks.rme-globalosc.streamDeckPlugin`.
+2. Double-click the file and approve installation in Stream Deck.
+3. In TotalMix FX, enable an OSC controller in **Global OSC** mode.
+4. Use `127.0.0.1`, incoming port `7008`, and outgoing port `9008` in TotalMix.
 
-## Baseline verified 2026-08-07
-- TotalMix FX 2.1 beta 4 is current public beta.
-- RME Global OSC protocol is beta 2.
-- Elgato SDK requires Node.js 24+ and Stream Deck 7.1+ for current development.
-- RME recommends separate controller ports such as 7008/9008 for Stream Deck.
-- This plugin does NOT use legacy page/bank OSC.
+The plugin actions default to the matching host and ports.
 
-## Actions
-1. Output Volume dial — `/output/N/volume`; dial press `/output/N/mute`.
-2. Submix Fader dial — `/mix/in|playback/SRC/OUT/fader`.
-3. Global OSC Toggle — default `/controlroom/dim`, configurable for other verified boolean paths.
-4. Snapshot — `/snapshot/load/N`, with current-state feedback.
+## Encoder presets
 
-## Build
-```bash
-npm install
-npm run build
-npm install -g @elgato/cli
-streamdeck validate com.chris.rme-globalosc.sdPlugin
+- Hardware Inputs — Analog 1/2
+- Hardware Inputs — Analog 3/4
+- Software Playback — Analog 1/2
+- Hardware Inputs — SPDIF
+- Control Room — Phones 1
+- Control Room — Main
+
+Press an encoder to mute or unmute its source/output. Rotation is ignored while muted. The encoder display turns red and reads `MUTED`.
+
+## Button presets
+
+- Main Mute
+- Dim
+- Analog 1/2 — 48V
+- Phones 1 Mute
+- Analog 1/2 — Mute
+- Talkback + Dim
+- Snapshots 1–8
+
+Buttons follow TotalMix feedback. Multi-path functions—stereo 48V and Talkback + Dim—switch all dependent paths together.
+
+## Synchronization
+
+- OSC state is applied when its UDP message arrives.
+- Encoder bursts are accumulated for 25 ms before the final value is sent.
+- Stream Deck display updates are limited to one per 100 ms per action.
+- Contradictory feedback is guarded for 250 ms after a local command.
+- Targeted reconciliation occurs after 350 ms.
+- Missing initial state retries after 750 ms, 1.5 seconds, and then every 3 seconds.
+- Simultaneous bulk-state requests collapse into one `/sendall` request per endpoint.
+
+Global OSC packets contain no timestamps or sequence numbers. The plugin treats TotalMix as the state authority and combines optimistic updates, expected-echo protection, and state reconciliation.
+
+## Development and testing
+
+The runtime has no third-party dependencies or build step. Stream Deck supplies Node.js 24.
+
+```sh
+npm test
 ```
 
-## Development install/test
-Use Elgato's supported CLI workflow:
-```bash
-npm run watch
+To validate or package with Elgato's CLI:
+
+```sh
+streamdeck validate com.fionetworks.rme-globalosc.sdPlugin
+streamdeck pack com.fionetworks.rme-globalosc.sdPlugin --output release
 ```
-The watch script restarts `com.chris.rme-globalosc` automatically.
 
-## TotalMix FX setup
-Use TotalMix FX 2.1 beta with OSC Compatibility/Mode = Global OSC.
-Use an available controller instance and mark it In Use.
-Recommended dedicated ports:
-- TotalMix incoming: 7008
-- TotalMix outgoing to plugin: 9008
-- Remote Controller Address: 127.0.0.1 for same-Mac operation
+See the [state ledger](docs/STATE_LEDGER.md), [default layout](docs/DEFAULT-LAYOUT.md), [QC report](docs/TEST-REPORT.md), and [hardware test notes](docs/HARDWARE-TEST.md) for validation details.
 
-Avoid `sendall` for Stream Deck. This v1 uses targeted `sendchan` where possible and `/sendstate` for current global/control state.
+## Compatibility
 
-## Important
-RME's Global OSC protocol is still beta. Do not substitute legacy OSC addresses. Before changing mappings, verify against the newest RME Global OSC protocol table.
+- macOS 13 or later
+- Stream Deck 7.1 or later
+- Stream Deck models with keys; encoder actions require a model with dials
+- A Global OSC-capable TotalMix FX release
+
+## Safety
+
+Phantom power can damage or stress incompatible connected equipment. Verify the attached microphone or device before using the 48V action.
+
+## Status
+
+Version 1.1.4.0. The plugin is free. Support: chris@fionetworks.com.
+
+RME, TotalMix, Elgato, and Stream Deck are trademarks of their respective owners. This independent project is not affiliated with or endorsed by RME Audio or Elgato.

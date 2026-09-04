@@ -5,13 +5,10 @@ on:
   push:
     branches: [main]
     paths:
-      - 'src/**'
-      - 'com.chris.rme-globalosc.sdPlugin/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'rollup.config.mjs'
-      - 'tsconfig.json'
-      - '.github/workflows/validate.yml'
+      - "com.fionetworks.rme-globalosc.sdPlugin/**"
+      - "test/**"
+      - "package.json"
+      - ".github/workflows/validate.yml"
 
 jobs:
   validate:
@@ -20,12 +17,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
-      - name: Install dependencies
-        run: npm install
-      - name: Build
-        run: npm run build
+          node-version: "24"
+      - name: Run automated tests
+        run: npm test
       - name: Install Stream Deck CLI
-        run: npm install -g @elgato/cli@latest
+        run: npm install --global @elgato/cli@latest
       - name: Validate plugin
-        run: streamdeck validate com.chris.rme-globalosc.sdPlugin
+        run: streamdeck validate com.fionetworks.rme-globalosc.sdPlugin

@@ -1,0 +1,113 @@
+{
+  "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
+  "UUID": "com.fionetworks.rme-globalosc",
+  "Name": "RME Controller for macOS",
+  "Version": "1.1.4.0",
+  "Author": "FiO Networks",
+  "Description": "Bidirectional Stream Deck control for RME TotalMix FX using Global OSC.",
+  "Icon": "imgs/plugin",
+  "Category": "RME Controller for macOS",
+  "CategoryIcon": "imgs/plugin",
+  "CodePath": "bin/plugin.js",
+  "SDKVersion": 2,
+  "Software": {
+    "MinimumVersion": "7.1"
+  },
+  "Nodejs": {
+    "Version": "24"
+  },
+  "OS": [
+    {
+      "Platform": "mac",
+      "MinimumVersion": "13"
+    }
+  ],
+  "Actions": [
+    {
+      "UUID": "com.fionetworks.rme-globalosc.outputvolume",
+      "Name": "Output Volume",
+      "Tooltip": "Control a TotalMix hardware output volume; press dial to mute.",
+      "Icon": "imgs/dial",
+      "Controllers": [
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "$B1",
+        "TriggerDescription": {
+          "Rotate": "Adjust volume",
+          "Push": "Mute / unmute"
+        }
+      },
+      "States": [
+        {
+          "Image": "imgs/dial"
+        }
+      ],
+      "PropertyInspectorPath": "ui/output-volume.html"
+    },
+    {
+      "UUID": "com.fionetworks.rme-globalosc.mixfader",
+      "Name": "Submix Fader",
+      "Tooltip": "Control a source-to-output TotalMix submix fader.",
+      "Icon": "imgs/dial",
+      "Controllers": [
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "$B1",
+        "TriggerDescription": {
+          "Rotate": "Adjust send level",
+          "Push": "Mute / unmute"
+        }
+      },
+      "States": [
+        {
+          "Image": "imgs/dial"
+        }
+      ],
+      "PropertyInspectorPath": "ui/mix-fader.html"
+    },
+    {
+      "UUID": "com.fionetworks.rme-globalosc.toggle",
+      "Name": "Control Toggle",
+      "Tooltip": "Control a documented TotalMix Global OSC boolean path.",
+      "Icon": "imgs/toggle",
+      "Controllers": [
+        "Keypad"
+      ],
+      "DisableAutomaticStates": true,
+      "States": [
+        {
+          "Image": "imgs/toggle",
+          "Title": "OFF"
+        },
+        {
+          "Image": "imgs/toggle-on",
+          "Title": "ON"
+        }
+      ],
+      "PropertyInspectorPath": "ui/toggle.html"
+    },
+    {
+      "UUID": "com.fionetworks.rme-globalosc.snapshot",
+      "Name": "Snapshot",
+      "Tooltip": "Recall a TotalMix snapshot.",
+      "Icon": "imgs/snapshot",
+      "Controllers": [
+        "Keypad"
+      ],
+      "DisableAutomaticStates": true,
+      "States": [
+        {
+          "Image": "imgs/snapshot",
+          "Title": "SNAP"
+        },
+        {
+          "Image": "imgs/snapshot-on",
+          "Title": "ACTIVE"
+        }
+      ],
+      "PropertyInspectorPath": "ui/snapshot.html"
+    }
+  ]
+}
