@@ -2,6 +2,9 @@
 
 A clean-room macOS Stream Deck plugin for TotalMix FX 2.1 Global OSC.
 
+**Copyright and project owner:** FiO Network Solutions LLC  
+**Managing Partner:** Chris W. Brown
+
 ## Baseline verified 2026-08-07
 - TotalMix FX 2.1 beta 4 is current public beta.
 - RME Global OSC protocol is beta 2.
