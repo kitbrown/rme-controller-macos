@@ -1,0 +1,56 @@
+{
+  "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
+  "UUID": "com.chris.rme-globalosc",
+  "Name": "RME Global OSC",
+  "Version": "1.0.0.0",
+  "Author": "Chris",
+  "Description": "Controls RME TotalMix FX 2.1 Global OSC on macOS with bidirectional state feedback.",
+  "Icon": "imgs/plugin",
+  "Category": "RME Global OSC",
+  "CategoryIcon": "imgs/plugin",
+  "CodePath": "bin/plugin.js",
+  "SDKVersion": 2,
+  "Software": { "MinimumVersion": "7.1" },
+  "Nodejs": { "Version": "24", "Debug": "enabled" },
+  "OS": [{ "Platform": "mac", "MinimumVersion": "13" }],
+  "Actions": [
+    {
+      "UUID": "com.chris.rme-globalosc.outputvolume",
+      "Name": "Output Volume",
+      "Tooltip": "Direct TotalMix Global OSC hardware-output volume dial",
+      "Icon": "imgs/dial",
+      "Controllers": ["Encoder"],
+      "Encoder": { "layout": "$B1", "TriggerDescription": { "Rotate": "Adjust output volume", "Push": "Mute / unmute" } },
+      "States": [{ "Image": "imgs/dial" }],
+      "PropertyInspectorPath": "ui/output-volume.html"
+    },
+    {
+      "UUID": "com.chris.rme-globalosc.mixfader",
+      "Name": "Submix Fader",
+      "Tooltip": "Direct Global OSC source-to-submix fader dial",
+      "Icon": "imgs/dial",
+      "Controllers": ["Encoder"],
+      "Encoder": { "layout": "$B1", "TriggerDescription": { "Rotate": "Adjust send level" } },
+      "States": [{ "Image": "imgs/dial" }],
+      "PropertyInspectorPath": "ui/mix-fader.html"
+    },
+    {
+      "UUID": "com.chris.rme-globalosc.toggle",
+      "Name": "Global OSC Toggle",
+      "Tooltip": "Bidirectional boolean Global OSC control",
+      "Icon": "imgs/toggle",
+      "Controllers": ["Keypad"],
+      "States": [{ "Image": "imgs/toggle", "Title": "OFF" }, { "Image": "imgs/toggle", "Title": "ON" }],
+      "PropertyInspectorPath": "ui/toggle.html"
+    },
+    {
+      "UUID": "com.chris.rme-globalosc.snapshot",
+      "Name": "Snapshot",
+      "Tooltip": "Recall TotalMix snapshot with Global OSC state feedback",
+      "Icon": "imgs/snapshot",
+      "Controllers": ["Keypad"],
+      "States": [{ "Image": "imgs/snapshot", "Title": "SNAP" }],
+      "PropertyInspectorPath": "ui/snapshot.html"
+    }
+  ]
+}
