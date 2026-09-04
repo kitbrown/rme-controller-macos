@@ -1,3 +1,4 @@
+import commonjs from "@rollup/plugin-commonjs";
 import resolve from "@rollup/plugin-node-resolve";
 import typescript from "@rollup/plugin-typescript";
 
@@ -9,8 +10,9 @@ export default {
     sourcemap: true
   },
   plugins: [
-    resolve({ preferBuiltins: true }),
-    typescript({ tsconfig: "./tsconfig.json" })
+    typescript({ tsconfig: "./tsconfig.json" }),
+    resolve({ browser: false, exportConditions: ["node"], preferBuiltins: true }),
+    commonjs()
   ],
   external: [/^node:/]
 };
