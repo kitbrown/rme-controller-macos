@@ -5,6 +5,12 @@ A clean-room macOS Stream Deck plugin for TotalMix FX 2.1 Global OSC.
 **Copyright and project owner:** FiO Network Solutions LLC  
 **Managing Partner:** Chris W. Brown
 
+## Validation
+- Node.js 24 build validated on macOS via GitHub Actions.
+- Current Elgato Stream Deck CLI validation passes.
+- Stream Deck+ starter-profile layout is defined in `profiles/STREAM-DECK-PLUS-STARTER.md`.
+- The actual bundled `.streamDeckProfile` will be exported from the Stream Deck application during live-device testing.
+
 ## Baseline verified 2026-08-07
 - TotalMix FX 2.1 beta 4 is current public beta.
 - RME Global OSC protocol is beta 2.
