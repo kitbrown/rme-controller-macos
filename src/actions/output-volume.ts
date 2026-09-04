@@ -11,19 +11,20 @@ const muted = new Map<string, boolean>();
 export class OutputVolumeAction extends SingletonAction<OutputVolumeSettings> {
   override async onWillAppear(ev: WillAppearEvent<OutputVolumeSettings>): Promise<void> {
     if (!ev.action.isDial()) return;
+    const dialAction = ev.action;
     const c = cfg(ev.payload.settings);
     await osc.listen(c.receivePort);
     const index = typeof ev.payload.settings.outputIndex === "number" ? ev.payload.settings.outputIndex : 0;
-    await ev.action.setFeedback({ title: `OUT ${index}`, value: "-- dB", indicator: 0 });
+    await dialAction.setFeedback({ title: `OUT ${index}`, value: "-- dB", indicator: 0 });
     osc.onMessage(async m => {
       const volPath = `/output/${index}/volume`;
       const mutePath = `/output/${index}/mute`;
       if (m.address === volPath && typeof m.args[0] === "number") {
         const db = m.args[0];
-        levels.set(ev.action.id, db);
-        await ev.action.setFeedback({ title: `OUT ${index}`, value: `${db.toFixed(1)} dB`, indicator: Math.max(0, Math.min(100, ((db + 65) / 71) * 100)) });
+        levels.set(dialAction.id, db);
+        await dialAction.setFeedback({ title: `OUT ${index}`, value: `${db.toFixed(1)} dB`, indicator: Math.max(0, Math.min(100, ((db + 65) / 71) * 100)) });
       } else if (m.address === mutePath && typeof m.args[0] === "number") {
-        muted.set(ev.action.id, m.args[0] > 0.5);
+        muted.set(dialAction.id, m.args[0] > 0.5);
       }
     });
     osc.send(c.host, c.sendPort, `/sendchan/output/${index}`, 1);
