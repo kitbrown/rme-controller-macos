@@ -12,9 +12,11 @@
     "pack": "streamdeck pack com.chris.rme-globalosc.sdPlugin"
   },
   "dependencies": {
-    "@elgato/streamdeck": "^2.0.0"
+    "@elgato/streamdeck": "^2.0.0",
+    "@elgato/utils": "^0.4.5"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.6",
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-typescript": "^12.1.4",
     "@types/node": "^24.0.0",
