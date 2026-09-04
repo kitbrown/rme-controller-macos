@@ -17,15 +17,16 @@ export class MixFaderAction extends SingletonAction<MixFaderSettings> {
 
   override async onWillAppear(ev: WillAppearEvent<MixFaderSettings>): Promise<void> {
     if (!ev.action.isDial()) return;
+    const dialAction = ev.action;
     const c = cfg(ev.payload.settings);
     await osc.listen(c.receivePort);
     const path = this.path(ev.payload.settings);
-    await ev.action.setFeedback({ title: "SUBMIX", value: "-- dB", indicator: 0 });
+    await dialAction.setFeedback({ title: "SUBMIX", value: "-- dB", indicator: 0 });
     osc.onMessage(async m => {
       if (m.address === path && typeof m.args[0] === "number") {
         const db = m.args[0];
-        levels.set(ev.action.id, db);
-        await ev.action.setFeedback({ title: "SUBMIX", value: `${db.toFixed(1)} dB`, indicator: Math.max(0, Math.min(100, ((db + 65) / 71) * 100)) });
+        levels.set(dialAction.id, db);
+        await dialAction.setFeedback({ title: "SUBMIX", value: `${db.toFixed(1)} dB`, indicator: Math.max(0, Math.min(100, ((db + 65) / 71) * 100)) });
       }
     });
     const bus = ev.payload.settings.bus === "playback" ? "playback" : "input";
