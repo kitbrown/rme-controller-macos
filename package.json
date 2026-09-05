@@ -1,10 +1,10 @@
 {
   "name": "rme-controller-macos",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node test/plugin-sandbox-test.mjs com.fionetworks.rme-globalosc.sdPlugin/bin/plugin.js && node test/plugin-v1.1-race-test.mjs com.fionetworks.rme-globalosc.sdPlugin/bin/plugin.js"
+    "test": "node test/plugin-sandbox-test.mjs com.fionetworks.rme-globalosc.sdPlugin/bin/plugin.js && node test/plugin-v1.1-race-test.mjs com.fionetworks.rme-globalosc.sdPlugin/bin/plugin.js && node test/plugin-v1.1.5-toggle-regression-test.mjs com.fionetworks.rme-globalosc.sdPlugin/bin/plugin.js"
   },
   "engines": {
     "node": ">=24"
