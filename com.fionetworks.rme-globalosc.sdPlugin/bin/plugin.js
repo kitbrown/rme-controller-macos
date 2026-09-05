@@ -91,7 +91,7 @@ function mixSpec(s = {}) {
   };
 }
 function toggleSpec(s = {}) {
-  const preset = s.preset || "mainMute";
+  const preset = s.preset || ((typeof s.path === "string" || typeof s.title === "string") ? "custom" : "mainMute");
   if (preset !== "custom" && TOGGLE_PRESETS[preset]) return TOGGLE_PRESETS[preset];
   const path = typeof s.path === "string" && s.path.startsWith("/") ? s.path.trim() : "/controlroom/dim";
   return {
