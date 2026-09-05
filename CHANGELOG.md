@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.5.0
+
+- Fixed new Control Toggle instances defaulting internally to Dim while the property inspector displayed Main Mute.
+- Fixed Talkback + Dim being blocked when TotalMix did not publish a standalone Talkback state during initial synchronization.
+- Added regression coverage for Main Mute initialization and Talkback + Dim command dispatch.
+- Hardware revalidation required before marking this release fully validated.
+
 ## 1.1.4.0
 
 - Added debounced Global OSC bulk-state synchronization.
