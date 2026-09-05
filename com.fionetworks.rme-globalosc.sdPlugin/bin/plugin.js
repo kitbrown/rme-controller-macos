@@ -39,7 +39,7 @@ const TOGGLE_PRESETS = {
   micMute: {label: "Mic Mute", paths: ["/input/0/mute"]},
   phonesMute: {label: "Phones Mute", paths: ["/output/6/mute"]},
   mic48v: {label: "Mic 48V", paths: ["/input/0/48v", "/input/1/48v"]},
-  talkback: {label: "Talkback", paths: ["/controlroom/talkback", "/controlroom/dim"]}
+  talkback: {label: "Talkback", paths: ["/controlroom/talkback", "/controlroom/dim"], feedbackPaths: ["/controlroom/dim"]}
 };
 
 const instances = new Map();
@@ -91,7 +91,7 @@ function mixSpec(s = {}) {
   };
 }
 function toggleSpec(s = {}) {
-  const preset = s.preset || "dim";
+  const preset = s.preset || "mainMute";
   if (preset !== "custom" && TOGGLE_PRESETS[preset]) return TOGGLE_PRESETS[preset];
   const path = typeof s.path === "string" && s.path.startsWith("/") ? s.path.trim() : "/controlroom/dim";
   return {
@@ -99,6 +99,7 @@ function toggleSpec(s = {}) {
     paths: [path]
   };
 }
+function toggleFeedbackPaths(spec) { return spec.feedbackPaths || spec.paths; }
 function outputPath(s) { return `/output/${outputSpec(s).outputIndex}/volume`; }
 function outputMutePath(s) { return `/output/${outputSpec(s).outputIndex}/mute`; }
 function mixPath(s) {
@@ -351,8 +352,9 @@ function applyValueToMatching(port, address, rawValue) {
       const spec = toggleSpec(inst.settings);
       if (spec.paths.includes(address)) {
         inst.toggleStates.set(address, Number(rawValue) > 0.5);
-        const ready = spec.paths.every(path => inst.toggleStates.has(path));
-        if (ready) renderKeyState(inst, spec.paths.every(path => inst.toggleStates.get(path)));
+        const feedbackPaths = toggleFeedbackPaths(spec);
+        const ready = feedbackPaths.every(path => inst.toggleStates.has(path));
+        if (ready) renderKeyState(inst, feedbackPaths.every(path => inst.toggleStates.get(path)));
       }
     } else if (inst.action === ACTION_SNAPSHOT && address === actionPaths(inst)[0]) {
       inst.snapshotState = Number(rawValue);
@@ -393,7 +395,10 @@ function isReady(inst, operation) {
     if (operation === "rotate") return inst.value !== undefined && (inst.settings.muteOnPress === false || inst.muted !== undefined);
     return inst.muted !== undefined;
   }
-  if (inst.action === ACTION_TOGGLE) return toggleSpec(inst.settings).paths.every(path => inst.toggleStates.has(path));
+  if (inst.action === ACTION_TOGGLE) {
+    const spec = toggleSpec(inst.settings);
+    return toggleFeedbackPaths(spec).every(path => inst.toggleStates.has(path));
+  }
   return true;
 }
 function requiredOperation(inst) {
@@ -536,7 +541,8 @@ function onKeyDown(msg) {
   if (inst.action === ACTION_TOGGLE) {
     if (!isReady(inst, "toggle")) return blockUntilReady(inst);
     const spec = toggleSpec(inst.settings);
-    const next = spec.paths.every(path => inst.toggleStates.get(path)) ? 0 : 1;
+    const feedbackPaths = toggleFeedbackPaths(spec);
+    const next = feedbackPaths.every(path => inst.toggleStates.get(path)) ? 0 : 1;
     for (const path of spec.paths) sendCommand(inst, path, next);
   } else if (inst.action === ACTION_SNAPSHOT) {
     if (inst.configuring) return blockUntilReady(inst);
