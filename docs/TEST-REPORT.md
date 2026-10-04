@@ -1,6 +1,6 @@
 # Software QC Report
 
-Build: `RME Controller for macOS 1.1.4.0`  
+Build: `RME Controller for macOS 1.1.5.0`  
 Plugin UUID: `com.fionetworks.rme-globalosc` (side-by-side QC UUID)  
 Target runtime: Stream Deck Node.js `24.13.1`
 Native host: Stream Deck `7.5.1` build `22901` on macOS
