@@ -76,6 +76,6 @@ Phantom power can damage or stress incompatible connected equipment. Verify the 
 
 ## Status
 
-Version 1.1.4.0. The plugin is free. Support: chris@fionetworks.com.
+Version 1.1.5.0. The plugin is free. Support: chris@fionetworks.com.
 
 RME, TotalMix, Elgato, and Stream Deck are trademarks of their respective owners. This independent project is not affiliated with or endorsed by RME Audio or Elgato.
