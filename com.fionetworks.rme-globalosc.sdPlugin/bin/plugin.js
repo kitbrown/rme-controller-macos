@@ -25,21 +25,26 @@ const SNAPSHOT_IMAGES = [pngDataUri("../imgs/snapshot.png"), pngDataUri("../imgs
 
 const OUTPUT_PRESETS = {
   main: {label: "Main", outputIndex: 0},
-  phones1: {label: "Phones 1", outputIndex: 6}
+  phones1: {label: "Phones 1", outputIndex: 6},
+  spdif: {label: "SPDIF Out", outputIndex: 8}
 };
 const MIX_PRESETS = {
   input12: {label: "Analog 1/2 In", bus: "in", sourceIndex: 0, outputIndex: 0},
   input34: {label: "Analog 3/4 In", bus: "in", sourceIndex: 2, outputIndex: 0},
-  playback12: {label: "Analog 1/2 PB", bus: "playback", sourceIndex: 0, outputIndex: 0},
-  spdif: {label: "SPDIF In", bus: "in", sourceIndex: 8, outputIndex: 0}
+  mic1: {label: "Mic 1", bus: "in", sourceIndex: 0, outputIndex: 0},
+  playback12: {label: "Core Audio", bus: "playback", sourceIndex: 0, outputIndex: 0},
+  spdif: {label: "TV SPDIF", bus: "in", sourceIndex: 8, outputIndex: 0}
 };
 const TOGGLE_PRESETS = {
   mainMute: {label: "Main Mute", paths: ["/output/0/mute"]},
   dim: {label: "Dim", paths: ["/controlroom/dim"]},
-  micMute: {label: "Mic Mute", paths: ["/input/0/mute"]},
+  mono: {label: "Mono", paths: ["/controlroom/mono"]},
+  micMute: {label: "Mic 1 Mute", paths: ["/input/0/mute"]},
+  tvSpdifMute: {label: "TV SPDIF Mute", paths: ["/input/8/mute"]},
+  spdifOutMute: {label: "SPDIF Out Mute", paths: ["/output/8/mute"]},
   phonesMute: {label: "Phones Mute", paths: ["/output/6/mute"]},
   mic48v: {label: "Mic 48V", paths: ["/input/0/48v", "/input/1/48v"]},
-  talkback: {label: "Talkback", paths: ["/controlroom/talkback", "/controlroom/dim"], feedbackPaths: ["/controlroom/dim"]}
+  talkback: {label: "Talkback", paths: ["/controlroom/talkback", "/controlroom/dim"], feedbackPaths: ["/controlroom/dim"], momentary: true}
 };
 
 const instances = new Map();
@@ -535,12 +540,23 @@ function onDialDown(msg) {
   const path = inst.action === ACTION_OUTPUT ? outputMutePath(inst.settings) : mixMutePath(inst.settings);
   sendCommand(inst, path, inst.muted ? 0 : 1);
 }
+function onKeyUp(msg) {
+  const inst = instances.get(msg.context);
+  if (!inst || inst.action !== ACTION_TOGGLE) return;
+  const spec = toggleSpec(inst.settings);
+  if (!spec.momentary) return;
+  for (const path of spec.paths) sendCommand(inst, path, 0);
+}
 function onKeyDown(msg) {
   const inst = instances.get(msg.context);
   if (!inst) return;
   if (inst.action === ACTION_TOGGLE) {
     if (!isReady(inst, "toggle")) return blockUntilReady(inst);
     const spec = toggleSpec(inst.settings);
+    if (spec.momentary) {
+      for (const path of spec.paths) sendCommand(inst, path, 1);
+      return;
+    }
     const feedbackPaths = toggleFeedbackPaths(spec);
     const next = feedbackPaths.every(path => inst.toggleStates.get(path)) ? 0 : 1;
     for (const path of spec.paths) sendCommand(inst, path, next);
@@ -572,6 +588,7 @@ function connectStreamDeck() {
       else if (msg.event === "dialRotate") onDialRotate(msg);
       else if (msg.event === "dialDown") onDialDown(msg);
       else if (msg.event === "keyDown") onKeyDown(msg);
+      else if (msg.event === "keyUp") onKeyUp(msg);
       else if (msg.event === "didReceiveSettings") void queueConfiguration(msg, true);
     } catch (error) {
       console.error("Stream Deck message:", error.message || error);
