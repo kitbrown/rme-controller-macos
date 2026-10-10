@@ -1,11 +1,14 @@
 # Software QC Report
 
-Build: `RME Controller for macOS 1.1.5.0`  
+Build: `RME Controller for macOS 1.1.6.0`  
 Plugin UUID: `com.fionetworks.rme-globalosc` (side-by-side QC UUID)  
 Target runtime: Stream Deck Node.js `24.13.1`
 Native host: Stream Deck `7.5.1` build `22901` on macOS
 
 ## Passed
+
+- GitHub Actions release-candidate validation on 2026-10-10: Node 24 automated test suite PASS and Elgato CLI `streamdeck validate` PASS
+- v1.1.6 regression coverage for momentary Talkback + Dim, Mono, TV SPDIF input mute, and SPDIF output mute
 
 - JavaScript syntax checks for plugin and Property Inspector
 - Manifest schema and Elgato CLI validation with zero warnings
@@ -43,10 +46,16 @@ Native host: Stream Deck `7.5.1` build `22901` on macOS
 - Fresh profile actions visibly render red active/muted states on buttons and encoder touch-strip displays
 - First positive encoder tick from TotalMix's `-300` silence sentinel wakes directly to `-64.5 dB`
 
+## Remaining v1.1.6 release gate
+
+- Run `streamdeck pack` against current `main` and install that exact package on the Mac.
+- Confirm plugin startup and initial state synchronization with TotalMix/UCX II.
+- Perform a short live acceptance pass of the newly added v1.1.6 controls; previously validated 1.1.5 controls do not require a full retest.
+
 ## Intentionally deferred safety/audio checks
 
 - The stereo 48V command and state logic pass automated tests, and live readback showed both channels active. Automated QC does not switch phantom power on connected inputs.
 - Talkback + Dim multi-path enable/disable passes automated tests. Its audible routing and configured dim depth remain dependent on the user's TotalMix routing.
 - Long-duration unplug/replug soak testing remains operational monitoring rather than a release blocker.
 
-The packaged QC build is `outputs/com.fionetworks.rme-globalosc.streamDeckPlugin`.
+The previous packaged QC build is superseded by v1.1.6 source on `main`; a fresh v1.1.6 package is still required.
