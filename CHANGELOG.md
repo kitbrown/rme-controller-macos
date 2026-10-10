@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.6.0
+
+- Added user-focused presets for Core Audio playback, Mic 1, TV SPDIF input, and SPDIF output.
+- Added Mono, TV SPDIF input mute, and SPDIF output mute controls.
+- Changed Talkback + Dim to momentary press/release behavior.
+- Updated the default layout around the user's normal UCX II signal flow.
+- Added regression coverage for the new controls and momentary Talkback.
+- GitHub Actions Node 24 automated tests and Elgato CLI validation pass on the merged release candidate.
+- Fresh packaging and live startup/state-sync verification remain the final release gate.
+
+
 ## 1.1.5.0
 
 - Fixed new Control Toggle instances defaulting internally to Dim while the property inspector displayed Main Mute.
