@@ -13,12 +13,14 @@ The plugin actions default to the matching host and ports.
 
 ## Encoder presets
 
+- Core Audio — Analog 1/2 Playback
+- Mic 1
+- TV — SPDIF Input
+- Control Room — Main
+- SPDIF Output
+- Control Room — Phones 1
 - Hardware Inputs — Analog 1/2
 - Hardware Inputs — Analog 3/4
-- Software Playback — Analog 1/2
-- Hardware Inputs — SPDIF
-- Control Room — Phones 1
-- Control Room — Main
 
 Press an encoder to mute or unmute its source/output. Rotation is ignored while muted. The encoder display turns red and reads `MUTED`.
 
@@ -26,13 +28,16 @@ Press an encoder to mute or unmute its source/output. Rotation is ignored while 
 
 - Main Mute
 - Dim
-- Analog 1/2 — 48V
+- Mono
+- Mic 1 Mute
+- TV SPDIF Input Mute
+- SPDIF Output Mute
 - Phones 1 Mute
-- Analog 1/2 — Mute
-- Talkback + Dim
+- Analog 1/2 — 48V
+- Talkback + Dim (momentary)
 - Snapshots 1–8
 
-Buttons follow TotalMix feedback. Multi-path functions—stereo 48V and Talkback + Dim—switch all dependent paths together.
+Buttons follow TotalMix feedback. Talkback + Dim is push-and-hold: press enables both paths and release disables both. Stereo 48V remains a linked two-path toggle.
 
 ## Synchronization
 
@@ -76,6 +81,6 @@ Phantom power can damage or stress incompatible connected equipment. Verify the 
 
 ## Status
 
-Version 1.1.5.0. The plugin is free. Support: chris@fionetworks.com.
+Version 1.1.6.0. The plugin is free. Support: chris@fionetworks.com.
 
 RME, TotalMix, Elgato, and Stream Deck are trademarks of their respective owners. This independent project is not affiliated with or endorsed by RME Audio or Elgato.
