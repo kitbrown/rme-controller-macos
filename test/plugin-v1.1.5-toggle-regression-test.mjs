@@ -100,7 +100,36 @@ assert(packets.some(packet => packet.address === "/controlroom/talkback" && pack
 assert(packets.some(packet => packet.address === "/controlroom/dim" && packet.value === 1),
   "Talkback + Dim must command Dim together with Talkback");
 
+ws.message({event: "keyUp", action: "com.fionetworks.rme-globalosc.toggle", context: "talkback", payload: {}});
+await sleep(80);
+assert(packets.some(packet => packet.address === "/controlroom/talkback" && packet.value === 0),
+  "Momentary Talkback must release Talkback on keyUp");
+assert(packets.some(packet => packet.address === "/controlroom/dim" && packet.value === 0),
+  "Momentary Talkback must release Dim on keyUp");
+
+const presetCases = [
+  ["mono", "/controlroom/mono"],
+  ["tvSpdifMute", "/input/8/mute"],
+  ["spdifOutMute", "/output/8/mute"]
+];
+for (const [preset, path] of presetCases) {
+  const context = `preset-${preset}`;
+  ws.message({
+    event: "willAppear",
+    action: "com.fionetworks.rme-globalosc.toggle",
+    context,
+    payload: {settings: {...settings, preset}}
+  });
+  await sleep(30);
+  feedback.send(encode(path, 0), RECEIVE_PORT, HOST);
+  await sleep(30);
+  ws.message({event: "keyDown", action: "com.fionetworks.rme-globalosc.toggle", context, payload: {}});
+  await sleep(50);
+  assert(packets.some(packet => packet.address === path && packet.value === 1),
+    `${preset} must command ${path}`);
+}
+
 totalMix.close();
 feedback.close();
-console.log("v1.1.5 toggle regressions passed");
+console.log("v1.1.6 toggle/layout regressions passed");
 process.exit(0);

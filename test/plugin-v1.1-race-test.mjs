@@ -257,7 +257,7 @@ ws.message({event: "keyDown", action: TOGGLE, context: "dim", payload: {}});
 await waitFor(() => count("/controlroom/dim") === 2, "toggle disable missing");
 assert.equal(latest("/controlroom/dim").values[0], 0, "stale feedback changed toggle direction");
 
-// Multi-path functions enable and disable every dependent path together.
+// Talkback + Dim is momentary: keyDown enables both paths and keyUp disables both.
 ws.message({event: "willAppear", action: TOGGLE, context: "talk", payload: {settings: settings(RX_A, {preset: "talkback"})}});
 sendFeedback(RX_A, bundle([
   encode("/controlroom/talkback", [], ["F"]),
@@ -268,8 +268,8 @@ ws.message({event: "keyDown", action: TOGGLE, context: "talk", payload: {}});
 await waitFor(() => count("/controlroom/talkback") === 1 && count("/controlroom/dim") === 3, "talkback enable dependencies missing");
 assert.equal(latest("/controlroom/talkback").values[0], 1);
 assert.equal(latest("/controlroom/dim").values[0], 1);
-ws.message({event: "keyDown", action: TOGGLE, context: "talk", payload: {}});
-await waitFor(() => count("/controlroom/talkback") === 2 && count("/controlroom/dim") === 4, "talkback disable dependencies missing");
+ws.message({event: "keyUp", action: TOGGLE, context: "talk", payload: {}});
+await waitFor(() => count("/controlroom/talkback") === 2 && count("/controlroom/dim") === 4, "talkback release dependencies missing");
 assert.equal(latest("/controlroom/talkback").values[0], 0);
 assert.equal(latest("/controlroom/dim").values[0], 0);
 
