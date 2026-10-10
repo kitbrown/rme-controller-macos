@@ -195,10 +195,26 @@ function renderKeyState(inst, active) {
   setState(inst.context, state);
   setImage(inst.context, (inst.action === ACTION_SNAPSHOT ? SNAPSHOT_IMAGES : TOGGLE_IMAGES)[state]);
 }
+function accentForInstance(inst) {
+  if (inst.action === ACTION_OUTPUT) {
+    const preset = inst.settings.preset || "main";
+    if (preset === "main") return "#38d9ff";
+    if (preset === "spdif") return "#58e6a9";
+    if (preset === "phones1") return "#9aa8ff";
+  }
+  if (inst.action === ACTION_MIX) {
+    const preset = inst.settings.preset || "input12";
+    if (preset === "playback12") return "#4cc9ff";
+    if (preset === "mic1") return "#ffb84d";
+    if (preset === "spdif") return "#c88cff";
+    if (preset === "input12" || preset === "input34") return "#7fd7ff";
+  }
+  return "#38d9ff";
+}
 function feedbackPayload(inst) {
   const muted = inst.muted === true;
-  const background = muted ? "#74151b" : "#111820";
-  const accent = muted ? "#ff4d5a" : "#00a8ff";
+  const background = muted ? "#5a171c" : "#0b1118";
+  const accent = muted ? "#ff5d69" : accentForInstance(inst);
   let label = "RME";
   if (inst.action === ACTION_OUTPUT) label = outputSpec(inst.settings).label;
   else if (inst.action === ACTION_MIX) label = mixSpec(inst.settings).label;
@@ -209,7 +225,7 @@ function feedbackPayload(inst) {
     indicator: {
       value: inst.value === undefined ? 0 : indicator(inst.settings, inst.value),
       background,
-      bar_bg_c: muted ? "#74151b" : "#0d2b45",
+      bar_bg_c: muted ? "#5a171c" : "#13202b",
       bar_fill_c: accent
     }
   };
