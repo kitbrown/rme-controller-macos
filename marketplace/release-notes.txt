@@ -1,0 +1,6 @@
+Version 1.1.8
+
+• Added Stream Deck SDK 3 metadata for Marketplace DRM compatibility.
+• Preserved the accepted v1.1.7 runtime, OSC mappings, synchronization, controls and visual behavior.
+
+Includes the FiO console-style Property Inspector, source-specific Stream Deck + touch-strip colors, dynamic key artwork, explicit mute/Mono/Dim states and the v1.1.7 startup/label fixes.

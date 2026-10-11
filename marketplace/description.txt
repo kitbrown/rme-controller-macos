@@ -1,0 +1,7 @@
+Control RME TotalMix FX from Stream Deck on macOS. Use Stream Deck + dials to adjust hardware outputs and source-to-output submix levels, press to mute, and follow changes made in TotalMix with bidirectional Global OSC feedback.
+
+Keys provide Main Mute, Dim, Mono, input/output mute, momentary Talkback + Dim, linked Analog 1/2 phantom power and snapshots 1–8. Presets cover Core Audio playback, Mic 1, TV/SPDIF, Main, SPDIF output and Phones. Custom OSC paths support advanced setups. Clear state labels and source colors show what is active or muted.
+
+Requires macOS 13 or later, Stream Deck software 7.1 or later, and an RME interface with a Global OSC-capable TotalMix FX release. Dial actions require Stream Deck +. Tested with Fireface UCX II and TotalMix FX 2.10 beta 4; other interfaces may need custom mappings. Enable Global OSC; local defaults are 127.0.0.1, TotalMix receive port 7008 and plugin feedback port 9008. Check connected equipment before enabling 48V.
+
+Free. Independent software by FiO Networks; not affiliated with or endorsed by RME Audio or Elgato. AI assisted development, listing copy and media preparation under Maker direction and review.

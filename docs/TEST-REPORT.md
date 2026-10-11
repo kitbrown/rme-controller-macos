@@ -8,6 +8,8 @@ Target runtime: Stream Deck Node.js `24.13.1`
 
 Native host: Stream Deck `7.5.1` build `22901` on macOS
 
+Marketplace metadata candidate: `1.1.8.0` changes only the manifest version and `SDKVersion` from 2 to 3. The accepted v1.1.7 runtime/UI bytes are unchanged.
+
 ## Passed
 
 - GitHub Actions release-candidate validation on 2026-10-10: Node 24 automated test suite PASS and Elgato CLI `streamdeck validate` PASS
@@ -16,12 +18,15 @@ Native host: Stream Deck `7.5.1` build `22901` on macOS
 - Final package: 48,030 bytes; SHA-256 `c4b3dbc654cd5b2a591b4327f10862daa71109757b794c6190e366d56160bcfe`
 - Packaged manifest version `1.1.7.0`; SVG action/category assets, Property Inspector files, and dynamic SVG/semantic visual runtime are present
 - Manifest plugin icons verified at the current required 256 × 256 and 512 × 512 PNG sizes
-- A clean Stream Deck 7.5.1 restart on 2026-10-11 loaded and verified the preceding Mono/overflow correction; the final semantic-label package is installed on disk and requires one plugin reload
+- A clean Stream Deck 7.5.1 restart on 2026-10-11 loaded and verified the preceding Mono/overflow correction; the final semantic-label package was subsequently reloaded and visually accepted by the user, as recorded below
 - v1.1.6 regression coverage for momentary Talkback + Dim, Mono, TV SPDIF input mute, and SPDIF output mute
 - TotalMix FX 2.10 beta 4's installed Global OSC table exposes Control Room Mono as `mainmono`; the production preset and regression fixture now use `/controlroom/mainmono`
 - Regression coverage confirms Control Toggle keys clear the overflowing Stream Deck title layer while retaining the compact label in their dynamic SVG artwork
 - Regression coverage confirms mute controls distinguish `MUTE OFF` from `MUTED` instead of presenting an ambiguous generic OFF/ON state
 - User visual acceptance after the final plugin reload on 2026-10-11: visible controls work; no Mono alert, overflowing toggle label, or control stuck on `SYNCING` was reported
+- v1.1.8 metadata candidate: all three automated suites PASS; Stream Deck CLI 1.9.0 validation PASS; package size 48,030 bytes; SHA-256 `37c1966c3e3b719f2787186b12760d7c1464b29d717e54ae5b10ce922d362bdc`
+- Maker Console reports SDK compatibility Version 3 or later and DRM protection Yes for v1.1.8. The current UUID passes in a clean-product upload.
+- Installed files match the exact v1.1.8 candidate archive file-for-file. Stream Deck 7.5.1 launched the plugin as version `1.1.8.0`, logged `[com.fionetworks.rme-globalosc] Plugin connected`, and the runtime bound UDP feedback port 9008. Physical dial/key confirmation is folded into the required real-media capture session.
 
 - JavaScript syntax checks for plugin and Property Inspector
 - Manifest schema and Elgato CLI validation with zero warnings
@@ -65,4 +70,4 @@ Native host: Stream Deck `7.5.1` build `22901` on macOS
 - Talkback + Dim multi-path enable/disable passes automated tests. Its audible routing and configured dim depth remain dependent on the user's TotalMix routing.
 - Long-duration unplug/replug soak testing remains operational monitoring rather than a release blocker.
 
-The tracked release artifact is the final package identified above. Broad manual hardware acceptance remains assigned to the user.
+The tracked release artifact is the final package identified above. User visual acceptance is recorded above. The specifically deferred safety/audio and soak checks remain deferred. Marketplace capture and publication review remain assigned to the user.

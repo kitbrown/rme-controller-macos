@@ -8,7 +8,7 @@ Updated: 2026-10-11
 - GitHub Actions run 19 passed the complete Node 24 automated test suite and current Elgato CLI validation for v1.1.7.
 - Local release-candidate validation on 2026-10-11 passed all three Node test suites and `streamdeck validate` with the current Elgato CLI.
 - The corrected v1.1.7 package was created from the release source, inspected against the source tree, and installed on the Mac. It is 48,030 bytes with SHA-256 `c4b3dbc654cd5b2a591b4327f10862daa71109757b794c6190e366d56160bcfe`.
-- The corrected installed files report version `1.1.7.0`, and their runtime matches the corrected package. A clean Stream Deck 7.5.1 restart on 2026-10-11 loaded and verified the preceding Mono/overflow correction; the final semantic-label package is installed on disk and requires one plugin reload.
+- The corrected installed files report version `1.1.7.0`, and their runtime matches the corrected package. A clean Stream Deck 7.5.1 restart on 2026-10-11 loaded and verified the preceding Mono/overflow correction; the final semantic-label package was subsequently reloaded and accepted by the user, as recorded below.
 - The manifest plugin icons were corrected to the current required 256 × 256 and 512 × 512 PNG sizes before the final package was produced.
 - v1.1.7 adds the FiO console-style visual system, semantic key/touch-strip colors, dynamic SVG key artwork, dedicated monochrome SVG category/action icons, and Property Inspector validation.
 - The Mono preset now uses TotalMix's `/controlroom/mainmono` address. The previously configured `/controlroom/mono` address never received initial feedback and caused Stream Deck's error alert on the third key.
@@ -26,10 +26,21 @@ Updated: 2026-10-11
 - Elgato CLI validation passes without warnings in CI.
 - Prior live validation established Stream Deck / TotalMix startup, complete `/sendall` state, all six default encoder mappings, mute guards/red states, and Main/Phones/Mic/Dim button behavior.
 - The default transport is `127.0.0.1`, TotalMix port `7008`, plugin port `9008`.
+- Maker Console rejected the v1.1.7 manifest as SDK 2 / DRM disabled. The v1.1.8 candidate changes only `Version` and `SDKVersion`; all runtime and UI files are unchanged.
+- v1.1.8 passes all three automated suites and Stream Deck CLI 1.9.0 validation. Maker Console recognizes SDK 3 and DRM enabled.
+- Chris approved permanent removal of the obsolete rejected 0.9 Marketplace product, and it was deleted. A replacement draft now exists for current UUID `com.fionetworks.rme-globalosc` as Maker Console product `4805d54d-4d34-4f36-b392-e4f86172c12b`.
+- The replacement draft has the final description, English/Audio/Free details, support/setup links, icon and thumbnail. Its gallery and version table remain incomplete; no submission or publication occurred.
+- Installed files match the v1.1.8 candidate archive file-for-file. Stream Deck 7.5.1 launched it as version `1.1.8.0`, logged `Plugin connected`, and the plugin bound UDP port 9008.
 
 ## Remaining Marketplace work
 
-- Capture the required Marketplace app icon, thumbnail, gallery media, and hardware-integration demonstration video from the real installed build, then complete Maker Console submission.
+- COMPLETE: publication copy, support/non-affiliation wording, AI disclosure, version/package identity, 288 px icon, 1920 × 960 thumbnail, three gallery templates and capture/video shot list are prepared in `marketplace/`.
+- REQUIRES CHRIS: real captures, hardware demo, final media/provenance review and explicit submission/publication approval.
+- COMPLETE in Maker Console: FiO Networks account verified; obsolete 0.9 product deleted with authorization; clean current-UUID draft created; listing and support/setup links saved; icon/thumbnail uploaded; v1.1.8 SDK 3/DRM compatibility verified. No submission.
+- COMPLETE locally: exact v1.1.8 startup, Stream Deck connection and UDP 9008 binding smoke checks.
+- REQUIRES CHRIS: confirm one physical dial and key during capture, then complete real gallery/video and final media/provenance review.
+- MAKER CONSOLE remaining: add current gallery/video, create the 1.1.8 version, disable automatic publication, and submit only with Chris approval; see `marketplace/MAKER-CONSOLE.md`.
+- Accepted v1.1.7 runtime behavior remains unchanged; v1.1.8 contains manifest metadata only.
 
 ## Intentionally deferred
 
@@ -39,4 +50,4 @@ Updated: 2026-10-11
 
 ## Source of truth
 
-The validated implementation is `com.fionetworks.rme-globalosc.sdPlugin` on current `main`. Older `com.chris.*` and legacy `rme-totalmix-macos` bundles are not release baselines.
+The validated implementation is `com.fionetworks.rme-globalosc.sdPlugin`. v1.1.8 adds Marketplace-only manifest metadata to the accepted v1.1.7 runtime. Older `com.chris.*` and legacy `rme-totalmix-macos` bundles are not release baselines.
