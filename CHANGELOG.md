@@ -6,6 +6,7 @@
 - Added semantic Stream Deck + touch-strip accent colors for Core Audio, Mic 1, TV SPDIF, Main, SPDIF output, and Phones.
 - Added dynamic SVG key artwork with clear per-function labels and live ON/OFF state styling.
 - Added dedicated monochrome SVG icons for the plugin category and each action, aligned with current Marketplace action-list guidance.
+- Updated the packaged plugin icon to the current 256 × 256 and 512 × 512 Marketplace sizes.
 - Added inline Property Inspector validation for host, UDP ports, dB ranges, and custom OSC paths.
 - Prepared Marketplace submission copy and a current publication checklist.
 - No OSC routing, synchronization, or command semantics changed.

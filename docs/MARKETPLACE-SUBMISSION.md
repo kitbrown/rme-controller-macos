@@ -39,8 +39,9 @@ Before submission, prepare:
 
 1. **Marketplace app icon:** 288 × 288 PNG.
 2. **Thumbnail:** 1920 × 960 PNG.
-3. **At least 3 gallery items:** each 1920 × 960 PNG, or supported 1920 × 1080 MP4 where appropriate.
-4. Recommended gallery subjects:
+3. **3–10 gallery items:** each 1920 × 960 PNG, or 1920 × 1080 MP4 under 250 MB.
+4. **Hardware-integration demonstration video:** required by Elgato's review guidance because this plugin requires RME hardware. Use 1920 × 1080 MP4 under 250 MB; it can also serve as a gallery item.
+5. Recommended gallery subjects:
    - Stream Deck + showing Main, Core Audio, Mic and TV/SPDIF controls with the new semantic colors.
    - Property Inspector showing the polished preset/configuration UI.
    - TotalMix FX and Stream Deck side by side demonstrating bidirectional state, mute and snapshot feedback.
@@ -58,7 +59,7 @@ Current Elgato guidance requires:
 - Touch-strip UI should remain inside the 200 × 100 layout bounds.
 - Visual feedback should reflect state changes and failed interactions should use Stream Deck alert feedback.
 
-v1.1.7 now uses dedicated monochrome SVG category/action icons and dynamic SVG key state artwork.
+v1.1.7 now uses dedicated monochrome SVG category/action icons and dynamic SVG key state artwork. The final package's manifest plugin icons are verified at 256 × 256 and 512 × 512.
 
 ## Property Inspector checks
 
@@ -70,21 +71,25 @@ v1.1.7 now uses dedicated monochrome SVG category/action icons and dynamic SVG k
 
 ## Submission checklist
 
-- [ ] Run complete automated test suite on v1.1.7.
-- [ ] Run current `streamdeck validate`.
-- [ ] Run `streamdeck pack` and inspect the exact package.
-- [ ] Install the exact packaged v1.1.7 build on the Mac.
-- [ ] Confirm clean Stream Deck startup and initial TotalMix state synchronization.
+- [x] Run complete automated test suite on v1.1.7.
+- [x] Run current `streamdeck validate`.
+- [x] Run `streamdeck pack` and inspect the exact package.
+- [x] Install the exact packaged v1.1.7 build on the Mac.
+- [x] Confirm clean Stream Deck startup, plugin connection, action registration, and UDP receiver binding.
+- [ ] After the final icon-size-only package replacement, restart Stream Deck and visually confirm initial TotalMix state synchronization and no controls stuck on `SYNCING`.
 - [ ] Perform short live acceptance check of the v1.1.7 visual changes and newly added controls.
-- [ ] Verify manifest plugin PNG icon dimensions are exactly 256/512 px.
+- [x] Verify manifest plugin PNG icon dimensions are exactly 256/512 px.
 - [ ] Create Marketplace 288 × 288 app icon.
 - [ ] Create 1920 × 960 thumbnail.
 - [ ] Create at least three 1920 × 960 gallery images.
+- [ ] Record a 1920 × 1080 hardware-integration demonstration video under 250 MB.
 - [ ] Confirm FiO Networks exactly matches the organization name in Maker Console.
 - [ ] Add support/contact link or email in Maker Console.
 - [ ] Declare AI assistance in the submission as required by current Marketplace AI-use guidance.
 - [ ] Upload the packaged plugin and release notes through Maker Console.
 - [ ] Submit the new version for review.
+
+The release notes above are ready to paste into Maker Console. The remaining blockers require the Maker's visual/hardware acceptance, media capture, organization/account verification, upload, and submission.
 
 ## AI-use declaration draft
 

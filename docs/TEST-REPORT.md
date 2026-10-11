@@ -1,13 +1,22 @@
 # Software QC Report
 
-Build: `RME Controller for macOS 1.1.6.0`  
-Plugin UUID: `com.fionetworks.rme-globalosc` (side-by-side QC UUID)  
+Build: `RME Controller for macOS 1.1.7.0`
+
+Plugin UUID: `com.fionetworks.rme-globalosc`
+
 Target runtime: Stream Deck Node.js `24.13.1`
+
 Native host: Stream Deck `7.5.1` build `22901` on macOS
 
 ## Passed
 
 - GitHub Actions release-candidate validation on 2026-10-10: Node 24 automated test suite PASS and Elgato CLI `streamdeck validate` PASS
+- Local release-candidate validation on 2026-10-11: all three `npm test` suites PASS and current Elgato CLI validation PASS
+- Final package created with `streamdeck pack --force --no-update-check`, inspected file-for-file against source, and installed on the Mac
+- Final package: 47,869 bytes; SHA-256 `0c8676a0f642f4ffbe0601c4209e4561b8cfa5aa8367dbe367989e608439a9c9`
+- Packaged manifest version `1.1.7.0`; SVG action/category assets, Property Inspector files, and dynamic SVG/semantic visual runtime are present
+- Manifest plugin icons verified at the current required 256 × 256 and 512 × 512 PNG sizes
+- Clean Stream Deck 7.5.1 restart loaded the v1.1.7 runtime: the plugin connected, all four actions registered, and UDP port 9008 was bound while TotalMix was running
 - v1.1.6 regression coverage for momentary Talkback + Dim, Mono, TV SPDIF input mute, and SPDIF output mute
 
 - JavaScript syntax checks for plugin and Property Inspector
@@ -46,11 +55,10 @@ Native host: Stream Deck `7.5.1` build `22901` on macOS
 - Fresh profile actions visibly render red active/muted states on buttons and encoder touch-strip displays
 - First positive encoder tick from TotalMix's `-300` silence sentinel wakes directly to `-64.5 dB`
 
-## Remaining v1.1.6 release gate
+## Remaining v1.1.7 release gate
 
-- Run `streamdeck pack` against current `main` and install that exact package on the Mac.
-- Confirm plugin startup and initial state synchronization with TotalMix/UCX II.
-- Perform a short live acceptance pass of the newly added v1.1.6 controls; previously validated 1.1.5 controls do not require a full retest.
+- Restart Stream Deck once after the final icon-size-only package replacement and visually confirm all assigned controls leave `SYNCING`; rendered hardware state is not exposed to the test sandbox.
+- Perform the user's short live acceptance pass of the v1.1.7 visual changes and newly added v1.1.6 controls; previously validated controls do not require a full retest.
 
 ## Intentionally deferred safety/audio checks
 
@@ -58,4 +66,4 @@ Native host: Stream Deck `7.5.1` build `22901` on macOS
 - Talkback + Dim multi-path enable/disable passes automated tests. Its audible routing and configured dim depth remain dependent on the user's TotalMix routing.
 - Long-duration unplug/replug soak testing remains operational monitoring rather than a release blocker.
 
-The previous packaged QC build is superseded by v1.1.6 source on `main`; a fresh v1.1.6 package is still required.
+The tracked release artifact is the final package identified above. Broad manual hardware acceptance remains assigned to the user.
