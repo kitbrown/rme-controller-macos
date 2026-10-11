@@ -21,6 +21,7 @@ Native host: Stream Deck `7.5.1` build `22901` on macOS
 - TotalMix FX 2.10 beta 4's installed Global OSC table exposes Control Room Mono as `mainmono`; the production preset and regression fixture now use `/controlroom/mainmono`
 - Regression coverage confirms Control Toggle keys clear the overflowing Stream Deck title layer while retaining the compact label in their dynamic SVG artwork
 - Regression coverage confirms mute controls distinguish `MUTE OFF` from `MUTED` instead of presenting an ambiguous generic OFF/ON state
+- User visual acceptance after the final plugin reload on 2026-10-11: visible controls work; no Mono alert, overflowing toggle label, or control stuck on `SYNCING` was reported
 
 - JavaScript syntax checks for plugin and Property Inspector
 - Manifest schema and Elgato CLI validation with zero warnings
@@ -57,11 +58,6 @@ Native host: Stream Deck `7.5.1` build `22901` on macOS
 - Consolidated physical button test passed Main Mute, Phones Mute, Mic Mute, and Dim with matching state feedback
 - Fresh profile actions visibly render red active/muted states on buttons and encoder touch-strip displays
 - First positive encoder tick from TotalMix's `-300` silence sentinel wakes directly to `-64.5 dB`
-
-## Remaining v1.1.7 release gate
-
-- Reload the plugin after the final semantic-label package installation, then visually confirm Mono initializes without an alert, mute keys distinguish `MUTE OFF` from `MUTED`, toggle labels fit inside their keys, and all assigned controls leave `SYNCING`.
-- Perform the user's short live acceptance pass of the v1.1.7 visual changes and newly added v1.1.6 controls; previously validated controls do not require a full retest.
 
 ## Intentionally deferred safety/audio checks
 

@@ -14,6 +14,7 @@ Updated: 2026-10-11
 - The Mono preset now uses TotalMix's `/controlroom/mainmono` address. The previously configured `/controlroom/mono` address never received initial feedback and caused Stream Deck's error alert on the third key.
 - Control Toggle keys clear Stream Deck's separate title overlay and use the compact label already rendered in their dynamic SVG artwork, preventing long labels from spilling outside the key.
 - Key state captions are semantic: mute controls show `MUTE OFF` or `MUTED`; Mono shows `STEREO` or `MONO`; Dim shows `FULL` or `DIMMED`; 48V, Talkback, and snapshots use similarly explicit states.
+- After the final plugin reload on 2026-10-11, the user confirmed the visible controls work, including the corrected labels; no Mono alert, overflowing toggle label, or control stuck on `SYNCING` was reported.
 - Other OSC routing, synchronization, and command semantics are unchanged.
 - v1.1.6 functionality remains included: Core Audio, Mic 1, TV SPDIF, SPDIF output, Mono, dedicated SPDIF mute controls, and momentary Talkback + Dim, while retaining the earlier general presets.
 
@@ -26,10 +27,8 @@ Updated: 2026-10-11
 - Prior live validation established Stream Deck / TotalMix startup, complete `/sendall` state, all six default encoder mappings, mute guards/red states, and Main/Phones/Mic/Dim button behavior.
 - The default transport is `127.0.0.1`, TotalMix port `7008`, plugin port `9008`.
 
-## Remaining release gate
+## Remaining Marketplace work
 
-- Reload the plugin after the final semantic-label package installation, then visually confirm the third key displays `MONO` without an alert, mute keys distinguish `MUTE OFF` from `MUTED`, the compact labels fit inside their keys, and all assigned controls leave `SYNCING`.
-- Run the user's short live acceptance pass for the v1.1.7 visual changes and the new v1.1.6 controls that have not yet been physically rechecked.
 - Capture the required Marketplace app icon, thumbnail, gallery media, and hardware-integration demonstration video from the real installed build, then complete Maker Console submission.
 
 ## Intentionally deferred
