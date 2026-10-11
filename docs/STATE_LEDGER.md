@@ -8,7 +8,7 @@ Updated: 2026-10-11
 - GitHub Actions run 19 passed the complete Node 24 automated test suite and current Elgato CLI validation for v1.1.7.
 - Local release-candidate validation on 2026-10-11 passed all three Node test suites and `streamdeck validate` with the current Elgato CLI.
 - The corrected v1.1.7 package was created from the release source, inspected against the source tree, and installed on the Mac. It is 47,867 bytes with SHA-256 `f98a84de9e810de356f8d9761f5cb3d8f2221d9bfdc15b7d14bd99db3ad7a271`.
-- The installed package reports version `1.1.7.0`; its manifest and runtime hashes match the package, all four actions are registered, the plugin connected after a clean Stream Deck 7.5.1 restart, and its UDP receiver is bound on port 9008 while TotalMix is running.
+- The corrected installed files report version `1.1.7.0`, and their runtime matches the corrected package. The preceding v1.1.7 build connected after a clean Stream Deck 7.5.1 restart, registered all four actions, and bound UDP port 9008 while TotalMix was running; loading the corrected runtime remains the restart check below.
 - The manifest plugin icons were corrected to the current required 256 × 256 and 512 × 512 PNG sizes before the final package was produced.
 - v1.1.7 adds the FiO console-style visual system, semantic key/touch-strip colors, dynamic SVG key artwork, dedicated monochrome SVG category/action icons, and Property Inspector validation.
 - The Mono preset now uses TotalMix's `/controlroom/mainmono` address. The previously configured `/controlroom/mono` address never received initial feedback and caused Stream Deck's error alert on the third key.

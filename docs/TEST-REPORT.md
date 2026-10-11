@@ -16,7 +16,7 @@ Native host: Stream Deck `7.5.1` build `22901` on macOS
 - Final package: 47,867 bytes; SHA-256 `f98a84de9e810de356f8d9761f5cb3d8f2221d9bfdc15b7d14bd99db3ad7a271`
 - Packaged manifest version `1.1.7.0`; SVG action/category assets, Property Inspector files, and dynamic SVG/semantic visual runtime are present
 - Manifest plugin icons verified at the current required 256 × 256 and 512 × 512 PNG sizes
-- Clean Stream Deck 7.5.1 restart loaded the v1.1.7 runtime: the plugin connected, all four actions registered, and UDP port 9008 was bound while TotalMix was running
+- A clean Stream Deck 7.5.1 restart loaded the preceding v1.1.7 runtime: the plugin connected, all four actions registered, and UDP port 9008 was bound while TotalMix was running; the corrected runtime still requires the restart check below
 - v1.1.6 regression coverage for momentary Talkback + Dim, Mono, TV SPDIF input mute, and SPDIF output mute
 - TotalMix FX 2.10 beta 4's installed Global OSC table exposes Control Room Mono as `mainmono`; the production preset and regression fixture now use `/controlroom/mainmono`
 - Regression coverage confirms Control Toggle keys clear the overflowing Stream Deck title layer while retaining the compact label in their dynamic SVG artwork
