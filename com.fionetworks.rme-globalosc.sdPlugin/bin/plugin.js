@@ -190,10 +190,58 @@ function showAlert(context) { sendSD("showAlert", context); }
 function setTitle(context, title) { sendSD("setTitle", context, {title, target: 0}); }
 function setState(context, state) { sendSD("setState", context, {state}); }
 function setImage(context, image) { sendSD("setImage", context, {image}); }
+function xml(value) {
+  return String(value).replace(/[&<>"']/g, char => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&apos;"}[char]));
+}
+function keyToken(inst) {
+  if (inst.action === ACTION_SNAPSHOT) return `S${integer(inst.settings.snapshot, 1, 1, 8)}`;
+  const preset = inst.settings.preset || "mainMute";
+  return ({
+    mainMute: "MAIN",
+    dim: "DIM",
+    mono: "MONO",
+    micMute: "MIC",
+    tvSpdifMute: "TV",
+    spdifOutMute: "SPDIF",
+    phonesMute: "PHONES",
+    mic48v: "48V",
+    talkback: "TALK"
+  })[preset] || "OSC";
+}
+function keyAccent(inst) {
+  if (inst.action === ACTION_SNAPSHOT) return "#c88cff";
+  const preset = inst.settings.preset || "mainMute";
+  return ({
+    mainMute: "#38d9ff",
+    dim: "#58e6a9",
+    mono: "#9aa8ff",
+    micMute: "#ffb84d",
+    tvSpdifMute: "#c88cff",
+    spdifOutMute: "#58e6a9",
+    phonesMute: "#9aa8ff",
+    mic48v: "#ff8e4d",
+    talkback: "#ff5d69"
+  })[preset] || "#38d9ff";
+}
+function keyImage(inst, active) {
+  const token = xml(keyToken(inst));
+  const accent = keyAccent(inst);
+  const bg = active ? accent : "#0b1118";
+  const fg = active ? "#071016" : "#edf4fb";
+  const ring = active ? "#ffffff" : accent;
+  const status = active ? "ON" : "OFF";
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
+    <rect x="5" y="5" width="134" height="134" rx="24" fill="${bg}" stroke="${ring}" stroke-width="5"/>
+    <rect x="17" y="17" width="110" height="5" rx="2.5" fill="${accent}"/>
+    <text x="72" y="77" text-anchor="middle" fill="${fg}" font-family="-apple-system,BlinkMacSystemFont,Arial,sans-serif" font-size="${token.length > 5 ? 23 : 29}" font-weight="750">${token}</text>
+    <text x="72" y="108" text-anchor="middle" fill="${active ? fg : "#8fa1b2"}" font-family="-apple-system,BlinkMacSystemFont,Arial,sans-serif" font-size="16" font-weight="650" letter-spacing="2">${status}</text>
+  </svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}
 function renderKeyState(inst, active) {
   const state = active ? 1 : 0;
   setState(inst.context, state);
-  setImage(inst.context, (inst.action === ACTION_SNAPSHOT ? SNAPSHOT_IMAGES : TOGGLE_IMAGES)[state]);
+  setImage(inst.context, keyImage(inst, active));
 }
 function accentForInstance(inst) {
   if (inst.action === ACTION_OUTPUT) {
@@ -498,10 +546,10 @@ async function configureInstance(msg, replacing = false) {
   if (inst.action === ACTION_OUTPUT || inst.action === ACTION_MIX) renderDial(inst, true);
   else if (inst.action === ACTION_TOGGLE) {
     setTitle(inst.context, toggleSpec(settings).label);
-    setImage(inst.context, TOGGLE_IMAGES[0]);
+    setImage(inst.context, keyImage(inst, false));
   } else if (inst.action === ACTION_SNAPSHOT) {
     setTitle(inst.context, `SNAP ${integer(settings.snapshot, 1, 1, 8)}`);
-    setImage(inst.context, SNAPSHOT_IMAGES[0]);
+    setImage(inst.context, keyImage(inst, false));
   }
   requestState(inst);
   inst.resyncAttempt = 0;
