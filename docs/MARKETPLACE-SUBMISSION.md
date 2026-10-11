@@ -33,6 +33,7 @@ Setup requires enabling one TotalMix Global OSC controller. The default local co
 - Momentary Talkback + Dim behavior.
 - Fixed Mono startup synchronization with TotalMix's current Global OSC address.
 - Kept Control Toggle labels inside the key artwork so long names no longer overflow.
+- Replaced generic ON/OFF captions with explicit mute, routing, power, Talkback, and snapshot states.
 - Bidirectional TotalMix Global OSC synchronization and existing control logic retained.
 
 ## Media package still required
@@ -79,7 +80,7 @@ v1.1.7 now uses dedicated monochrome SVG category/action icons and dynamic SVG k
 - [x] Install the exact packaged v1.1.7 build on the Mac.
 - [x] Confirm clean Stream Deck startup, plugin connection, action registration, and UDP receiver binding.
 - [x] Restart Stream Deck after the corrected package installation and confirm clean plugin connection, UDP binding, and TotalMix feedback traffic.
-- [ ] Visually confirm Mono initializes without an alert, Control Toggle labels fit inside their keys, and no controls remain stuck on `SYNCING`.
+- [ ] Reload the plugin after the final semantic-label package installation, then visually confirm Mono initializes without an alert, mute keys distinguish `MUTE OFF` from `MUTED`, Control Toggle labels fit inside their keys, and no controls remain stuck on `SYNCING`.
 - [ ] Perform short live acceptance check of the v1.1.7 visual changes and newly added controls.
 - [x] Verify manifest plugin PNG icon dimensions are exactly 256/512 px.
 - [ ] Create Marketplace 288 × 288 app icon.

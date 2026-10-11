@@ -11,6 +11,7 @@
 - Prepared Marketplace submission copy and a current publication checklist.
 - Corrected the Mono preset to TotalMix's `/controlroom/mainmono` Global OSC address so its initial state synchronizes and the key no longer raises an alert.
 - Removed Stream Deck's separate title overlay from Control Toggle keys; their compact dynamic SVG labels now remain inside the key artwork.
+- Replaced ambiguous generic ON/OFF captions with semantic states: mute keys show `MUTE OFF` or `MUTED`, while Dim, Mono, 48V, Talkback, and snapshot keys identify their actual operating state.
 - Other OSC routing, synchronization, and command semantics are unchanged.
 
 

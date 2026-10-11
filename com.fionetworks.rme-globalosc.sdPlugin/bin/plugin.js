@@ -223,18 +223,32 @@ function keyAccent(inst) {
     talkback: "#ff5d69"
   })[preset] || "#38d9ff";
 }
+function keyStatus(inst, active) {
+  if (inst.action === ACTION_SNAPSHOT) return active ? "ACTIVE" : "READY";
+  const preset = inst.settings.preset || "mainMute";
+  if (["mainMute", "micMute", "tvSpdifMute", "spdifOutMute", "phonesMute"].includes(preset)) {
+    return active ? "MUTED" : "MUTE OFF";
+  }
+  if (preset === "dim") return active ? "DIMMED" : "FULL";
+  if (preset === "mono") return active ? "MONO" : "STEREO";
+  if (preset === "mic48v") return active ? "48V ON" : "48V OFF";
+  if (preset === "talkback") return active ? "ACTIVE" : "READY";
+  return active ? "ON" : "OFF";
+}
 function keyImage(inst, active) {
   const token = xml(keyToken(inst));
   const accent = keyAccent(inst);
   const bg = active ? accent : "#0b1118";
   const fg = active ? "#071016" : "#edf4fb";
   const ring = active ? "#ffffff" : accent;
-  const status = active ? "ON" : "OFF";
+  const status = xml(keyStatus(inst, active));
+  const statusSize = status.length > 6 ? 13 : 16;
+  const statusSpacing = status.length > 6 ? 1 : 2;
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
     <rect x="5" y="5" width="134" height="134" rx="24" fill="${bg}" stroke="${ring}" stroke-width="5"/>
     <rect x="17" y="17" width="110" height="5" rx="2.5" fill="${accent}"/>
     <text x="72" y="77" text-anchor="middle" fill="${fg}" font-family="-apple-system,BlinkMacSystemFont,Arial,sans-serif" font-size="${token.length > 5 ? 23 : 29}" font-weight="750">${token}</text>
-    <text x="72" y="108" text-anchor="middle" fill="${active ? fg : "#8fa1b2"}" font-family="-apple-system,BlinkMacSystemFont,Arial,sans-serif" font-size="16" font-weight="650" letter-spacing="2">${status}</text>
+    <text x="72" y="108" text-anchor="middle" fill="${active ? fg : "#8fa1b2"}" font-family="-apple-system,BlinkMacSystemFont,Arial,sans-serif" font-size="${statusSize}" font-weight="650" letter-spacing="${statusSpacing}">${status}</text>
   </svg>`;
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }

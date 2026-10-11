@@ -7,12 +7,13 @@ Updated: 2026-10-11
 - v1.1.7 is merged to `main` as commit `bb7b2d5df110079cd4486d8caa34f451cfecf621`.
 - GitHub Actions run 19 passed the complete Node 24 automated test suite and current Elgato CLI validation for v1.1.7.
 - Local release-candidate validation on 2026-10-11 passed all three Node test suites and `streamdeck validate` with the current Elgato CLI.
-- The corrected v1.1.7 package was created from the release source, inspected against the source tree, and installed on the Mac. It is 47,867 bytes with SHA-256 `f98a84de9e810de356f8d9761f5cb3d8f2221d9bfdc15b7d14bd99db3ad7a271`.
-- The corrected installed files report version `1.1.7.0`, and their runtime matches the corrected package. A clean Stream Deck 7.5.1 restart on 2026-10-11 loaded that runtime: the plugin connected without a logged startup error, bound UDP port 9008, and exchanged more than 480 KB of feedback traffic with TotalMix during initial synchronization.
+- The corrected v1.1.7 package was created from the release source, inspected against the source tree, and installed on the Mac. It is 48,030 bytes with SHA-256 `c4b3dbc654cd5b2a591b4327f10862daa71109757b794c6190e366d56160bcfe`.
+- The corrected installed files report version `1.1.7.0`, and their runtime matches the corrected package. A clean Stream Deck 7.5.1 restart on 2026-10-11 loaded and verified the preceding Mono/overflow correction; the final semantic-label package is installed on disk and requires one plugin reload.
 - The manifest plugin icons were corrected to the current required 256 × 256 and 512 × 512 PNG sizes before the final package was produced.
 - v1.1.7 adds the FiO console-style visual system, semantic key/touch-strip colors, dynamic SVG key artwork, dedicated monochrome SVG category/action icons, and Property Inspector validation.
 - The Mono preset now uses TotalMix's `/controlroom/mainmono` address. The previously configured `/controlroom/mono` address never received initial feedback and caused Stream Deck's error alert on the third key.
 - Control Toggle keys clear Stream Deck's separate title overlay and use the compact label already rendered in their dynamic SVG artwork, preventing long labels from spilling outside the key.
+- Key state captions are semantic: mute controls show `MUTE OFF` or `MUTED`; Mono shows `STEREO` or `MONO`; Dim shows `FULL` or `DIMMED`; 48V, Talkback, and snapshots use similarly explicit states.
 - Other OSC routing, synchronization, and command semantics are unchanged.
 - v1.1.6 functionality remains included: Core Audio, Mic 1, TV SPDIF, SPDIF output, Mono, dedicated SPDIF mute controls, and momentary Talkback + Dim, while retaining the earlier general presets.
 
@@ -27,7 +28,7 @@ Updated: 2026-10-11
 
 ## Remaining release gate
 
-- Visually confirm the third key displays `MONO` without an alert, the compact toggle labels fit inside their keys, and all assigned controls leave `SYNCING`; the corrected runtime's restart, connection, UDP binding, and TotalMix traffic are confirmed, but current Codex Computer Use app approval does not expose the rendered Stream Deck UI.
+- Reload the plugin after the final semantic-label package installation, then visually confirm the third key displays `MONO` without an alert, mute keys distinguish `MUTE OFF` from `MUTED`, the compact labels fit inside their keys, and all assigned controls leave `SYNCING`.
 - Run the user's short live acceptance pass for the v1.1.7 visual changes and the new v1.1.6 controls that have not yet been physically rechecked.
 - Capture the required Marketplace app icon, thumbnail, gallery media, and hardware-integration demonstration video from the real installed build, then complete Maker Console submission.
 

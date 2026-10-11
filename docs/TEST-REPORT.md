@@ -13,13 +13,14 @@ Native host: Stream Deck `7.5.1` build `22901` on macOS
 - GitHub Actions release-candidate validation on 2026-10-10: Node 24 automated test suite PASS and Elgato CLI `streamdeck validate` PASS
 - Local release-candidate validation on 2026-10-11: all three `npm test` suites PASS and current Elgato CLI validation PASS
 - Corrected package created with `streamdeck pack --force --no-update-check`, inspected file-for-file against source, and installed on the Mac
-- Final package: 47,867 bytes; SHA-256 `f98a84de9e810de356f8d9761f5cb3d8f2221d9bfdc15b7d14bd99db3ad7a271`
+- Final package: 48,030 bytes; SHA-256 `c4b3dbc654cd5b2a591b4327f10862daa71109757b794c6190e366d56160bcfe`
 - Packaged manifest version `1.1.7.0`; SVG action/category assets, Property Inspector files, and dynamic SVG/semantic visual runtime are present
 - Manifest plugin icons verified at the current required 256 × 256 and 512 × 512 PNG sizes
-- A clean Stream Deck 7.5.1 restart on 2026-10-11 loaded the corrected v1.1.7 runtime: the plugin connected without a logged startup error, bound UDP port 9008, and exchanged more than 480 KB of feedback traffic with TotalMix during initial synchronization
+- A clean Stream Deck 7.5.1 restart on 2026-10-11 loaded and verified the preceding Mono/overflow correction; the final semantic-label package is installed on disk and requires one plugin reload
 - v1.1.6 regression coverage for momentary Talkback + Dim, Mono, TV SPDIF input mute, and SPDIF output mute
 - TotalMix FX 2.10 beta 4's installed Global OSC table exposes Control Room Mono as `mainmono`; the production preset and regression fixture now use `/controlroom/mainmono`
 - Regression coverage confirms Control Toggle keys clear the overflowing Stream Deck title layer while retaining the compact label in their dynamic SVG artwork
+- Regression coverage confirms mute controls distinguish `MUTE OFF` from `MUTED` instead of presenting an ambiguous generic OFF/ON state
 
 - JavaScript syntax checks for plugin and Property Inspector
 - Manifest schema and Elgato CLI validation with zero warnings
@@ -59,7 +60,7 @@ Native host: Stream Deck `7.5.1` build `22901` on macOS
 
 ## Remaining v1.1.7 release gate
 
-- Visually confirm Mono initializes without an alert, toggle labels fit inside their keys, and all assigned controls leave `SYNCING`; the corrected runtime is loaded and exchanging TotalMix traffic, but current Codex Computer Use app approval does not expose the rendered Stream Deck UI.
+- Reload the plugin after the final semantic-label package installation, then visually confirm Mono initializes without an alert, mute keys distinguish `MUTE OFF` from `MUTED`, toggle labels fit inside their keys, and all assigned controls leave `SYNCING`.
 - Perform the user's short live acceptance pass of the v1.1.7 visual changes and newly added v1.1.6 controls; previously validated controls do not require a full retest.
 
 ## Intentionally deferred safety/audio checks

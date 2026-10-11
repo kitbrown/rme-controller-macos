@@ -82,8 +82,18 @@ assert(ws.sent.some(message =>
 assert(ws.sent.some(message =>
   message.event === "setImage" &&
   message.context === "default-toggle" &&
-  message.payload.image.includes("MAIN")
-), "Control Toggle must render its compact label in the key artwork");
+  message.payload.image.includes("MAIN") &&
+  message.payload.image.includes("MUTE%20OFF")
+), "Control Toggle must show that Main is available while its mute is off");
+feedback.send(encode("/output/0/mute", 0), RECEIVE_PORT, HOST);
+await sleep(30);
+ws.message({event: "keyDown", action: "com.fionetworks.rme-globalosc.toggle", context: "default-toggle", payload: {}});
+await sleep(50);
+assert(ws.sent.some(message =>
+  message.event === "setImage" &&
+  message.context === "default-toggle" &&
+  message.payload.image.includes("MUTED")
+), "Control Toggle must identify the active Main state as MUTED");
 
 ws.message({event: "willDisappear", action: "com.fionetworks.rme-globalosc.toggle", context: "default-toggle", payload: {}});
 await sleep(20);
