@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.7.0
+
+- Added a distinctive FiO console-style Property Inspector theme.
+- Added semantic Stream Deck + touch-strip accent colors for Core Audio, Mic 1, TV SPDIF, Main, SPDIF output, and Phones.
+- Added dynamic SVG key artwork with clear per-function labels and live ON/OFF state styling.
+- Added dedicated monochrome SVG icons for the plugin category and each action, aligned with current Marketplace action-list guidance.
+- Added inline Property Inspector validation for host, UDP ports, dB ranges, and custom OSC paths.
+- Prepared Marketplace submission copy and a current publication checklist.
+- No OSC routing, synchronization, or command semantics changed.
+
+
 ## 1.1.6.0
 
 - Added user-focused presets for Core Audio playback, Mic 1, TV SPDIF input, and SPDIF output.
