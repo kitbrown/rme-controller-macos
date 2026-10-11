@@ -26,14 +26,18 @@ Updated: 2026-10-11
 - Elgato CLI validation passes without warnings in CI.
 - Prior live validation established Stream Deck / TotalMix startup, complete `/sendall` state, all six default encoder mappings, mute guards/red states, and Main/Phones/Mic/Dim button behavior.
 - The default transport is `127.0.0.1`, TotalMix port `7008`, plugin port `9008`.
+- Maker Console rejected the v1.1.7 manifest as SDK 2 / DRM disabled. The v1.1.8 candidate changes only `Version` and `SDKVersion`; all runtime and UI files are unchanged.
+- v1.1.8 passes all three automated suites and Stream Deck CLI 1.9.0 validation. Maker Console recognizes SDK 3 and DRM enabled.
+- The existing rejected 0.9 Marketplace draft is bound to legacy UUID `com.fionetworks.rme-totalmix-macos`. A clean-product upload accepts the current UUID `com.fionetworks.rme-globalosc`; its only remaining block is the product-name collision with the obsolete draft.
 
 ## Remaining Marketplace work
 
 - COMPLETE: publication copy, support/non-affiliation wording, AI disclosure, version/package identity, 288 px icon, 1920 × 960 thumbnail, three gallery templates and capture/video shot list are prepared in `marketplace/`.
 - REQUIRES CHRIS: real captures, hardware demo, final media/provenance review and explicit submission/publication approval.
-- COMPLETE in Maker Console: FiO Networks account and existing draft verified; listing and support/setup links saved; icon/thumbnail uploaded. v1.1.7.0 package parsed, notes staged, automatic publication off; no submission.
-- MAKER CONSOLE remaining: replace four legacy gallery items, resolve applicable 0.9 rejection feedback, then submit only with Chris approval; see `marketplace/MAKER-CONSOLE.md`.
-- Runtime/plugin source and the accepted package remain unchanged during publication preparation.
+- COMPLETE in Maker Console: FiO Networks account verified; listing and support/setup links saved; icon/thumbnail uploaded; v1.1.8 SDK 3/DRM compatibility and clean-product UUID acceptance verified. No submission.
+- REQUIRES CHRIS: authorize permanent deletion of the obsolete 0.9 draft and perform one installed-package smoke check of v1.1.8.
+- MAKER CONSOLE remaining: delete the obsolete draft after authorization, create the clean current-UUID product, add current gallery/video, and submit only with Chris approval; see `marketplace/MAKER-CONSOLE.md`.
+- Accepted v1.1.7 runtime behavior remains unchanged; v1.1.8 contains manifest metadata only.
 
 ## Intentionally deferred
 
@@ -43,4 +47,4 @@ Updated: 2026-10-11
 
 ## Source of truth
 
-The validated implementation is `com.fionetworks.rme-globalosc.sdPlugin` on current `main`. Older `com.chris.*` and legacy `rme-totalmix-macos` bundles are not release baselines.
+The validated implementation is `com.fionetworks.rme-globalosc.sdPlugin`. v1.1.8 adds Marketplace-only manifest metadata to the accepted v1.1.7 runtime. Older `com.chris.*` and legacy `rme-totalmix-macos` bundles are not release baselines.

@@ -2,14 +2,14 @@
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
   "UUID": "com.fionetworks.rme-globalosc",
   "Name": "RME Controller for macOS",
-  "Version": "1.1.7.0",
+  "Version": "1.1.8.0",
   "Author": "FiO Networks",
   "Description": "Bidirectional Stream Deck control for RME TotalMix FX using Global OSC.",
   "Icon": "imgs/plugin",
   "Category": "RME Controller for macOS",
   "CategoryIcon": "imgs/category",
   "CodePath": "bin/plugin.js",
-  "SDKVersion": 2,
+  "SDKVersion": 3,
   "Software": {
     "MinimumVersion": "7.1"
   },

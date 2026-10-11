@@ -8,6 +8,8 @@ Target runtime: Stream Deck Node.js `24.13.1`
 
 Native host: Stream Deck `7.5.1` build `22901` on macOS
 
+Marketplace metadata candidate: `1.1.8.0` changes only the manifest version and `SDKVersion` from 2 to 3. The accepted v1.1.7 runtime/UI bytes are unchanged.
+
 ## Passed
 
 - GitHub Actions release-candidate validation on 2026-10-10: Node 24 automated test suite PASS and Elgato CLI `streamdeck validate` PASS
@@ -22,6 +24,8 @@ Native host: Stream Deck `7.5.1` build `22901` on macOS
 - Regression coverage confirms Control Toggle keys clear the overflowing Stream Deck title layer while retaining the compact label in their dynamic SVG artwork
 - Regression coverage confirms mute controls distinguish `MUTE OFF` from `MUTED` instead of presenting an ambiguous generic OFF/ON state
 - User visual acceptance after the final plugin reload on 2026-10-11: visible controls work; no Mono alert, overflowing toggle label, or control stuck on `SYNCING` was reported
+- v1.1.8 metadata candidate: all three automated suites PASS; Stream Deck CLI 1.9.0 validation PASS; package size 48,030 bytes; SHA-256 `37c1966c3e3b719f2787186b12760d7c1464b29d717e54ae5b10ce922d362bdc`
+- Maker Console reports SDK compatibility Version 3 or later and DRM protection Yes for v1.1.8. The current UUID passes in a clean-product upload.
 
 - JavaScript syntax checks for plugin and Property Inspector
 - Manifest schema and Elgato CLI validation with zero warnings

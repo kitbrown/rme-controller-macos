@@ -1,6 +1,6 @@
-# Marketplace publication kit — v1.1.7
+# Marketplace publication kit — v1.1.8
 
-Prepared 2026-10-11. Runtime/plugin behavior is frozen. Start with [listing fields](LISTING.md), [capture checklist](CAPTURE-CHECKLIST.md), and [Maker Console steps](MAKER-CONSOLE.md).
+Prepared 2026-10-11. v1.1.8 changes only manifest metadata needed for Marketplace SDK 3/DRM checks; accepted v1.1.7 behavior remains frozen. Start with [listing fields](LISTING.md), [capture checklist](CAPTURE-CHECKLIST.md), and [Maker Console steps](MAKER-CONSOLE.md).
 
 ## COMPLETE
 
@@ -11,7 +11,7 @@ Prepared 2026-10-11. Runtime/plugin behavior is frozen. Start with [listing fiel
 - Three editable 1920 × 960 gallery SVG layouts and matching PNG previews in `templates/`.
 - Real screenshot/photo shot list and 1920 × 1080 demo sequence.
 - Existing FiO Networks draft verified; final description/support/setup links saved and icon/thumbnail uploaded.
-- Frozen package checksum verified; see [PACKAGE.md](PACKAGE.md).
+- SDK 3/DRM candidate packaged, checksummed, tested and accepted by the clean-product upload parser; see [PACKAGE.md](PACKAGE.md).
 
 ## REQUIRES CHRIS
 
@@ -19,19 +19,21 @@ Prepared 2026-10-11. Runtime/plugin behavior is frozen. Start with [listing fiel
 - Supply hardware demo footage; export 1920 × 1080 MP4.
 - Review final captures and confirm media rights and AI disclosure accuracy.
 - Locate prior 0.9 rejection feedback; it was not visible in the Console.
+- Authorize permanent deletion of the obsolete 0.9 draft so the exact product name can be reused with the current UUID.
+- Install and smoke-check the exact v1.1.8 candidate before submission.
 - Explicit approval before submission, and before publication.
 
 ## MAKER CONSOLE
 
-- Existing draft has rejected version 0.9 dated August 3, 2026. Its rejection reason was not visible; Chris must locate the review email before resubmission. A focused connected-mail search found no matching message.
+- Existing draft has rejected version 0.9 dated August 3, 2026 and owns the name but is bound to legacy UUID `com.fionetworks.rme-totalmix-macos`.
 - Replace all four legacy gallery images with current captures and demo. They contain obsolete visuals/claims (including three OSC controllers and a one-second 48V hold).
-- Stage v1.1.7.0 and release notes through Create version; package metadata parsed successfully, but this form has no separate Save draft control.
+- After Chris authorizes deletion, remove the obsolete draft and create a clean product from the v1.1.8 candidate. The clean wizard accepts its current UUID, SDK 3 and DRM status; only the duplicate name blocks continuation today.
 - Verify support/setup links, tags, AI disclosure and preview.
 - Disable automatic publication, save draft if available, stop before submission.
 
 ## Asset provenance and use
 
-Assets reuse the current repository’s category SVG mixer symbol and FiO dark/cyan palette from the Property Inspector. They contain no official RME or Elgato logo, no synthetic hardware, and no simulated application UI. Native SVG composition sources are retained; `source/render-assets.cjs` renders PNGs with Node and `sharp`. No dependency or runtime change was added to the plugin.
+Assets reuse the current repository’s category SVG mixer symbol and FiO dark/cyan palette from the Property Inspector. They contain no official RME or Elgato logo, no synthetic hardware, and no simulated application UI. Native SVG composition sources are retained; `source/render-assets.cjs` renders PNGs with Node and `sharp`.
 
 The icon and thumbnail are finished artwork. Templates are explicitly marked **TEMPLATE — NOT FOR UPLOAD** and must be filled with real captures. Older project artwork was inspected and excluded because it depicted an earlier interface; no usable current hardware captures were found in the inspected project folders. Chris’s media review remains necessary before submission.
 

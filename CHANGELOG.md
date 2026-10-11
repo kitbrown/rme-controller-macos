@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.8.0
+
+- Updated the manifest to Stream Deck SDK 3 so Maker Console can apply Marketplace DRM protection.
+- Kept the accepted v1.1.7 runtime, OSC mappings, synchronization, controls, and visual behavior unchanged.
+- Added the final Marketplace publication kit and recorded the verified Maker Console handoff.
+
 ## 1.1.7.0
 
 - Added a distinctive FiO console-style Property Inspector theme.
