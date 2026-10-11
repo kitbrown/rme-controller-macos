@@ -38,7 +38,7 @@ const MIX_PRESETS = {
 const TOGGLE_PRESETS = {
   mainMute: {label: "Main Mute", paths: ["/output/0/mute"]},
   dim: {label: "Dim", paths: ["/controlroom/dim"]},
-  mono: {label: "Mono", paths: ["/controlroom/mono"]},
+  mono: {label: "Mono", paths: ["/controlroom/mainmono"]},
   micMute: {label: "Mic 1 Mute", paths: ["/input/0/mute"]},
   tvSpdifMute: {label: "TV SPDIF Mute", paths: ["/input/8/mute"]},
   spdifOutMute: {label: "SPDIF Out Mute", paths: ["/output/8/mute"]},
@@ -545,7 +545,7 @@ async function configureInstance(msg, replacing = false) {
   }
   if (inst.action === ACTION_OUTPUT || inst.action === ACTION_MIX) renderDial(inst, true);
   else if (inst.action === ACTION_TOGGLE) {
-    setTitle(inst.context, toggleSpec(settings).label);
+    setTitle(inst.context, "");
     setImage(inst.context, keyImage(inst, false));
   } else if (inst.action === ACTION_SNAPSHOT) {
     setTitle(inst.context, `SNAP ${integer(settings.snapshot, 1, 1, 8)}`);

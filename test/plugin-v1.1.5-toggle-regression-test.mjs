@@ -77,8 +77,13 @@ await sleep(40);
 assert(ws.sent.some(message =>
   message.event === "setTitle" &&
   message.context === "default-toggle" &&
-  message.payload.title === "Main Mute"
-), "new Control Toggle must default to Main Mute");
+  message.payload.title === ""
+), "Control Toggle must suppress Stream Deck's overflowing title overlay");
+assert(ws.sent.some(message =>
+  message.event === "setImage" &&
+  message.context === "default-toggle" &&
+  message.payload.image.includes("MAIN")
+), "Control Toggle must render its compact label in the key artwork");
 
 ws.message({event: "willDisappear", action: "com.fionetworks.rme-globalosc.toggle", context: "default-toggle", payload: {}});
 await sleep(20);
@@ -108,7 +113,7 @@ assert(packets.some(packet => packet.address === "/controlroom/dim" && packet.va
   "Momentary Talkback must release Dim on keyUp");
 
 const presetCases = [
-  ["mono", "/controlroom/mono"],
+  ["mono", "/controlroom/mainmono"],
   ["tvSpdifMute", "/input/8/mute"],
   ["spdifOutMute", "/output/8/mute"]
 ];
@@ -131,5 +136,5 @@ for (const [preset, path] of presetCases) {
 
 totalMix.close();
 feedback.close();
-console.log("v1.1.6 toggle/layout regressions passed");
+console.log("v1.1.7 toggle/layout regressions passed");
 process.exit(0);

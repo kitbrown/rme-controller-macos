@@ -12,12 +12,14 @@ Native host: Stream Deck `7.5.1` build `22901` on macOS
 
 - GitHub Actions release-candidate validation on 2026-10-10: Node 24 automated test suite PASS and Elgato CLI `streamdeck validate` PASS
 - Local release-candidate validation on 2026-10-11: all three `npm test` suites PASS and current Elgato CLI validation PASS
-- Final package created with `streamdeck pack --force --no-update-check`, inspected file-for-file against source, and installed on the Mac
-- Final package: 47,869 bytes; SHA-256 `0c8676a0f642f4ffbe0601c4209e4561b8cfa5aa8367dbe367989e608439a9c9`
+- Corrected package created with `streamdeck pack --force --no-update-check`, inspected file-for-file against source, and installed on the Mac
+- Final package: 47,867 bytes; SHA-256 `f98a84de9e810de356f8d9761f5cb3d8f2221d9bfdc15b7d14bd99db3ad7a271`
 - Packaged manifest version `1.1.7.0`; SVG action/category assets, Property Inspector files, and dynamic SVG/semantic visual runtime are present
 - Manifest plugin icons verified at the current required 256 × 256 and 512 × 512 PNG sizes
 - Clean Stream Deck 7.5.1 restart loaded the v1.1.7 runtime: the plugin connected, all four actions registered, and UDP port 9008 was bound while TotalMix was running
 - v1.1.6 regression coverage for momentary Talkback + Dim, Mono, TV SPDIF input mute, and SPDIF output mute
+- TotalMix FX 2.10 beta 4's installed Global OSC table exposes Control Room Mono as `mainmono`; the production preset and regression fixture now use `/controlroom/mainmono`
+- Regression coverage confirms Control Toggle keys clear the overflowing Stream Deck title layer while retaining the compact label in their dynamic SVG artwork
 
 - JavaScript syntax checks for plugin and Property Inspector
 - Manifest schema and Elgato CLI validation with zero warnings
@@ -57,7 +59,7 @@ Native host: Stream Deck `7.5.1` build `22901` on macOS
 
 ## Remaining v1.1.7 release gate
 
-- Restart Stream Deck once after the final icon-size-only package replacement and visually confirm all assigned controls leave `SYNCING`; rendered hardware state is not exposed to the test sandbox.
+- Restart Stream Deck once after the corrected package installation and visually confirm Mono initializes without an alert, toggle labels fit inside their keys, and all assigned controls leave `SYNCING`; rendered hardware state is not exposed to the test sandbox.
 - Perform the user's short live acceptance pass of the v1.1.7 visual changes and newly added v1.1.6 controls; previously validated controls do not require a full retest.
 
 ## Intentionally deferred safety/audio checks

@@ -9,7 +9,9 @@
 - Updated the packaged plugin icon to the current 256 × 256 and 512 × 512 Marketplace sizes.
 - Added inline Property Inspector validation for host, UDP ports, dB ranges, and custom OSC paths.
 - Prepared Marketplace submission copy and a current publication checklist.
-- No OSC routing, synchronization, or command semantics changed.
+- Corrected the Mono preset to TotalMix's `/controlroom/mainmono` Global OSC address so its initial state synchronizes and the key no longer raises an alert.
+- Removed Stream Deck's separate title overlay from Control Toggle keys; their compact dynamic SVG labels now remain inside the key artwork.
+- Other OSC routing, synchronization, and command semantics are unchanged.
 
 
 ## 1.1.6.0
