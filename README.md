@@ -39,6 +39,10 @@ Press an encoder to mute or unmute its source/output. Rotation is ignored while 
 
 Buttons follow TotalMix feedback. Talkback + Dim is push-and-hold: press enables both paths and release disables both. Stereo 48V remains a linked two-path toggle.
 
+## Visual system
+
+The v1.1.7 release candidate adds a purpose-built FiO console theme. Key artwork is generated dynamically as SVG so each control is immediately recognizable and reflects live on/off state. Stream Deck + touch-strip feedback uses semantic accents for major sources and outputs while mute always overrides to a red warning state. Property Inspectors use a consistent dark console layout with inline validation.
+
 ## Synchronization
 
 - OSC state is applied when its UDP message arrives.
@@ -81,6 +85,6 @@ Phantom power can damage or stress incompatible connected equipment. Verify the 
 
 ## Status
 
-Version 1.1.6.0. The plugin is free. Support: chris@fionetworks.com.
+Version 1.1.7.0 release candidate. The plugin is free. Support: chris@fionetworks.com.
 
 RME, TotalMix, Elgato, and Stream Deck are trademarks of their respective owners. This independent project is not affiliated with or endorsed by RME Audio or Elgato.

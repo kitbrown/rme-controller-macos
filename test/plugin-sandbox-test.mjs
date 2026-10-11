@@ -189,7 +189,7 @@ await waitFor(() => count("/sendall") > toggleStateRequests, "toggle state reque
 sendFeedback(encode("/controlroom/dim", [], ["T"]));
 await waitFor(() => sdMessages("setState", "toggle").some(message => message.payload.state === 1), "boolean true toggle feedback missing");
 const toggleOnImage = sdMessages("setImage", "toggle").at(-1)?.payload.image;
-assert.match(toggleOnImage, /^data:image\/png;base64,/, "active toggle image must be an embedded PNG");
+assert.match(toggleOnImage, /^data:image\/svg\+xml,/, "active toggle image must be an embedded SVG");
 ws.message({ event: "keyDown", action: "com.fionetworks.rme-globalosc.toggle", context: "toggle", payload: {} });
 await waitFor(() => count("/controlroom/dim") === 1, "toggle command missing");
 assert.equal(latest("/controlroom/dim").values[0], 0);
@@ -208,7 +208,7 @@ sendFeedback(bundle([
 await waitFor(() => sdMessages("setFeedback", "output").some(message => message.payload.value?.value === "-7.3 dB"), "bundle volume feedback missing");
 await waitFor(() => sdMessages("setState", "toggle").some(message => message.payload.state === 0), "bundle boolean feedback missing");
 const toggleOffImage = sdMessages("setImage", "toggle").at(-1)?.payload.image;
-assert.match(toggleOffImage, /^data:image\/png;base64,/, "inactive toggle image must be an embedded PNG");
+assert.match(toggleOffImage, /^data:image\/svg\+xml,/, "inactive toggle image must be an embedded SVG");
 assert.notEqual(toggleOffImage, toggleOnImage, "active and inactive toggle artwork must differ");
 
 sendFeedback(Buffer.from([1, 2, 3, 4, 5]));

@@ -2,12 +2,12 @@
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
   "UUID": "com.fionetworks.rme-globalosc",
   "Name": "RME Controller for macOS",
-  "Version": "1.1.6.0",
+  "Version": "1.1.7.0",
   "Author": "FiO Networks",
   "Description": "Bidirectional Stream Deck control for RME TotalMix FX using Global OSC.",
   "Icon": "imgs/plugin",
   "Category": "RME Controller for macOS",
-  "CategoryIcon": "imgs/plugin",
+  "CategoryIcon": "imgs/category",
   "CodePath": "bin/plugin.js",
   "SDKVersion": 2,
   "Software": {
@@ -27,7 +27,7 @@
       "UUID": "com.fionetworks.rme-globalosc.outputvolume",
       "Name": "Output Volume",
       "Tooltip": "Control a TotalMix hardware output volume; press dial to mute.",
-      "Icon": "imgs/dial",
+      "Icon": "imgs/action-output",
       "Controllers": [
         "Encoder"
       ],
@@ -49,7 +49,7 @@
       "UUID": "com.fionetworks.rme-globalosc.mixfader",
       "Name": "Submix Fader",
       "Tooltip": "Control a source-to-output TotalMix submix fader.",
-      "Icon": "imgs/dial",
+      "Icon": "imgs/action-mix",
       "Controllers": [
         "Encoder"
       ],
@@ -71,7 +71,7 @@
       "UUID": "com.fionetworks.rme-globalosc.toggle",
       "Name": "Control Toggle",
       "Tooltip": "Control a documented TotalMix Global OSC boolean path.",
-      "Icon": "imgs/toggle",
+      "Icon": "imgs/action-toggle",
       "Controllers": [
         "Keypad"
       ],
@@ -92,7 +92,7 @@
       "UUID": "com.fionetworks.rme-globalosc.snapshot",
       "Name": "Snapshot",
       "Tooltip": "Recall a TotalMix snapshot.",
-      "Icon": "imgs/snapshot",
+      "Icon": "imgs/action-snapshot",
       "Controllers": [
         "Keypad"
       ],
