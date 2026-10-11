@@ -26,6 +26,7 @@ Marketplace metadata candidate: `1.1.8.0` changes only the manifest version and 
 - User visual acceptance after the final plugin reload on 2026-10-11: visible controls work; no Mono alert, overflowing toggle label, or control stuck on `SYNCING` was reported
 - v1.1.8 metadata candidate: all three automated suites PASS; Stream Deck CLI 1.9.0 validation PASS; package size 48,030 bytes; SHA-256 `37c1966c3e3b719f2787186b12760d7c1464b29d717e54ae5b10ce922d362bdc`
 - Maker Console reports SDK compatibility Version 3 or later and DRM protection Yes for v1.1.8. The current UUID passes in a clean-product upload.
+- Installed files match the exact v1.1.8 candidate archive file-for-file. Stream Deck 7.5.1 launched the plugin as version `1.1.8.0`, logged `[com.fionetworks.rme-globalosc] Plugin connected`, and the runtime bound UDP feedback port 9008. Physical dial/key confirmation is folded into the required real-media capture session.
 
 - JavaScript syntax checks for plugin and Property Inspector
 - Manifest schema and Elgato CLI validation with zero warnings

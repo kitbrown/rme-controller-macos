@@ -28,15 +28,18 @@ Updated: 2026-10-11
 - The default transport is `127.0.0.1`, TotalMix port `7008`, plugin port `9008`.
 - Maker Console rejected the v1.1.7 manifest as SDK 2 / DRM disabled. The v1.1.8 candidate changes only `Version` and `SDKVersion`; all runtime and UI files are unchanged.
 - v1.1.8 passes all three automated suites and Stream Deck CLI 1.9.0 validation. Maker Console recognizes SDK 3 and DRM enabled.
-- The existing rejected 0.9 Marketplace draft is bound to legacy UUID `com.fionetworks.rme-totalmix-macos`. A clean-product upload accepts the current UUID `com.fionetworks.rme-globalosc`; its only remaining block is the product-name collision with the obsolete draft.
+- Chris approved permanent removal of the obsolete rejected 0.9 Marketplace product, and it was deleted. A replacement draft now exists for current UUID `com.fionetworks.rme-globalosc` as Maker Console product `4805d54d-4d34-4f36-b392-e4f86172c12b`.
+- The replacement draft has the final description, English/Audio/Free details, support/setup links, icon and thumbnail. Its gallery and version table remain incomplete; no submission or publication occurred.
+- Installed files match the v1.1.8 candidate archive file-for-file. Stream Deck 7.5.1 launched it as version `1.1.8.0`, logged `Plugin connected`, and the plugin bound UDP port 9008.
 
 ## Remaining Marketplace work
 
 - COMPLETE: publication copy, support/non-affiliation wording, AI disclosure, version/package identity, 288 px icon, 1920 × 960 thumbnail, three gallery templates and capture/video shot list are prepared in `marketplace/`.
 - REQUIRES CHRIS: real captures, hardware demo, final media/provenance review and explicit submission/publication approval.
-- COMPLETE in Maker Console: FiO Networks account verified; listing and support/setup links saved; icon/thumbnail uploaded; v1.1.8 SDK 3/DRM compatibility and clean-product UUID acceptance verified. No submission.
-- REQUIRES CHRIS: authorize permanent deletion of the obsolete 0.9 draft and perform one installed-package smoke check of v1.1.8.
-- MAKER CONSOLE remaining: delete the obsolete draft after authorization, create the clean current-UUID product, add current gallery/video, and submit only with Chris approval; see `marketplace/MAKER-CONSOLE.md`.
+- COMPLETE in Maker Console: FiO Networks account verified; obsolete 0.9 product deleted with authorization; clean current-UUID draft created; listing and support/setup links saved; icon/thumbnail uploaded; v1.1.8 SDK 3/DRM compatibility verified. No submission.
+- COMPLETE locally: exact v1.1.8 startup, Stream Deck connection and UDP 9008 binding smoke checks.
+- REQUIRES CHRIS: confirm one physical dial and key during capture, then complete real gallery/video and final media/provenance review.
+- MAKER CONSOLE remaining: add current gallery/video, create the 1.1.8 version, disable automatic publication, and submit only with Chris approval; see `marketplace/MAKER-CONSOLE.md`.
 - Accepted v1.1.7 runtime behavior remains unchanged; v1.1.8 contains manifest metadata only.
 
 ## Intentionally deferred

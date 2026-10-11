@@ -15,4 +15,4 @@ Sources: [product guidelines](https://docs.elgato.com/guidelines/products/), [pl
 
 The published gallery guideline permits under 250 MB, but the authenticated Maker Console media form explicitly limits MP4 uploads to 50 MB. Follow the stricter live limit: export under 50 MB. Live limits also show icon 2 MB, thumbnail 5 MB and gallery PNG 10 MB. The description editor displays 4,000 characters; our 1,169-character plain-text description also meets the stricter published 1,500-character guideline. Elgato estimates 4–10 working days for review; timing is not guaranteed.
 
-Do not confuse the 288 px Marketplace icon with the packaged 256/512 px plugin icons. The latter already passed validation. Stream Deck + has a space before + in listing copy. The authenticated Console already contains this product name in FiO Networks; continue that existing draft.
+Do not confuse the 288 px Marketplace icon with the packaged 256/512 px plugin icons. The latter already passed validation. Stream Deck + has a space before + in listing copy. Continue the replacement FiO Networks draft created for the current UUID.

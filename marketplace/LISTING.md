@@ -17,7 +17,7 @@ Prepared 2026-10-11 from main `d363ff66ec3cbcff994fd6032e7150bae7c14ab3`.
 | Setup URL | https://github.com/kitbrown/rme-controller-macos#install |
 | Contact | chris@fionetworks.com (existing README contact) |
 
-Use `description.txt` (1169 characters excluding trailing newline) and `release-notes.txt`. The first 250 characters are plain text. Suggested tags, only where offered: Audio, macOS, Stream Deck +. The existing FiO Networks draft uses this exact product name; retain it. Live category is Audio, language English and monetization Free.
+Use `description.txt` (1169 characters excluding trailing newline) and `release-notes.txt`. The first 250 characters are plain text. Suggested tags, only where offered: Audio, macOS, Stream Deck +. The replacement FiO Networks draft uses this exact product name. Live category is Audio, language English and monetization Free.
 
 ## Support text
 
