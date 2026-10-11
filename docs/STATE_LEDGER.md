@@ -8,7 +8,7 @@ Updated: 2026-10-11
 - GitHub Actions run 19 passed the complete Node 24 automated test suite and current Elgato CLI validation for v1.1.7.
 - Local release-candidate validation on 2026-10-11 passed all three Node test suites and `streamdeck validate` with the current Elgato CLI.
 - The corrected v1.1.7 package was created from the release source, inspected against the source tree, and installed on the Mac. It is 47,867 bytes with SHA-256 `f98a84de9e810de356f8d9761f5cb3d8f2221d9bfdc15b7d14bd99db3ad7a271`.
-- The corrected installed files report version `1.1.7.0`, and their runtime matches the corrected package. The preceding v1.1.7 build connected after a clean Stream Deck 7.5.1 restart, registered all four actions, and bound UDP port 9008 while TotalMix was running; loading the corrected runtime remains the restart check below.
+- The corrected installed files report version `1.1.7.0`, and their runtime matches the corrected package. A clean Stream Deck 7.5.1 restart on 2026-10-11 loaded that runtime: the plugin connected without a logged startup error, bound UDP port 9008, and exchanged more than 480 KB of feedback traffic with TotalMix during initial synchronization.
 - The manifest plugin icons were corrected to the current required 256 × 256 and 512 × 512 PNG sizes before the final package was produced.
 - v1.1.7 adds the FiO console-style visual system, semantic key/touch-strip colors, dynamic SVG key artwork, dedicated monochrome SVG category/action icons, and Property Inspector validation.
 - The Mono preset now uses TotalMix's `/controlroom/mainmono` address. The previously configured `/controlroom/mono` address never received initial feedback and caused Stream Deck's error alert on the third key.
@@ -27,8 +27,7 @@ Updated: 2026-10-11
 
 ## Remaining release gate
 
-- Restart Stream Deck once after the corrected package installation, confirm the third key displays `MONO` without an alert, and confirm the compact toggle labels fit inside their keys; the sandbox cannot inspect the rendered hardware state.
-- Confirm all assigned controls leave `SYNCING` after that restart.
+- Visually confirm the third key displays `MONO` without an alert, the compact toggle labels fit inside their keys, and all assigned controls leave `SYNCING`; the corrected runtime's restart, connection, UDP binding, and TotalMix traffic are confirmed, but current Codex Computer Use app approval does not expose the rendered Stream Deck UI.
 - Run the user's short live acceptance pass for the v1.1.7 visual changes and the new v1.1.6 controls that have not yet been physically rechecked.
 - Capture the required Marketplace app icon, thumbnail, gallery media, and hardware-integration demonstration video from the real installed build, then complete Maker Console submission.
 
