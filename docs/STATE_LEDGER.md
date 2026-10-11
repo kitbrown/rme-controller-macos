@@ -8,7 +8,7 @@ Updated: 2026-10-11
 - GitHub Actions run 19 passed the complete Node 24 automated test suite and current Elgato CLI validation for v1.1.7.
 - Local release-candidate validation on 2026-10-11 passed all three Node test suites and `streamdeck validate` with the current Elgato CLI.
 - The corrected v1.1.7 package was created from the release source, inspected against the source tree, and installed on the Mac. It is 48,030 bytes with SHA-256 `c4b3dbc654cd5b2a591b4327f10862daa71109757b794c6190e366d56160bcfe`.
-- The corrected installed files report version `1.1.7.0`, and their runtime matches the corrected package. A clean Stream Deck 7.5.1 restart on 2026-10-11 loaded and verified the preceding Mono/overflow correction; the final semantic-label package is installed on disk and requires one plugin reload.
+- The corrected installed files report version `1.1.7.0`, and their runtime matches the corrected package. A clean Stream Deck 7.5.1 restart on 2026-10-11 loaded and verified the preceding Mono/overflow correction; the final semantic-label package was subsequently reloaded and accepted by the user, as recorded below.
 - The manifest plugin icons were corrected to the current required 256 × 256 and 512 × 512 PNG sizes before the final package was produced.
 - v1.1.7 adds the FiO console-style visual system, semantic key/touch-strip colors, dynamic SVG key artwork, dedicated monochrome SVG category/action icons, and Property Inspector validation.
 - The Mono preset now uses TotalMix's `/controlroom/mainmono` address. The previously configured `/controlroom/mono` address never received initial feedback and caused Stream Deck's error alert on the third key.
@@ -29,7 +29,11 @@ Updated: 2026-10-11
 
 ## Remaining Marketplace work
 
-- Capture the required Marketplace app icon, thumbnail, gallery media, and hardware-integration demonstration video from the real installed build, then complete Maker Console submission.
+- COMPLETE: publication copy, support/non-affiliation wording, AI disclosure, version/package identity, 288 px icon, 1920 × 960 thumbnail, three gallery templates and capture/video shot list are prepared in `marketplace/`.
+- REQUIRES CHRIS: real captures, hardware demo, final media/provenance review and explicit submission/publication approval.
+- COMPLETE in Maker Console: FiO Networks account and existing draft verified; listing and support/setup links saved; icon/thumbnail uploaded. v1.1.7.0 package parsed, notes staged, automatic publication off; no submission.
+- MAKER CONSOLE remaining: replace four legacy gallery items, resolve applicable 0.9 rejection feedback, then submit only with Chris approval; see `marketplace/MAKER-CONSOLE.md`.
+- Runtime/plugin source and the accepted package remain unchanged during publication preparation.
 
 ## Intentionally deferred
 

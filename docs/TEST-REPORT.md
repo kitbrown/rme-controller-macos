@@ -16,7 +16,7 @@ Native host: Stream Deck `7.5.1` build `22901` on macOS
 - Final package: 48,030 bytes; SHA-256 `c4b3dbc654cd5b2a591b4327f10862daa71109757b794c6190e366d56160bcfe`
 - Packaged manifest version `1.1.7.0`; SVG action/category assets, Property Inspector files, and dynamic SVG/semantic visual runtime are present
 - Manifest plugin icons verified at the current required 256 × 256 and 512 × 512 PNG sizes
-- A clean Stream Deck 7.5.1 restart on 2026-10-11 loaded and verified the preceding Mono/overflow correction; the final semantic-label package is installed on disk and requires one plugin reload
+- A clean Stream Deck 7.5.1 restart on 2026-10-11 loaded and verified the preceding Mono/overflow correction; the final semantic-label package was subsequently reloaded and visually accepted by the user, as recorded below
 - v1.1.6 regression coverage for momentary Talkback + Dim, Mono, TV SPDIF input mute, and SPDIF output mute
 - TotalMix FX 2.10 beta 4's installed Global OSC table exposes Control Room Mono as `mainmono`; the production preset and regression fixture now use `/controlroom/mainmono`
 - Regression coverage confirms Control Toggle keys clear the overflowing Stream Deck title layer while retaining the compact label in their dynamic SVG artwork
@@ -65,4 +65,4 @@ Native host: Stream Deck `7.5.1` build `22901` on macOS
 - Talkback + Dim multi-path enable/disable passes automated tests. Its audible routing and configured dim depth remain dependent on the user's TotalMix routing.
 - Long-duration unplug/replug soak testing remains operational monitoring rather than a release blocker.
 
-The tracked release artifact is the final package identified above. Broad manual hardware acceptance remains assigned to the user.
+The tracked release artifact is the final package identified above. User visual acceptance is recorded above. The specifically deferred safety/audio and soak checks remain deferred. Marketplace capture and publication review remain assigned to the user.

@@ -1,0 +1,10 @@
+Version 1.1.7
+
+• Added the FiO console-style Property Inspector with inline settings validation.
+• Added source-specific Stream Deck + touch-strip colors and dynamic key artwork.
+• Added dedicated monochrome category and action icons and updated plugin icon sizes.
+• Fixed Mono startup synchronization with TotalMix.
+• Fixed overflowing Control Toggle labels.
+• Added explicit states such as MUTE OFF/MUTED, STEREO/MONO and FULL/DIMMED.
+
+Includes the existing Core Audio, Mic 1, TV/SPDIF and SPDIF output presets and momentary Talkback + Dim introduced in 1.1.6. Other OSC routing, synchronization and command semantics are unchanged.
