@@ -8,7 +8,7 @@ Prepared 2026-10-11 from main `d363ff66ec3cbcff994fd6032e7150bae7c14ab3`.
 | Organization / manifest author | FiO Networks (account match verified) |
 | Price | Free |
 | Product type | Stream Deck plugin |
-| Public version / manifest version | 1.1.8 / 1.1.8.0 |
+| Public version / manifest version | 1.1.8 / 1.1.8.1 |
 | UUID | com.fionetworks.rme-globalosc |
 | Minimum platform | macOS 13; Stream Deck software 7.1 |
 | Hardware evidence | Fireface UCX II; Stream Deck 7.5.1; TotalMix FX 2.10 beta 4 |
@@ -17,7 +17,7 @@ Prepared 2026-10-11 from main `d363ff66ec3cbcff994fd6032e7150bae7c14ab3`.
 | Setup URL | https://github.com/kitbrown/rme-controller-macos#install |
 | Contact | chris@fionetworks.com (existing README contact) |
 
-Use `description.txt` (1169 characters excluding trailing newline) and `release-notes.txt`. The first 250 characters are plain text. Suggested tags, only where offered: Audio, macOS, Stream Deck +. The replacement FiO Networks draft uses this exact product name. Live category is Audio, language English and monetization Free.
+Use `description.txt` and `release-notes.txt`. The first 250 characters are plain text. Suggested tags, only where offered: Audio, macOS, Stream Deck +. The replacement FiO Networks draft uses this exact product name. Live category is Audio, language English and monetization Free.
 
 ## Support text
 
@@ -35,4 +35,4 @@ The short disclosure is already included in the public description. Also paste t
 
 ## Reviewer notes
 
-The Marketplace package is v1.1.8.0; see `PACKAGE.md`. Its runtime is byte-identical to the accepted v1.1.7.0 build; only version and SDK 3 manifest metadata changed for DRM compatibility. Global OSC must be enabled in TotalMix FX. Default loopback transport: TotalMix receives UDP 7008, plugin receives UDP 9008. Video must show real Fireface UCX II integration and feedback in both directions. Audible Talkback depends on TotalMix routing and dim settings. Phantom-power switching was not part of automated hardware QC. Long-duration unplug/replug testing remains deferred; do not describe it as completed.
+The Marketplace package is v1.1.8.1; see `PACKAGE.md`. Its runtime is byte-identical to the accepted v1.1.7.0 build; the package adds starter profiles plus version and SDK 3 manifest metadata; executable controls are unchanged. Global OSC must be enabled in TotalMix FX. Default loopback transport: TotalMix receives UDP 7008, plugin receives UDP 9008. Video must show real Fireface UCX II integration and feedback in both directions. Audible Talkback depends on TotalMix routing and dim settings. Phantom-power switching was not part of automated hardware QC. Long-duration unplug/replug testing remains deferred; do not describe it as completed.

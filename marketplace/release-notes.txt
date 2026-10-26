@@ -1,6 +1,7 @@
-Version 1.1.8
+Version 1.1.8 (build 1.1.8.1)
 
+• Added editable starter profiles for Stream Deck, Mini, XL, Neo, + and + XL, offered during first installation.
+• Includes configured mute, Dim, Mono, momentary Talkback, snapshots 1–8, and dial presets on compatible devices.
+• Existing user profiles are preserved; select the RME Starter layout to get started.
 • Added Stream Deck SDK 3 metadata for Marketplace DRM compatibility.
 • Preserved the accepted v1.1.7 runtime, OSC mappings, synchronization, controls and visual behavior.
-
-Includes the FiO console-style Property Inspector, source-specific Stream Deck + touch-strip colors, dynamic key artwork, explicit mute/Mono/Dim states and the v1.1.7 startup/label fixes.
