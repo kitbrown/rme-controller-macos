@@ -4,10 +4,13 @@ A bidirectional Stream Deck plugin for controlling RME TotalMix FX through Globa
 
 ## Install
 
-1. Download `release/com.fionetworks.rme-globalosc.streamDeckPlugin`.
+1. For the unpublished Marketplace candidate, download `marketplace/candidate/com.fionetworks.rme-globalosc.streamDeckPlugin`.
 2. Double-click the file and approve installation in Stream Deck.
 3. In TotalMix FX, enable an OSC controller in **Global OSC** mode.
 4. Use `127.0.0.1`, incoming port `7008`, and outgoing port `9008` in TotalMix.
+5. Accept **Install Profile(s)** when Stream Deck offers the included layouts. Select **RME Starter** for your device from the profile selector. Your existing profiles are preserved.
+
+Editable starter profiles are included for Stream Deck, Mini, XL, Neo, + and + XL. Dial layouts use touch-strip swipes to navigate pages; smaller key-only layouts include previous/next page keys. See [Starter profiles](docs/STARTER-PROFILES.md).
 
 The plugin actions default to the matching host and ports.
 
