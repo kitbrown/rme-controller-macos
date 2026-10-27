@@ -1,6 +1,6 @@
 import dgram from "node:dgram";
 import {readFileSync} from "node:fs";
-import {renderConsoleKey, renderLevelKey, renderStackKey} from "../ui/console-art.js";
+import {renderConsoleKey, renderLevelKey as drawLevelKey, renderStackKey} from "../ui/console-art.js";
 
 const PLUGIN_UUID = "com.fionetworks.rme-globalosc";
 const ACTION_OUTPUT = `${PLUGIN_UUID}.outputvolume`;
@@ -256,7 +256,7 @@ function levelKeyImage(inst) {
       position: inst.settings.stackPosition
     });
   }
-  return renderLevelKey({
+  return drawLevelKey({
     label: levelKeyLabel(inst.settings),
     value: inst.value === undefined ? "SYNC" : inst.muted === true ? "MUTED" : formatDb(inst.value),
     level: inst.value === undefined ? 0 : indicator(inst.settings, inst.value),
