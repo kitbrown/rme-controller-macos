@@ -7,13 +7,52 @@ window.connectElgatoStreamDeckSocket = (port, propertyInspectorUUID, registerEve
   ws.onopen = () => {
     ws.send(JSON.stringify({event: registerEvent, uuid}));
     fill(actionInfo.payload?.settings || {});
+    ws.send(JSON.stringify({event:"sendToPlugin",context:uuid,payload:{kind:"channelNames"}}));
   };
   ws.onmessage = e => {
     const m = JSON.parse(e.data);
     if (m.event === "didReceiveSettings") fill(m.payload?.settings || {});
+    if (m.event === "sendToPropertyInspector" && m.payload?.kind==="channelNames")
+      populateChannelPicker(m.payload.names||[]);
   };
 };
 
+function populateChannelPicker(names) {
+  const picker=document.querySelector("[data-channel-picker]");
+  if(!picker)return;
+  const type=document.querySelector("[data-setting='target']")?.value;
+  const allowed=type==="output"||!document.querySelector("[data-setting='target']") ?
+    picker.dataset.channelBuses.split(",") :
+    ["input","playback"];
+  const previous=picker.value;
+  picker.replaceChildren(new Option("Select a reported channel…",""));
+  for(const item of names) {
+    if(!allowed.includes(item.bus) || !Number.isInteger(item.index))continue;
+    picker.add(new Option(item.bus+" "+item.index+" · "+item.name,item.bus+":"+item.index));
+  }
+  if([...picker.options].some(o=>o.value===previous))picker.value=previous;
+}
+function useChannelPicker(picker) {
+  if(!picker.value)return;
+  const [bus,indexText]=picker.value.split(":"),index=Number(indexText);
+  if(!Number.isInteger(index)||index<0||index>999)return;
+  const preset=document.querySelector("[data-setting='preset']");
+  if(preset)preset.value="custom";
+  const target=document.querySelector("[data-setting='target']");
+  if(target)target.value=bus==="output"?"output":"mix";
+  const out=document.querySelector("[data-setting='outputIndex']");
+  const source=document.querySelector("[data-setting='sourceIndex']");
+  const sourceBus=document.querySelector("[data-setting='bus']");
+  if(bus==="output" && out)out.value=String(index);
+  if(bus!=="output" && source)source.value=String(index);
+  if(bus!=="output" && sourceBus)sourceBus.value=bus==="playback"?"playback":"in";
+  const title=document.querySelector("[data-setting='label']");
+  const option=picker.selectedOptions[0];
+  if(title && option)title.value=option.textContent.split(" · ").slice(1).join(" · ");
+  const follow=document.querySelector("[data-setting='followName']");
+  if(follow)follow.checked=true;
+  updateVisibility(); save();
+}
 function validationBox() {
   let box = document.getElementById("validation-message");
   if (box) return box;
@@ -151,7 +190,10 @@ function save() {
   ws.send(JSON.stringify({event:"setSettings", context:uuid, payload:settingsFromForm()}));
 }
 
-document.addEventListener("change", () => {
+document.addEventListener("change", event => {
+  if(event.target?.matches?.("[data-channel-picker]")) {
+    useChannelPicker(event.target);return;
+  }
   updateVisibility();
   save();
 });
