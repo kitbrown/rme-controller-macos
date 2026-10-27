@@ -130,7 +130,7 @@
       "UUID": "com.fionetworks.rme-globalosc.peakmeter",
       "Name": "Live Audio Peak Meter",
       "Tooltip": "Displays actual TotalMix audio peaks in dBFS on a seamless vertical stack of 1–4 keys. Display only.",
-      "Icon": "imgs/action-output",
+      "Icon": "imgs/action-meter",
       "Controllers": [
         "Keypad"
       ],
