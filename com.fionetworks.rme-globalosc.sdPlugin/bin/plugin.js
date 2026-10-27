@@ -8,6 +8,8 @@ const ACTION_MIX = `${PLUGIN_UUID}.mixfader`;
 const ACTION_TOGGLE = `${PLUGIN_UUID}.toggle`;
 const ACTION_SNAPSHOT = `${PLUGIN_UUID}.snapshot`;
 const ACTION_LEVEL_KEY = `${PLUGIN_UUID}.levelkey`;
+const ACTION_PEAK_METER = `${PLUGIN_UUID}.peakmeter`;
+const isMeter = inst => inst.action === ACTION_PEAK_METER || (inst.action === ACTION_LEVEL_KEY && levelKeyMode(inst.settings) === "meter");
 
 const DEFAULT_HOST = "127.0.0.1";
 const DEFAULT_SEND_PORT = 7008;
@@ -263,7 +265,7 @@ function keyImage(inst, active) {
   return renderConsoleKey({token: keyToken(inst), status: keyStatus(inst, active), accent: keyAccent(inst), active});
 }
 function levelKeyImage(inst) {
-  if (levelKeyMode(inst.settings) === "meter") {
+  if (isMeter(inst)) {
     return renderStackKey({
       level: meterIndicator(inst.settings, inst.peakValue),
       known: inst.peakValue !== undefined,
@@ -288,7 +290,7 @@ function flushLevelKey(inst) {
   inst.lastFeedbackAt = Date.now();
 }
 function renderLevelKey(inst, immediate = false) {
-  if (inst.action !== ACTION_LEVEL_KEY) return;
+  if (inst.action !== ACTION_LEVEL_KEY && inst.action !== ACTION_PEAK_METER) return;
   if (immediate || !inst.lastFeedbackAt || Date.now() - inst.lastFeedbackAt >= FEEDBACK_INTERVAL_MS) {
     clearTimeout(inst.feedbackTimer);
     flushLevelKey(inst);
@@ -466,6 +468,7 @@ function guardedValue(port, address, value) {
 function actionPaths(inst) {
   if (inst.action === ACTION_OUTPUT) return [outputPath(inst.settings), outputMutePath(inst.settings)];
   if (inst.action === ACTION_MIX) return [mixPath(inst.settings), mixMutePath(inst.settings)];
+  if (inst.action === ACTION_PEAK_METER) return meterPaths(inst.settings);
   if (inst.action === ACTION_LEVEL_KEY) return levelKeyMode(inst.settings) === "meter" ?
     meterPaths(inst.settings) : [levelKeyPath(inst.settings), levelKeyMutePath(inst.settings)];
   if (inst.action === ACTION_TOGGLE) return toggleSpec(inst.settings).paths;
@@ -482,8 +485,8 @@ function applyValueToMatching(port, address, rawValue) {
     } else if (inst.action === ACTION_MIX) {
       if (address === mixPath(inst.settings)) { inst.value = Number(rawValue); renderDial(inst); }
       else if (address === mixMutePath(inst.settings)) { inst.muted = Number(rawValue) > 0.5; renderDial(inst); }
-    } else if (inst.action === ACTION_LEVEL_KEY) {
-      if (levelKeyMode(inst.settings) === "meter") {
+    } else if (inst.action === ACTION_LEVEL_KEY || inst.action === ACTION_PEAK_METER) {
+      if (isMeter(inst)) {
         if (meterPaths(inst.settings).includes(address)) {
           inst.peakLevels.set(address, Number(rawValue));
           inst.peakValue = Math.max(...inst.peakLevels.values());
@@ -527,7 +530,7 @@ function requestState(inst) {
   const s = inst.settings;
   // Peak data is streamed by TotalMix when Send Level Messages is enabled.
   // /sendchan only fetches static channel parameters; it cannot request live peaks.
-  if (inst.action === ACTION_LEVEL_KEY && levelKeyMode(s) === "meter") return;
+  if (isMeter(inst)) return;
   if (inst.action === ACTION_OUTPUT) {
     sendPacket(s, `/sendchan/output/${outputSpec(s).outputIndex}`, 1);
   } else if (inst.action === ACTION_MIX || (inst.action === ACTION_LEVEL_KEY && levelKeyIsMix(s))) {
@@ -546,9 +549,10 @@ function isReady(inst, operation) {
     if (operation === "rotate") return inst.value !== undefined && (inst.settings.muteOnPress === false || inst.muted !== undefined);
     return inst.muted !== undefined;
   }
+  if (inst.action === ACTION_PEAK_METER) return true; // passive Global OSC /level stream
   if (inst.action === ACTION_LEVEL_KEY) {
     if (levelKeyMode(inst.settings) === "mute") return inst.muted !== undefined;
-    if (levelKeyMode(inst.settings) === "meter") return true; // passive stream: no polling
+    if (isMeter(inst)) return true; // passive stream: no polling
     return inst.value !== undefined && inst.muted !== undefined;
   }
   if (inst.action === ACTION_TOGGLE) {
@@ -635,7 +639,7 @@ async function configureInstance(msg, replacing = false) {
     else await acquireReceiver(newPort);
   }
   if (inst.action === ACTION_OUTPUT || inst.action === ACTION_MIX) renderDial(inst, true);
-  else if (inst.action === ACTION_LEVEL_KEY) {
+  else if (inst.action === ACTION_LEVEL_KEY || inst.action === ACTION_PEAK_METER) {
     setTitle(inst.context, "");
     renderLevelKey(inst, true);
   } else if (inst.action === ACTION_TOGGLE) {
@@ -708,9 +712,10 @@ function onKeyUp(msg) {
 function onKeyDown(msg) {
   const inst = instances.get(msg.context);
   if (!inst) return;
+  if (inst.action === ACTION_PEAK_METER) return; // Dedicated audio peak meter is always read-only.
   if (inst.action === ACTION_LEVEL_KEY) {
     const mode = levelKeyMode(inst.settings);
-    if (mode === "meter") return; // Visual-only monitor; no OSC side effects.
+    if (mode === "meter") return; // Legacy visual-only mode; no OSC side effects.
     if (!isReady(inst, "key")) return blockUntilReady(inst);
     if (mode === "mute") {
       sendCommand(inst, levelKeyMutePath(inst.settings), inst.muted ? 0 : 1);
