@@ -1,0 +1,23 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+:root{color-scheme:dark}body{padding:14px;color:#e9f1fb;background:#101822;font:13px -apple-system,Arial,sans-serif}
+section{padding:12px;margin-bottom:11px;border:1px solid #344657;border-radius:9px;background:#182432}
+h2{font-size:18px;margin:0 0 6px}h3{font-size:12px;margin:0 0 8px;color:#72dab5}
+label{display:block;margin:9px 0 4px}input,select{width:100%;box-sizing:border-box;background:#0a151f;color:white;border:1px solid #3d5264;border-radius:5px;padding:8px}
+p{font-size:11px;color:#a7bfcd;line-height:1.4}[hidden]{display:none!important}
+</style></head><body><section><h2>Control Toggle</h2><p>Feedback-driven state. Active keys turn red. Unsupported functions remain blocked until TotalMix reports their state.</p></section>
+<section><h3>Function</h3><label>Preset</label><select data-setting="preset">
+<option value="mainMute">Main Mute</option><option value="dim">Dim</option><option value="mono">Mono</option>
+<option value="micMute">Mic 1 Mute</option><option value="tvSpdifMute">TV SPDIF Input Mute</option><option value="spdifOutMute">SPDIF Output Mute</option>
+<option value="phonesMute">Phones 1 Mute</option><option value="mic48v">Analog 1/2 - 48V</option><option value="talkback">Talkback + Dim (hold)</option>
+<option value="eqEnable">Channel EQ</option><option value="dynEnable">Channel Dynamics</option><option value="lowcutEnable">Channel Low Cut</option>
+<option value="autoLevelEnable">Channel Auto Level</option><option value="reverbEnable">Global Reverb</option><option value="echoEnable">Global Echo</option>
+<option value="custom">Custom Global OSC toggle</option></select>
+<div data-show-processing="true"><label>Processing bus</label><select data-setting="processingBus">
+<option value="input">Hardware input</option><option value="output">Hardware output</option></select>
+<label>Channel index</label><input type="number" min="0" max="999" data-setting="processingIndex" value="0"></div>
+<div data-show-preset="custom"><label>Key title</label><input data-setting="title" value="Toggle"><label>OSC path</label><input data-setting="path" value="/controlroom/dim"></div>
+</section>
+<section><h3>OSC</h3><label>Host</label><input data-setting="host" value="127.0.0.1">
+<label>TotalMix receive port</label><input data-setting="sendPort" type="number" value="7008">
+<label>Plugin receive port</label><input data-setting="receivePort" type="number" value="9008"></section>
+<script src="common.js"></script></body></html>
