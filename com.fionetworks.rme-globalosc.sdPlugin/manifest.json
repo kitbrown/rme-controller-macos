@@ -86,7 +86,7 @@
           "Title": "ON"
         }
       ],
-      "PropertyInspectorPath": "ui/toggle.html"
+      "PropertyInspectorPath": "ui/toggle-advanced.html"
     },
     {
       "UUID": "com.fionetworks.rme-globalosc.snapshot",
