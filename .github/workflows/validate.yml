@@ -7,6 +7,7 @@ on:
     paths:
       - "com.fionetworks.rme-globalosc.sdPlugin/**"
       - "test/**"
+      - "tools/**"
       - "package.json"
       - ".github/workflows/validate.yml"
 
@@ -20,6 +21,10 @@ jobs:
           node-version: "24"
       - name: Run automated tests
         run: npm test
+      - name: Render app icons
+        run: |
+          npm install --no-save @resvg/resvg-js@2.6.2
+          node tools/render-console-icon.mjs
       - name: Install Stream Deck CLI
         run: npm install --global @elgato/cli@latest
       - name: Validate plugin
@@ -30,6 +35,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: console-surface-next-UNRELEASED
-          path: dist/*.streamDeckPlugin
+          path: |
+            dist/*.streamDeckPlugin
+            dist/console-marketplace-icon-288.png
           if-no-files-found: error
           retention-days: 14
