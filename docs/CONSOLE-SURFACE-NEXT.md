@@ -1,57 +1,46 @@
-# Console Surface — Unreleased Engineering Candidate
+# RME Console Surface — Unreleased Test Build 1.1.8.2
 
-**Branch:** `feature/console-surface-next`  
-**Production baseline:** v1.1.8.0, submitted to Elgato and left untouched.  
-**Version decision:** no new public release number has been assigned. The development manifest still identifies as v1.1.8.0; **do not publish or submit this package as that version**.
+Production version **1.1.8.0** remains unchanged and under Marketplace review. This branch is an independent candidate with a higher **test-only** version to prevent same-version installation conflicts; it is not a new public release.
 
 ## State ledger
 
-| Status | Statement |
+| Evidence | Statement |
 |---|---|
-| CONFIRMED | Development changes exist only on `feature/console-surface-next`. |
-| CONFIRMED | Elgato SDK 3 documents custom Stream Deck + 200×100 layouts, feedback data, and dynamic SVG keys. |
-| CONFIRMED | Old global OSC message mapping, routing and synchronization are retained. |
-| CONFIRMED | A new read-only meter mode uses 1–4 physical keys with no labels, tick marks, or horizontal boundaries. |
-| CONFIRMED | An identical vertical gradient is rendered across the configured key positions: physical bottom key is position 1, physical top is N. |
-| CONFIRMED | The meter represents **TotalMix fader position in dB** based on OSC feedback, not audio peak activity. |
-| CONFIRMED | The visual-only key mode sends no fader or mute commands on key presses. |
-| CONFIRMED | The plugin retains rate-limiting of display updates to approximately 10 per second per action. |
-| UNKNOWN | The actual visual continuity and latency when the glyphs are viewed through physical key spacing on the Stream Deck. |
-| UNKNOWN | Live hardware responsiveness with the user's TotalMix/UCX II and selected profile after installing this development candidate. |
-| REJECTED | Independent labels, discrete vertical meters, or separate colored displays on each stack key. |
-| REJECTED | Claims that this fader-value visualization reads live audio signal amplitude. |
-| REJECTED | Any change to the submitted production version before the Marketplace review concludes. |
+| CONFIRMED | `feature/console-surface-next` contains the premium mixer-console key artwork, custom dial feedback and new Live Channel Fader action. |
+| CONFIRMED | **Live audio meter** now uses TotalMix Global OSC **audio peak** paths: `/level/out/N`, `/level/in/N`, `/level/pb/N`. The previous `/output/N/volume` fader-position implementation is rejected. |
+| CONFIRMED | The selected channel and output/mix preset remain configurable per button; all OSC transport defaults are unchanged (`127.0.0.1`, `7008`, `9008`). |
+| CONFIRMED | The live meter draws a continuous, unlabeled vertical fill across 1–4 keys, bottom key position 1; the top is 0 dBFS, configurable meter floor defaults to -60 dBFS. |
+| CONFIRMED | Optional stereo mode displays the higher instantaneous peak of two consecutive absolute OSC channels. Selected channel-only mode remains available. |
+| CONFIRMED | Audio signal amplitude is separate from fader settings and mute states. A genuine 0 dBFS peak indicates clipping and turns the meter red. |
+| CONFIRMED | Visual meter actions are read-only and never send fader or mute commands. |
+| CONFIRMED | CI covers direct UDP /level readings, independent input/playback/output selectors, stereo aggregation, 3/4-key artwork, read-only safety, and original OSC regressions. |
+| CONFIRMED | Elgato CLI validation and packaging run through GitHub Actions on macOS. |
+| UNKNOWN | Actual device peak feedback rate, values, timing, image alignment and activity on this user's UCX II with the current TotalMix version. |
+| UNKNOWN | User acceptance of the new artwork and installed Property Inspector configuration. |
+| REJECTED | Displaying fader position as an audio meter, synthetic audio amplitude, per-key labels, or separate meters in the vertical stack. |
+| REJECTED | Publication or merge before device acceptance and explicit authorization. |
 
-## New actions and controls
+## Required TotalMix setup
 
-- **Live Channel Fader:** a single key can display the selected fader and be configured as a +step, −step or mute control. New **Visual meter — no key action** mode displays only.
-- **Continuous meter:** 1–4 copies of that action form one upright meter on any physically adjacent vertical key column. Each key monitors the same TotalMix channel and shows its assigned vertical slice. No shared physical position inference is required.
-- **Dial layout:** new custom touch-strip layout with channel name, dB readout, bar, and status line, while retaining the existing output and submix OSC mapping.
-- **Artwork:** dynamic console-surface action artwork is implemented in SVG, including mute feedback.
-- **Configuration:** preset mappings, customizable channel indices, level range and transport controls.
+Open **TotalMix FX → Options → Settings → OSC** for the **same** Global OSC remote controller configured with local incoming port **7008** and outgoing port **9008**. In **Details**, enable **Send Level Messages** (also referred to as Send Peak Level Data in some interfaces). Leave **Send changes** and **Send status** enabled. Enable OSC control from TotalMix Options.
 
-## Exact hardware configuration (3-key example)
+The meter depends on real streaming level feedback; static fader-state replies and `/sendall` are insufficient. No audio waveform capture or CoreAudio loopback is used.
 
-1. Save/export the current Stream Deck profile before installing **any** development build. This branch has the same UUID and manifest version as the existing release and may replace the locally installed plugin. It does not modify the Marketplace submission.
-2. Download the UNRELEASED candidate generated by the branch's successful GitHub Actions validation workflow. Do not install until ready to test.
-3. Place **Live Channel Fader** in one physically vertical column on three keys.
-4. On all three actions select the same target/preset, the same dB range (default −65 to +6), and **Visual meter — no key action**.
-5. On the **bottom key** set stack height **3**, position **1**. On the **middle key** set **3**, position **2**. On the **top key** set **3**, position **3**.
-6. Enable TotalMix **Global OSC**, receiving UDP **7008** and sending state feedback to UDP **9008** at **127.0.0.1**.
-7. Move the selected fader through minimum, midpoint, and maximum. Confirm fill begins at the bottom and continues smoothly upward, no text appears, and all three keys track the same fader.
-8. Test mute indication and verify pressing any of the three meter keys does not send control commands.
+## Three-key Live Audio Peak Meter
 
-## Release gates
+1. Export/back up the current Stream Deck profile. Installing the test candidate keeps the same plugin UUID and may replace the locally installed plugin.
+2. Install the CI-generated **UNRELEASED** candidate `1.1.8.2` when ready for hardware acceptance.
+3. On Page 3, place three **Live Channel Fader** actions on consecutive vertically aligned keys.
+4. For each: **Channel type** = Hardware output, **Preset** = Control Room — Main (or choose another source independently), **On key press** = Live audio peak meter, **Stack height** = 3, **Meter floor** = -60 dBFS, and **Meter channels** = Selected channel (or select Selected + next channel for stereo maximum). The three buttons must use matching source, meter floor, channels and transport settings.
+5. Set **Position in stack** to **3 top, 2 middle, 1 bottom**.
+6. Play audio and confirm meter animation follows the live audio, regardless of the fader's value (except when fader changes affect the actual post-fader output audio). Test stop/silence and near-clip, compare TotalMix's source/output peak meters, and test one/right stereo channel independently if stereo is selected.
+7. Verify the three meter buttons are read-only; no OSC control command is emitted when touched.
+8. Compare hardware update latency, key-to-key color continuity, and stability for 30 minutes before approving a candidate release.
 
-- All Node.js tests pass, including end-to-end UDP/OSC integration of three and four meter keys, and current Elgato CLI validation passes.
-- Review a physical Stream Deck recording demonstrating continuous meter movement and actual timing.
-- Confirm Property Inspector configuration behaves correctly on installed hardware.
-- Review premium app/Marketplace icon separately: the already submitted icon is not changed by this branch.
-- Assign a new release version only on the user's instruction, then package a version-distinct candidate for final acceptance.
-- Never submit or publish to Marketplace without separate explicit authorization.
+## Other actions
 
-## Primary current documentation
+Live Channel Fader also retains fader +step/−step/mute modes; only the display-only meter mode reads the peak OSC stream. Existing output volume dials, submix dials, toggles and snapshots keep their previously accepted OSC behavior.
 
-- https://docs.elgato.com/streamdeck/sdk/references/layouts/
-- https://docs.elgato.com/guidelines/stream-deck/plugins/
-- https://docs.elgato.com/streamdeck/cli/commands/pack/
+## Release and acceptance
+
+Automated simulation proves that correct OSC audio-peak packets drive the meter; it does **not** prove that a particular TotalMix installation is configured to send them. Confirm with the real Fireface UCX II before release. The new application icon remains a candidate for design/branding review. Do not merge, publish or submit without authorization.
