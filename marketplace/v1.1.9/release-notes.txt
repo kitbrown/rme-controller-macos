@@ -7,5 +7,6 @@ Version 1.1.9
 • Added optional live channel-name discovery and configurable channel selection where TotalMix reports names.
 • Updated mixer-console app icon, retained the accepted key design, and standardized active-red key indicators.
 • Preserved existing output/submix, mute, snapshots and transport behavior.
+• Restored six editable starter profiles; build 1.1.9.1 upgrades the 1.1.9.0 test candidate.
 
 Hardware support for advanced parameters varies by interface; controls require corresponding Global OSC feedback before adjustments are enabled.

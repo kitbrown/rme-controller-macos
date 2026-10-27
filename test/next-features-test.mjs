@@ -6,7 +6,7 @@ import {readFileSync} from "node:fs";
 
 const PLUGIN=process.argv[2];assert(PLUGIN);
 const M=JSON.parse(readFileSync("com.fionetworks.rme-globalosc.sdPlugin/manifest.json","utf8"));
-assert.equal(M.Version,"1.1.9.0");
+assert.equal(M.Version,"1.1.9.1");
 assert(M.Actions.some(a=>a.UUID.endsWith(".parameter")));
 assert(M.Actions.some(a=>a.UUID.endsWith(".diagnostic")));
 assert.equal(resolveParameter({paramKey:"eq1Gain",paramBus:"input",sourceIndex:1}).path,"/input/1/eq/band1gain");

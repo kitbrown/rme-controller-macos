@@ -1,3 +1,7 @@
+# Current release: v1.1.9
+
+Use [the v1.1.9 handoff](v1.1.9/MAKER-CONSOLE-UPLOAD.md), [validation](v1.1.9/VALIDATION.md), and [exact package identity](PACKAGE.md). The prior v1.1.8 notes below are historical.
+
 # Maker Console — observed state and remaining steps
 
 Checked live on 2026-10-11 after Chris signed in.

@@ -1,3 +1,7 @@
+# Current v1.1.9 listing
+
+Use `marketplace/v1.1.9/description.txt`, `marketplace/v1.1.9/release-notes.txt`, and the matching mixer-console assets in `marketplace/v1.1.9/assets/`. The prior listing guidance follows for provenance.
+
 # Marketplace listing — ready to paste
 
 Prepared 2026-10-11 from main `d363ff66ec3cbcff994fd6032e7150bae7c14ab3`.

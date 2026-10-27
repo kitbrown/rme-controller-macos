@@ -1,13 +1,9 @@
 # Marketplace candidate package
 
-Use `marketplace/candidate/com.fionetworks.rme-globalosc.streamDeckPlugin` for the new Marketplace product.
+Current authorized release: public **1.1.9**, manifest **1.1.9.1**.
 
-- Version: `1.1.8.0`; public release: `1.1.8`.
-- UUID: `com.fionetworks.rme-globalosc`.
-- Size: 48,030 bytes.
-- SHA-256: `37c1966c3e3b719f2787186b12760d7c1464b29d717e54ae5b10ce922d362bdc`.
-- Runtime baseline: accepted v1.1.7 on main `d363ff66ec3cbcff994fd6032e7150bae7c14ab3`.
+Use `marketplace/v1.1.9/candidate/com.fionetworks.rme-globalosc.streamDeckPlugin` (134,106 bytes).
 
-The only plugin change from v1.1.7 is manifest metadata: version `1.1.8.0` and `SDKVersion: 3`. The JavaScript runtime, Property Inspectors, icons, OSC mappings, and settings are byte-identical. All three automated suites and Stream Deck CLI 1.9.0 validation pass. Maker Console recognizes SDK 3 and DRM protection for this package. It does not read or modify packaged files at runtime, meeting the published DRM readiness constraints.
+SHA-256: `8b2b0f08db4327d9b4796a41c7203503bf19b60bc2315789cb0afe87e3a8cb0f`.
 
-The existing `release/` archive remains the accepted v1.1.7 hardware baseline. Do not upload it to Marketplace: Maker Console marks SDK 2 and DRM disabled as incompatible. The v1.1.8 candidate still needs one installed-package smoke check before submission.
+See [v1.1.9 validation](v1.1.9/VALIDATION.md) and [Maker Console handoff](v1.1.9/MAKER-CONSOLE-UPLOAD.md). The older root `marketplace/candidate/` v1.1.8.1 archive and `release/` v1.1.7 archive are historical and must not be uploaded for this release.

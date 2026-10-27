@@ -1,3 +1,18 @@
+# v1.1.9 Maker Console submission checkpoint
+
+User authorization: restore starter profiles, verify connected hardware, and submit v1.1.9 with new icons; preserve controls and keep automatic publication OFF.
+
+- Exact candidate: `marketplace/v1.1.9/candidate/com.fionetworks.rme-globalosc.streamDeckPlugin`, manifest 1.1.9.1, 134,106 bytes.
+- SHA-256: `8b2b0f08db4327d9b4796a41c7203503bf19b60bc2315789cb0afe87e3a8cb0f`.
+- Existing product: https://maker.elgato.com/8e915638-e18c-4e54-a55d-3b2f206fa00a/products/4805d54d-4d34-4f36-b392-e4f86172c12b
+- Source base and scoped test results: [VALIDATION.md](VALIDATION.md).
+- Console recognition confirmed: SDK 3 or later, DRM Yes, default profiles Yes, + dials Yes.
+- New icon, matching thumbnail/cover, description and release notes prepared. Existing real media retained.
+- Automatic publication OFF.
+- Current action boundary: final console verification, then the explicitly authorized Submit for Review. Do not publish.
+
+## Earlier handoff (historical)
+
 # RME Controller for macOS — v1.1.9 Maker Console upload handoff
 
 Updated 2026-10-27. Author: Chris W. Brown. Work product: CONFIDENTIAL, FiO Networks. This is a **DRAFT UPLOAD** handoff; it is not a claim of a completed Elgato upload or hardware acceptance.
