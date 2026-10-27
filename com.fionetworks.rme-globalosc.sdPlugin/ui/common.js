@@ -37,9 +37,23 @@ function fill(s) {
 }
 
 function updateVisibility() {
+  const target = document.querySelector("[data-setting='target']")?.value;
+  const presetSelect = document.querySelector("[data-setting='preset']");
+  if (target && presetSelect) {
+    for (const option of presetSelect.options) {
+      if (option.dataset.target) option.hidden = option.dataset.target !== target && option.dataset.target !== "both";
+    }
+    if (presetSelect.selectedOptions[0]?.hidden) {
+      const first = [...presetSelect.options].find(option => !option.hidden);
+      if (first) presetSelect.value = first.value;
+    }
+  }
+  document.querySelectorAll("[data-show-target]").forEach(el => { el.hidden = target !== el.dataset.showTarget; });
+  const mode = document.querySelector("[data-setting='keyMode']")?.value;
+  document.querySelectorAll("[data-show-mode]").forEach(el => { el.hidden = mode !== el.dataset.showMode; });
+  document.querySelectorAll("[data-hide-mode]").forEach(el => { el.hidden = mode === el.dataset.hideMode; });
   document.querySelectorAll("[data-show-preset]").forEach(el => {
-    const preset = document.querySelector("[data-setting='preset']")?.value;
-    el.hidden = preset !== el.dataset.showPreset;
+    el.hidden = presetSelect?.value !== el.dataset.showPreset;
   });
 }
 
@@ -75,6 +89,35 @@ function validate() {
     }
   }
 
+  const step = document.querySelector("[data-setting='stepDb']");
+  if (step && (!Number.isFinite(Number(step.value)) || Number(step.value) <= 0 || Number(step.value) > 24)) {
+    errors.push("dB step must be greater than 0 and no more than 24.");
+    step.style.borderColor = "#ff5d69";
+  }
+  for (const name of ["outputIndex", "sourceIndex"]) {
+    const el = document.querySelector(`[data-setting='${name}']`);
+    if (!el) continue;
+    const value = Number(el.value);
+    if (!Number.isInteger(value) || value < 0 || value > 999) {
+      errors.push(`${name} must be a whole index from 0 to 999.`);
+      el.style.borderColor = "#ff5d69";
+    }
+  }
+  const segments = document.querySelector("[data-setting='stackSegments']");
+  const position = document.querySelector("[data-setting='stackPosition']");
+  if ((!document.querySelector("[data-setting='keyMode']") ||
+     document.querySelector("[data-setting='keyMode']").value === "meter") &&
+     segments && position && Number(position.value) > Number(segments.value)) {
+    errors.push("Stack position cannot exceed stack height.");
+    position.style.borderColor = "#ff5d69";
+  }
+  const floor = document.querySelector("[data-setting='meterFloorDb']");
+  if (floor && (!document.querySelector("[data-setting='keyMode']") ||
+      document.querySelector("[data-setting='keyMode']").value === "meter") &&
+      (!Number.isFinite(Number(floor.value)) || Number(floor.value) < -120 || Number(floor.value) > -6)) {
+    errors.push("Audio meter floor must be between -120 and -6 dBFS.");
+    floor.style.borderColor = "#ff5d69";
+  }
   const min = document.querySelector("[data-setting='minDb']");
   const max = document.querySelector("[data-setting='maxDb']");
   if (min && max && Number(min.value) >= Number(max.value)) {

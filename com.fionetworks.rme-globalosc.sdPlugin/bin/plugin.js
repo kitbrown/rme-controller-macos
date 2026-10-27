@@ -1,11 +1,15 @@
 import dgram from "node:dgram";
 import {readFileSync} from "node:fs";
+import {renderConsoleKey, renderLevelKey as drawLevelKey, renderStackKey} from "../ui/console-art.js";
 
 const PLUGIN_UUID = "com.fionetworks.rme-globalosc";
 const ACTION_OUTPUT = `${PLUGIN_UUID}.outputvolume`;
 const ACTION_MIX = `${PLUGIN_UUID}.mixfader`;
 const ACTION_TOGGLE = `${PLUGIN_UUID}.toggle`;
 const ACTION_SNAPSHOT = `${PLUGIN_UUID}.snapshot`;
+const ACTION_LEVEL_KEY = `${PLUGIN_UUID}.levelkey`;
+const ACTION_PEAK_METER = `${PLUGIN_UUID}.peakmeter`;
+const isMeter = inst => inst.action === ACTION_PEAK_METER || (inst.action === ACTION_LEVEL_KEY && levelKeyMode(inst.settings) === "meter");
 
 const DEFAULT_HOST = "127.0.0.1";
 const DEFAULT_SEND_PORT = 7008;
@@ -26,7 +30,8 @@ const SNAPSHOT_IMAGES = [pngDataUri("../imgs/snapshot.png"), pngDataUri("../imgs
 const OUTPUT_PRESETS = {
   main: {label: "Main", outputIndex: 0},
   phones1: {label: "Phones 1", outputIndex: 6},
-  spdif: {label: "SPDIF Out", outputIndex: 8}
+  spdif: {label: "SPDIF Out", outputIndex: 8},
+  spdifOut: {label: "SPDIF Out", outputIndex: 8}
 };
 const MIX_PRESETS = {
   input12: {label: "Analog 1/2 In", bus: "in", sourceIndex: 0, outputIndex: 0},
@@ -105,6 +110,27 @@ function toggleSpec(s = {}) {
   };
 }
 function toggleFeedbackPaths(spec) { return spec.feedbackPaths || spec.paths; }
+function levelKeyIsMix(s) { return s.target === "mix"; }
+function levelKeyPath(s) { return levelKeyIsMix(s) ? mixPath(s) : outputPath(s); }
+function levelKeyMutePath(s) { return levelKeyIsMix(s) ? mixMutePath(s) : outputMutePath(s); }
+function levelKeyLabel(s) { return typeof s.label === "string" && s.label.trim() ? s.label.trim() : (levelKeyIsMix(s) ? mixSpec(s).label : outputSpec(s).label); }
+function levelKeyMode(s) { return ["up","down","mute","meter"].includes(s.keyMode) ? s.keyMode : "up"; }
+// RME Global OSC live peak-level paths, independent of the channel's fader position.
+// A stereo meter displays the maximum of the selected and following channel.
+function meterPaths(s) {
+  const base = levelKeyIsMix(s) ?
+    `/level/${mixSpec(s).bus === "playback" ? "pb" : "in"}/${mixSpec(s).sourceIndex}` :
+    `/level/out/${outputSpec(s).outputIndex}`;
+  if (s.meterChannels !== "stereo") return [base];
+  const parts = base.split("/");
+  parts[3] = String(Number(parts[3]) + 1);
+  return [base, parts.join("/")];
+}
+function meterIndicator(s, value) {
+  const floor = Math.max(-120, Math.min(-6, finite(s.meterFloorDb, -60)));
+  if (value === undefined || Number.isNaN(value)) return 0;
+  return Math.max(0, Math.min(100, ((value - floor) / (-floor)) * 100));
+}
 function outputPath(s) { return `/output/${outputSpec(s).outputIndex}/volume`; }
 function outputMutePath(s) { return `/output/${outputSpec(s).outputIndex}/mute`; }
 function mixPath(s) {
@@ -208,20 +234,16 @@ function keyToken(inst) {
     talkback: "TALK"
   })[preset] || "OSC";
 }
+// Fixed idle colors by functional key family; all engaged keys render red.
+// Snapshot: purple, mute: blue, other toggles (Dim/Mono/Talkback/48V): green.
 function keyAccent(inst) {
   if (inst.action === ACTION_SNAPSHOT) return "#c88cff";
-  const preset = inst.settings.preset || "mainMute";
-  return ({
-    mainMute: "#38d9ff",
-    dim: "#58e6a9",
-    mono: "#9aa8ff",
-    micMute: "#ffb84d",
-    tvSpdifMute: "#c88cff",
-    spdifOutMute: "#58e6a9",
-    phonesMute: "#9aa8ff",
-    mic48v: "#ff8e4d",
-    talkback: "#ff5d69"
-  })[preset] || "#38d9ff";
+  const preset = inst.settings.preset || ((typeof inst.settings.path === "string" || typeof inst.settings.title === "string") ? "custom" : "mainMute");
+  if (["mainMute", "micMute", "tvSpdifMute", "spdifOutMute", "phonesMute"].includes(preset) ||
+      (preset === "custom" && toggleSpec(inst.settings).paths.some(path => path.endsWith("/mute")))) {
+    return "#38d9ff";
+  }
+  return "#58e6a9";
 }
 function keyStatus(inst, active) {
   if (inst.action === ACTION_SNAPSHOT) return active ? "ACTIVE" : "READY";
@@ -236,21 +258,41 @@ function keyStatus(inst, active) {
   return active ? "ON" : "OFF";
 }
 function keyImage(inst, active) {
-  const token = xml(keyToken(inst));
-  const accent = keyAccent(inst);
-  const bg = active ? accent : "#0b1118";
-  const fg = active ? "#071016" : "#edf4fb";
-  const ring = active ? "#ffffff" : accent;
-  const status = xml(keyStatus(inst, active));
-  const statusSize = status.length > 6 ? 13 : 16;
-  const statusSpacing = status.length > 6 ? 1 : 2;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
-    <rect x="5" y="5" width="134" height="134" rx="24" fill="${bg}" stroke="${ring}" stroke-width="5"/>
-    <rect x="17" y="17" width="110" height="5" rx="2.5" fill="${accent}"/>
-    <text x="72" y="77" text-anchor="middle" fill="${fg}" font-family="-apple-system,BlinkMacSystemFont,Arial,sans-serif" font-size="${token.length > 5 ? 23 : 29}" font-weight="750">${token}</text>
-    <text x="72" y="108" text-anchor="middle" fill="${active ? fg : "#8fa1b2"}" font-family="-apple-system,BlinkMacSystemFont,Arial,sans-serif" font-size="${statusSize}" font-weight="650" letter-spacing="${statusSpacing}">${status}</text>
-  </svg>`;
-  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+  return renderConsoleKey({token: keyToken(inst), status: keyStatus(inst, active), accent: keyAccent(inst), active});
+}
+function levelKeyImage(inst) {
+  if (isMeter(inst)) {
+    return renderStackKey({
+      level: meterIndicator(inst.settings, inst.peakValue),
+      known: inst.peakValue !== undefined,
+      clipped: inst.peakValue >= 0,
+      segments: inst.settings.stackSegments,
+      position: inst.settings.stackPosition
+    });
+  }
+  return drawLevelKey({
+    label: levelKeyLabel(inst.settings),
+    value: inst.value === undefined ? "SYNC" : inst.muted === true ? "MUTED" : formatDb(inst.value),
+    level: inst.value === undefined ? 0 : indicator(inst.settings, inst.value),
+    muted: inst.muted === true,
+    mode: levelKeyMode(inst.settings),
+    mix: levelKeyIsMix(inst.settings)
+  });
+}
+function flushLevelKey(inst) {
+  inst.feedbackTimer = null;
+  if (!instances.has(inst.context)) return;
+  setImage(inst.context, levelKeyImage(inst));
+  inst.lastFeedbackAt = Date.now();
+}
+function renderLevelKey(inst, immediate = false) {
+  if (inst.action !== ACTION_LEVEL_KEY && inst.action !== ACTION_PEAK_METER) return;
+  if (immediate || !inst.lastFeedbackAt || Date.now() - inst.lastFeedbackAt >= FEEDBACK_INTERVAL_MS) {
+    clearTimeout(inst.feedbackTimer);
+    flushLevelKey(inst);
+  } else if (!inst.feedbackTimer) {
+    inst.feedbackTimer = setTimeout(() => flushLevelKey(inst), FEEDBACK_INTERVAL_MS - (Date.now() - inst.lastFeedbackAt));
+  }
 }
 function renderKeyState(inst, active) {
   const state = active ? 1 : 0;
@@ -289,6 +331,11 @@ function feedbackPayload(inst) {
       background,
       bar_bg_c: muted ? "#5a171c" : "#13202b",
       bar_fill_c: accent
+    },
+    status: {
+      value: muted ? "MUTE ACTIVE" : inst.value === undefined ? "AWAITING OSC FEEDBACK" : inst.action === ACTION_MIX ? "SUBMIX SEND LEVEL" : "HARDWARE OUTPUT LEVEL",
+      color: muted ? "#ffbabd" : "#9ab0c0",
+      background
     }
   };
 }
@@ -417,6 +464,9 @@ function guardedValue(port, address, value) {
 function actionPaths(inst) {
   if (inst.action === ACTION_OUTPUT) return [outputPath(inst.settings), outputMutePath(inst.settings)];
   if (inst.action === ACTION_MIX) return [mixPath(inst.settings), mixMutePath(inst.settings)];
+  if (inst.action === ACTION_PEAK_METER) return meterPaths(inst.settings);
+  if (inst.action === ACTION_LEVEL_KEY) return levelKeyMode(inst.settings) === "meter" ?
+    meterPaths(inst.settings) : [levelKeyPath(inst.settings), levelKeyMutePath(inst.settings)];
   if (inst.action === ACTION_TOGGLE) return toggleSpec(inst.settings).paths;
   if (inst.action === ACTION_SNAPSHOT) return [`/snapshot/load/${integer(inst.settings.snapshot, 1, 1, 8)}`];
   return [];
@@ -431,6 +481,18 @@ function applyValueToMatching(port, address, rawValue) {
     } else if (inst.action === ACTION_MIX) {
       if (address === mixPath(inst.settings)) { inst.value = Number(rawValue); renderDial(inst); }
       else if (address === mixMutePath(inst.settings)) { inst.muted = Number(rawValue) > 0.5; renderDial(inst); }
+    } else if (inst.action === ACTION_LEVEL_KEY || inst.action === ACTION_PEAK_METER) {
+      if (isMeter(inst)) {
+        if (meterPaths(inst.settings).includes(address)) {
+          inst.peakLevels.set(address, Number(rawValue));
+          inst.peakValue = Math.max(...inst.peakLevels.values());
+          renderLevelKey(inst);
+        }
+      } else if (address === levelKeyPath(inst.settings)) {
+        inst.value = Number(rawValue); renderLevelKey(inst);
+      } else if (address === levelKeyMutePath(inst.settings)) {
+        inst.muted = Number(rawValue) > 0.5; renderLevelKey(inst);
+      }
     } else if (inst.action === ACTION_TOGGLE) {
       const spec = toggleSpec(inst.settings);
       if (spec.paths.includes(address)) {
@@ -453,7 +515,7 @@ function handleOsc(port, message) {
     for (const inst of instances.values()) if (matchesReceiver(inst, port)) inst.connected = message.args[0] > 0.5;
     return;
   }
-  if (typeof message.args[0] !== "number") return;
+  if (typeof message.args[0] !== "number" || Number.isNaN(message.args[0])) return;
   const value = guardedValue(port, message.address, message.args[0]);
   if (value === undefined) return;
   applyValueToMatching(port, message.address, value);
@@ -462,12 +524,17 @@ function handleOsc(port, message) {
 function requestState(inst) {
   if (!instances.has(inst.context)) return;
   const s = inst.settings;
+  // Peak data is streamed by TotalMix when Send Level Messages is enabled.
+  // /sendchan only fetches static channel parameters; it cannot request live peaks.
+  if (isMeter(inst)) return;
   if (inst.action === ACTION_OUTPUT) {
     sendPacket(s, `/sendchan/output/${outputSpec(s).outputIndex}`, 1);
-  } else if (inst.action === ACTION_MIX) {
+  } else if (inst.action === ACTION_MIX || (inst.action === ACTION_LEVEL_KEY && levelKeyIsMix(s))) {
     const x = mixSpec(s);
     sendPacket(s, `/sendchan/${x.bus === "playback" ? "playback" : "input"}/${x.sourceIndex}`, 1);
     requestGlobalState(s);
+  } else if (inst.action === ACTION_LEVEL_KEY) {
+    sendPacket(s, `/sendchan/output/${outputSpec(s).outputIndex}`, 1);
   } else {
     requestGlobalState(s);
   }
@@ -477,6 +544,12 @@ function isReady(inst, operation) {
   if (inst.action === ACTION_OUTPUT || inst.action === ACTION_MIX) {
     if (operation === "rotate") return inst.value !== undefined && (inst.settings.muteOnPress === false || inst.muted !== undefined);
     return inst.muted !== undefined;
+  }
+  if (inst.action === ACTION_PEAK_METER) return true; // passive Global OSC /level stream
+  if (inst.action === ACTION_LEVEL_KEY) {
+    if (levelKeyMode(inst.settings) === "mute") return inst.muted !== undefined;
+    if (isMeter(inst)) return true; // passive stream: no polling
+    return inst.value !== undefined && inst.muted !== undefined;
   }
   if (inst.action === ACTION_TOGGLE) {
     const spec = toggleSpec(inst.settings);
@@ -522,6 +595,8 @@ async function configureInstance(msg, replacing = false) {
       configuring: true,
       value: undefined,
       muted: undefined,
+      peakValue: undefined,
+      peakLevels: new Map(),
       toggleStates: new Map(),
       snapshotState: undefined,
       lastFeedbackAt: 0,
@@ -538,6 +613,8 @@ async function configureInstance(msg, replacing = false) {
     if (replacing) {
       inst.value = undefined;
       inst.muted = undefined;
+      inst.peakValue = undefined;
+      inst.peakLevels.clear();
       inst.toggleStates.clear();
       inst.snapshotState = undefined;
     }
@@ -558,7 +635,10 @@ async function configureInstance(msg, replacing = false) {
     else await acquireReceiver(newPort);
   }
   if (inst.action === ACTION_OUTPUT || inst.action === ACTION_MIX) renderDial(inst, true);
-  else if (inst.action === ACTION_TOGGLE) {
+  else if (inst.action === ACTION_LEVEL_KEY || inst.action === ACTION_PEAK_METER) {
+    setTitle(inst.context, "");
+    renderLevelKey(inst, true);
+  } else if (inst.action === ACTION_TOGGLE) {
     setTitle(inst.context, "");
     setImage(inst.context, keyImage(inst, false));
   } else if (inst.action === ACTION_SNAPSHOT) {
@@ -628,7 +708,21 @@ function onKeyUp(msg) {
 function onKeyDown(msg) {
   const inst = instances.get(msg.context);
   if (!inst) return;
-  if (inst.action === ACTION_TOGGLE) {
+  if (inst.action === ACTION_PEAK_METER) return; // Dedicated audio peak meter is always read-only.
+  if (inst.action === ACTION_LEVEL_KEY) {
+    const mode = levelKeyMode(inst.settings);
+    if (mode === "meter") return; // Legacy visual-only mode; no OSC side effects.
+    if (!isReady(inst, "key")) return blockUntilReady(inst);
+    if (mode === "mute") {
+      sendCommand(inst, levelKeyMutePath(inst.settings), inst.muted ? 0 : 1);
+    } else if (inst.muted !== true) {
+      const step = Math.max(0.1, Math.min(24, finite(inst.settings.stepDb, 1)));
+      const minimum = Math.min(finite(inst.settings.minDb, -65), finite(inst.settings.maxDb, 6));
+      const current = inst.value < minimum && mode === "up" ? minimum : inst.value;
+      const next = clampDb(inst.settings, current + (mode === "up" ? step : -step));
+      sendCommand(inst, levelKeyPath(inst.settings), next, true);
+    }
+  } else if (inst.action === ACTION_TOGGLE) {
     if (!isReady(inst, "toggle")) return blockUntilReady(inst);
     const spec = toggleSpec(inst.settings);
     if (spec.momentary) {

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{color-scheme:dark;--line:#304050;--text:#eaf2fb;--muted:#a0b3c5;--blue:#4fb8ef}
+*{box-sizing:border-box}body{margin:0;padding:14px;background:#0c121a;color:var(--text);font:13px -apple-system,BlinkMacSystemFont,Arial,sans-serif}
+.hero,.panel{border:1px solid var(--line);background:linear-gradient(155deg,#1a2633,#111923);border-radius:10px;padding:13px;margin-bottom:10px}
+.kicker{letter-spacing:.16em;font-size:10px;font-weight:700;color:var(--blue)}
+h2{font-size:19px;margin:5px 0 3px}h3{font-size:11px;color:#b5c8d9;letter-spacing:.12em;text-transform:uppercase;margin:0 0 8px}
+p{font-size:11px;color:var(--muted);line-height:1.45;margin:7px 0}
+label{display:block;margin:10px 0 4px;color:#ccdae5;font-size:12px}
+input,select{color:#fff;width:100%;padding:8px 9px;background:#0b141e;border:1px solid #3b4c5e;border-radius:6px}
+input:focus,select:focus{border-color:var(--blue);outline:2px solid #4fb8ef33}
+[hidden]{display:none!important}.tip{border-left:3px solid #4fb8ef;padding:8px 10px;background:#10212f;border-radius:5px}
+</style></head><body>
+<div class="hero"><div class="kicker">FIO / TOTALMIX CONSOLE</div><h2>Live Channel Fader</h2><p>Show an actual audio peak-level meter over multiple keys, or use a separate key to control a fader.</p></div>
+<div class="panel"><h3>Channel</h3>
+<label>Channel type</label><select data-setting="target"><option value="output">Hardware output</option><option value="mix">Source submix</option></select>
+<label>Preset / mapping</label><select data-setting="preset"><option value="main" data-target="output">Control Room — Main</option><option value="spdifOut" data-target="output">SPDIF Output</option><option value="phones1" data-target="output">Control Room — Phones 1</option><option value="mic1" data-target="mix">Mic 1 → Main</option><option value="playback12" data-target="mix">Core Audio → Main</option><option value="spdif" data-target="mix">SPDIF input → Main</option><option value="custom" data-target="both">Custom channel</option></select>
+<label>Custom display label (optional)</label><input data-setting="label" value="" placeholder="Use preset name" maxlength="32">
+<label>Output index (zero-based; used for custom)</label><input type="number" min="0" max="999" data-setting="outputIndex" value="0">
+<div data-show-target="mix">
+<label>Source bus</label><select data-setting="bus"><option value="in">Hardware input</option><option value="playback">Software playback</option></select>
+<label>Source index (zero-based)</label><input type="number" min="0" max="999" data-setting="sourceIndex" value="0">
+<p>Custom source-to-output mapping uses existing verified Global OSC paths.</p>
+</div></div>
+<div class="panel"><h3>Key behavior</h3>
+<label>On key press</label><select data-setting="keyMode"><option value="up">Level + step</option><option value="down">Level − step</option><option value="mute">Mute / unmute</option><option value="meter">Live audio peak meter — display only</option></select>
+<div data-show-mode="meter">
+<label>Audio meter channels</label><select data-setting="meterChannels"><option value="mono">Selected channel</option><option value="stereo">Selected + next channel (highest peak)</option></select>
+<label>Meter floor (dBFS; top is always 0 dBFS)</label><input type="number" data-setting="meterFloorDb" min="-120" max="-6" value="-60" step="1">
+<label>Vertical stack height</label><select data-setting="stackSegments"><option value="1">1 key</option><option value="2">2 keys</option><option value="3">3 keys</option><option value="4">4 keys</option></select>
+<label>Position in stack</label><select data-setting="stackPosition"><option value="1">Bottom key (1)</option><option value="2">Second from bottom (2)</option><option value="3">Third from bottom (3)</option><option value="4">Top key (4)</option></select>
+<p>Place copies of this action in a single physical column. Set the same channel and stack height on every key. Number positions upward from the bottom. The keys show one continuous audio peak meter with no text or segment divisions. Enable Send Level Messages in TotalMix Global OSC Details.</p></div>
+<div data-hide-mode="meter"><label>Fader dB step</label><input type="number" data-setting="stepDb" value="1" min="0.1" max="24" step="0.1">
+<label>Minimum fader dB</label><input type="number" data-setting="minDb" value="-65" step="0.1">
+<label>Maximum fader dB</label><input type="number" data-setting="maxDb" value="6" step="0.1"></div>
+</div>
+<div class="panel"><h3>Global OSC transport</h3><label>TotalMix host</label><input data-setting="host" value="127.0.0.1">
+<label>TotalMix receive port</label><input data-setting="sendPort" type="number" value="7008">
+<label>Plugin receive port</label><input data-setting="receivePort" type="number" value="9008">
+<p class="tip">Needs Global OSC enabled in TotalMix. Live audio peak readings arrive over Global OSC /level messages. Enable Send Level Messages for this OSC controller. Meter ranges from the configured floor to 0 dBFS and turns red on clipping; it never reads fader position. Meter keys send no control commands.</p></div>
+<script src="common.js"></script></body></html>

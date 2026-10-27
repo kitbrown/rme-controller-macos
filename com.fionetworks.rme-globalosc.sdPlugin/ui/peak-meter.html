@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{color-scheme:dark;--accent:#49c49d;--line:#304454;--text:#e8f2fb;--muted:#9bb0c1}
+*{box-sizing:border-box}
+body{margin:0;padding:14px;font:13px -apple-system,BlinkMacSystemFont,Arial,sans-serif;color:var(--text);background:#0d151e}
+.hero,.section{background:linear-gradient(145deg,#182939,#101b27);border:1px solid var(--line);border-radius:10px;padding:13px;margin-bottom:11px}
+.kicker{color:var(--accent);font-size:10px;letter-spacing:.15em;font-weight:800}
+h2{font-size:19px;margin:5px 0}h3{font-size:11px;color:#b8cedd;text-transform:uppercase;letter-spacing:.1em;margin:0 0 10px}
+p{font-size:11px;line-height:1.45;color:var(--muted);margin:6px 0}
+label{display:block;font-size:12px;margin:10px 0 4px;color:#d5e3ed}
+input,select{width:100%;border:1px solid #385063;background:#0b1621;color:#fff;border-radius:6px;padding:8px}
+input:focus,select:focus{outline:2px solid #49c49d50;border-color:var(--accent)}
+.note{border-left:3px solid var(--accent);padding:8px 10px;background:#0f2529;border-radius:4px}
+[hidden]{display:none!important}
+</style></head><body>
+<div class="hero">
+  <div class="kicker">FIO / TOTALMIX FX / SIGNAL</div>
+  <h2>Live Audio Peak Meter</h2>
+  <p>Real audio amplitude from TotalMix Global OSC. Display-only, continuous bottom-up meter across 1–4 keys.</p>
+</div>
+<div class="section"><h3>Audio source</h3>
+<label>Channel type</label><select data-setting="target">
+<option value="output">Hardware output</option><option value="mix">Hardware input / software playback</option>
+</select>
+<label>Channel preset</label><select data-setting="preset">
+<option value="main" data-target="output">Control Room — Main</option>
+<option value="spdifOut" data-target="output">SPDIF Output</option>
+<option value="phones1" data-target="output">Control Room — Phones 1</option>
+<option value="mic1" data-target="mix">Mic 1</option>
+<option value="playback12" data-target="mix">Core Audio — Playback 1/2</option>
+<option value="spdif" data-target="mix">SPDIF Input</option>
+<option value="custom" data-target="both">Custom channel</option></select>
+<div data-show-preset="custom">
+  <label>Output index (if output, zero-based)</label><input data-setting="outputIndex" type="number" value="0" min="0" max="999">
+  <div data-show-target="mix">
+    <label>Input bus</label><select data-setting="bus"><option value="in">Hardware input</option><option value="playback">Software playback</option></select>
+    <label>Source index (zero-based)</label><input data-setting="sourceIndex" type="number" value="0" min="0" max="999">
+  </div>
+</div>
+<label>Audio channels</label><select data-setting="meterChannels"><option value="mono">Selected channel</option><option value="stereo">Selected + next channel (higher peak)</option></select>
+</div>
+<div class="section"><h3>Vertical meter</h3>
+<label>Stack height</label><select data-setting="stackSegments">
+<option value="3" selected>3 keys</option><option value="1">1 key</option><option value="2">2 keys</option><option value="4">4 keys</option></select>
+<label>This key's position</label><select data-setting="stackPosition">
+<option value="1">Bottom (1)</option><option value="2">Middle / second (2)</option><option value="3">Top / third (3)</option><option value="4">Fourth / top (4)</option></select>
+<label>Meter floor (dBFS)</label><input data-setting="meterFloorDb" type="number" value="-60" min="-120" max="-6" step="1">
+<p class="note">Use the same audio source, stack height and meter floor on all keys. Assign 1 to the physical bottom key, 2 to the key above, and so on. No labels appear on the keys.</p>
+</div>
+<div class="section"><h3>OSC connection</h3>
+<label>TotalMix host</label><input data-setting="host" value="127.0.0.1">
+<label>TotalMix incoming port</label><input data-setting="sendPort" type="number" value="7008">
+<label>Plugin receive port</label><input data-setting="receivePort" type="number" value="9008">
+<p class="note">TotalMix FX → Options → Settings → OSC → Global OSC controller → Details: enable Send Level Messages. This meter never sends fader or mute commands.</p>
+</div>
+<script src="common.js"></script>
+</body></html>
