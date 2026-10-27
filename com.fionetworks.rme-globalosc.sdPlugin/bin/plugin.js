@@ -1,6 +1,7 @@
 import dgram from "node:dgram";
 import {readFileSync} from "node:fs";
 import {renderConsoleKey, renderLevelKey as drawLevelKey, renderStackKey} from "../ui/console-art.js";
+import {resolveParameter,parameterRange,displayParameter} from "../ui/parameter-config.js";
 
 const PLUGIN_UUID = "com.fionetworks.rme-globalosc";
 const ACTION_OUTPUT = `${PLUGIN_UUID}.outputvolume`;
@@ -9,6 +10,7 @@ const ACTION_TOGGLE = `${PLUGIN_UUID}.toggle`;
 const ACTION_SNAPSHOT = `${PLUGIN_UUID}.snapshot`;
 const ACTION_LEVEL_KEY = `${PLUGIN_UUID}.levelkey`;
 const ACTION_PEAK_METER = `${PLUGIN_UUID}.peakmeter`;
+const ACTION_PARAMETER = `${PLUGIN_UUID}.parameter`;
 const isMeter = inst => inst.action === ACTION_PEAK_METER || (inst.action === ACTION_LEVEL_KEY && levelKeyMode(inst.settings) === "meter");
 
 const DEFAULT_HOST = "127.0.0.1";
@@ -300,6 +302,7 @@ function renderKeyState(inst, active) {
   setImage(inst.context, keyImage(inst, active));
 }
 function accentForInstance(inst) {
+  if (inst.action === ACTION_PARAMETER) return "#f3be67";
   if (inst.action === ACTION_OUTPUT) {
     const preset = inst.settings.preset || "main";
     if (preset === "main") return "#38d9ff";
@@ -322,18 +325,25 @@ function feedbackPayload(inst) {
   let label = "RME";
   if (inst.action === ACTION_OUTPUT) label = outputSpec(inst.settings).label;
   else if (inst.action === ACTION_MIX) label = mixSpec(inst.settings).label;
-  const value = inst.value === undefined ? "SYNCING" : muted ? "MUTED" : formatDb(inst.value);
+  else if (inst.action === ACTION_PARAMETER) label = resolveParameter(inst.settings).label;
+  const spec = inst.action === ACTION_PARAMETER ? resolveParameter(inst.settings) : null;
+  const value = spec ? displayParameter(inst.value,spec) :
+    inst.value === undefined ? "SYNCING" : muted ? "MUTED" : formatDb(inst.value);
   return {
     title: {value: label, color: "#ffffff", background},
     value: {value, color: "#ffffff", background},
     indicator: {
-      value: inst.value === undefined ? 0 : indicator(inst.settings, inst.value),
+      value: spec ? (inst.value===undefined?0:Math.max(0,Math.min(100,
+        (inst.value-parameterRange(inst.settings,spec).min)/(parameterRange(inst.settings,spec).max-
+        parameterRange(inst.settings,spec).min)*100))) :
+        inst.value === undefined ? 0 : indicator(inst.settings, inst.value),
       background,
       bar_bg_c: muted ? "#5a171c" : "#13202b",
       bar_fill_c: accent
     },
     status: {
-      value: muted ? "MUTE ACTIVE" : inst.value === undefined ? "AWAITING OSC FEEDBACK" : inst.action === ACTION_MIX ? "SUBMIX SEND LEVEL" : "HARDWARE OUTPUT LEVEL",
+      value: spec ? (inst.value===undefined?"WAITING FOR PARAMETER FEEDBACK":"PROCESSING / ROUTING") :
+        muted ? "MUTE ACTIVE" : inst.value === undefined ? "AWAITING OSC FEEDBACK" : inst.action === ACTION_MIX ? "SUBMIX SEND LEVEL" : "HARDWARE OUTPUT LEVEL",
       color: muted ? "#ffbabd" : "#9ab0c0",
       background
     }
@@ -346,7 +356,7 @@ function flushFeedback(inst) {
   inst.lastFeedbackAt = Date.now();
 }
 function renderDial(inst, immediate = false) {
-  if (inst.action !== ACTION_OUTPUT && inst.action !== ACTION_MIX) return;
+  if (inst.action !== ACTION_OUTPUT && inst.action !== ACTION_MIX && inst.action !== ACTION_PARAMETER) return;
   if (immediate || !inst.lastFeedbackAt || Date.now() - inst.lastFeedbackAt >= FEEDBACK_INTERVAL_MS) {
     clearTimeout(inst.feedbackTimer);
     flushFeedback(inst);
@@ -462,6 +472,7 @@ function guardedValue(port, address, value) {
 }
 
 function actionPaths(inst) {
+  if (inst.action === ACTION_PARAMETER) return [resolveParameter(inst.settings).path];
   if (inst.action === ACTION_OUTPUT) return [outputPath(inst.settings), outputMutePath(inst.settings)];
   if (inst.action === ACTION_MIX) return [mixPath(inst.settings), mixMutePath(inst.settings)];
   if (inst.action === ACTION_PEAK_METER) return meterPaths(inst.settings);
@@ -475,7 +486,11 @@ function matchesReceiver(inst, port) { return cfg(inst.settings).receivePort ===
 function applyValueToMatching(port, address, rawValue) {
   for (const inst of instances.values()) {
     if (!matchesReceiver(inst, port)) continue;
-    if (inst.action === ACTION_OUTPUT) {
+    if (inst.action === ACTION_PARAMETER) {
+      if (address===resolveParameter(inst.settings).path) {
+        inst.value=Number(rawValue);inst.confirmedParameter=true;renderDial(inst);
+      }
+    } else if (inst.action === ACTION_OUTPUT) {
       if (address === outputPath(inst.settings)) { inst.value = Number(rawValue); renderDial(inst); }
       else if (address === outputMutePath(inst.settings)) { inst.muted = Number(rawValue) > 0.5; renderDial(inst); }
     } else if (inst.action === ACTION_MIX) {
@@ -527,7 +542,15 @@ function requestState(inst) {
   // Peak data is streamed by TotalMix when Send Level Messages is enabled.
   // /sendchan only fetches static channel parameters; it cannot request live peaks.
   if (isMeter(inst)) return;
-  if (inst.action === ACTION_OUTPUT) {
+  if (inst.action === ACTION_PARAMETER) {
+    const spec=resolveParameter(s);
+    if(spec.scope==="global")requestGlobalState(s);
+    else if(spec.scope==="output")sendPacket(s,"/sendchan/output/"+spec.outputIndex,1);
+    else {
+      sendPacket(s,"/sendchan/"+(spec.bus==="playback"?"playback":spec.bus)+"/"+spec.sourceIndex,1);
+      if(spec.scope==="mix")requestGlobalState(s);
+    }
+  } else if (inst.action === ACTION_OUTPUT) {
     sendPacket(s, `/sendchan/output/${outputSpec(s).outputIndex}`, 1);
   } else if (inst.action === ACTION_MIX || (inst.action === ACTION_LEVEL_KEY && levelKeyIsMix(s))) {
     const x = mixSpec(s);
@@ -541,6 +564,7 @@ function requestState(inst) {
 }
 function isReady(inst, operation) {
   if (inst.configuring) return false;
+  if (inst.action===ACTION_PARAMETER) return inst.confirmedParameter===true && Number.isFinite(inst.value);
   if (inst.action === ACTION_OUTPUT || inst.action === ACTION_MIX) {
     if (operation === "rotate") return inst.value !== undefined && (inst.settings.muteOnPress === false || inst.muted !== undefined);
     return inst.muted !== undefined;
@@ -595,6 +619,7 @@ async function configureInstance(msg, replacing = false) {
       configuring: true,
       value: undefined,
       muted: undefined,
+      confirmedParameter: false,
       peakValue: undefined,
       peakLevels: new Map(),
       toggleStates: new Map(),
@@ -613,6 +638,7 @@ async function configureInstance(msg, replacing = false) {
     if (replacing) {
       inst.value = undefined;
       inst.muted = undefined;
+      inst.confirmedParameter = false;
       inst.peakValue = undefined;
       inst.peakLevels.clear();
       inst.toggleStates.clear();
@@ -634,7 +660,7 @@ async function configureInstance(msg, replacing = false) {
     if (entry) await entry.ready;
     else await acquireReceiver(newPort);
   }
-  if (inst.action === ACTION_OUTPUT || inst.action === ACTION_MIX) renderDial(inst, true);
+  if (inst.action === ACTION_OUTPUT || inst.action === ACTION_MIX || inst.action===ACTION_PARAMETER) renderDial(inst, true);
   else if (inst.action === ACTION_LEVEL_KEY || inst.action === ACTION_PEAK_METER) {
     setTitle(inst.context, "");
     renderLevelKey(inst, true);
@@ -680,7 +706,17 @@ function removeInstance(context) {
 }
 function onDialRotate(msg) {
   const inst = instances.get(msg.context);
-  if (!inst || (inst.action !== ACTION_OUTPUT && inst.action !== ACTION_MIX)) return;
+  if (!inst || (inst.action !== ACTION_OUTPUT && inst.action !== ACTION_MIX && inst.action!==ACTION_PARAMETER)) return;
+  if (inst.action===ACTION_PARAMETER) {
+    if (!isReady(inst,"rotate")) return blockUntilReady(inst);
+    const ticks=finite(msg.payload?.ticks,0); if(!ticks)return;
+    const spec=resolveParameter(inst.settings),range=parameterRange(inst.settings,spec);
+    const requested=Math.abs(finite(inst.settings.stepValue,spec.step));
+    const step=requested>0?Math.min(requested,1000):spec.step;
+    const next=Math.max(range.min,Math.min(range.max,inst.value+ticks*step));
+    if(next!==inst.value)sendCommand(inst,spec.path,next,true);
+    return;
+  }
   if (!isReady(inst, "rotate")) return blockUntilReady(inst);
   if (inst.muted === true) return;
   const ticks = finite(msg.payload?.ticks, 0);
@@ -693,7 +729,8 @@ function onDialRotate(msg) {
 }
 function onDialDown(msg) {
   const inst = instances.get(msg.context);
-  if (!inst || (inst.action !== ACTION_OUTPUT && inst.action !== ACTION_MIX) || inst.settings.muteOnPress === false) return;
+  if (!inst || inst.action===ACTION_PARAMETER ||
+      (inst.action !== ACTION_OUTPUT && inst.action !== ACTION_MIX) || inst.settings.muteOnPress === false) return;
   if (!isReady(inst, "mute")) return blockUntilReady(inst);
   const path = inst.action === ACTION_OUTPUT ? outputMutePath(inst.settings) : mixMutePath(inst.settings);
   sendCommand(inst, path, inst.muted ? 0 : 1);
