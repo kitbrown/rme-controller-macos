@@ -113,6 +113,22 @@ function levelKeyPath(s) { return levelKeyIsMix(s) ? mixPath(s) : outputPath(s);
 function levelKeyMutePath(s) { return levelKeyIsMix(s) ? mixMutePath(s) : outputMutePath(s); }
 function levelKeyLabel(s) { return typeof s.label === "string" && s.label.trim() ? s.label.trim() : (levelKeyIsMix(s) ? mixSpec(s).label : outputSpec(s).label); }
 function levelKeyMode(s) { return ["up","down","mute","meter"].includes(s.keyMode) ? s.keyMode : "up"; }
+// RME Global OSC live peak-level paths, independent of the channel's fader position.
+// A stereo meter displays the maximum of the selected and following channel.
+function meterPaths(s) {
+  const base = levelKeyIsMix(s) ?
+    `/level/${mixSpec(s).bus === "playback" ? "pb" : "in"}/${mixSpec(s).sourceIndex}` :
+    `/level/out/${outputSpec(s).outputIndex}`;
+  if (s.meterChannels !== "stereo") return [base];
+  const parts = base.split("/");
+  parts[3] = String(Number(parts[3]) + 1);
+  return [base, parts.join("/")];
+}
+function meterIndicator(s, value) {
+  const floor = Math.max(-120, Math.min(-6, finite(s.meterFloorDb, -60)));
+  if (value === undefined || Number.isNaN(value)) return 0;
+  return Math.max(0, Math.min(100, ((value - floor) / (-floor)) * 100));
+}
 function outputPath(s) { return `/output/${outputSpec(s).outputIndex}/volume`; }
 function outputMutePath(s) { return `/output/${outputSpec(s).outputIndex}/mute`; }
 function mixPath(s) {
@@ -249,9 +265,9 @@ function keyImage(inst, active) {
 function levelKeyImage(inst) {
   if (levelKeyMode(inst.settings) === "meter") {
     return renderStackKey({
-      level: inst.value === undefined ? 0 : indicator(inst.settings, inst.value),
-      known: inst.value !== undefined,
-      muted: inst.muted === true,
+      level: meterIndicator(inst.settings, inst.peakValue),
+      known: inst.peakValue !== undefined,
+      clipped: inst.peakValue >= 0,
       segments: inst.settings.stackSegments,
       position: inst.settings.stackPosition
     });
@@ -450,7 +466,8 @@ function guardedValue(port, address, value) {
 function actionPaths(inst) {
   if (inst.action === ACTION_OUTPUT) return [outputPath(inst.settings), outputMutePath(inst.settings)];
   if (inst.action === ACTION_MIX) return [mixPath(inst.settings), mixMutePath(inst.settings)];
-  if (inst.action === ACTION_LEVEL_KEY) return [levelKeyPath(inst.settings), levelKeyMutePath(inst.settings)];
+  if (inst.action === ACTION_LEVEL_KEY) return levelKeyMode(inst.settings) === "meter" ?
+    meterPaths(inst.settings) : [levelKeyPath(inst.settings), levelKeyMutePath(inst.settings)];
   if (inst.action === ACTION_TOGGLE) return toggleSpec(inst.settings).paths;
   if (inst.action === ACTION_SNAPSHOT) return [`/snapshot/load/${integer(inst.settings.snapshot, 1, 1, 8)}`];
   return [];
@@ -466,8 +483,17 @@ function applyValueToMatching(port, address, rawValue) {
       if (address === mixPath(inst.settings)) { inst.value = Number(rawValue); renderDial(inst); }
       else if (address === mixMutePath(inst.settings)) { inst.muted = Number(rawValue) > 0.5; renderDial(inst); }
     } else if (inst.action === ACTION_LEVEL_KEY) {
-      if (address === levelKeyPath(inst.settings)) { inst.value = Number(rawValue); renderLevelKey(inst); }
-      else if (address === levelKeyMutePath(inst.settings)) { inst.muted = Number(rawValue) > 0.5; renderLevelKey(inst); }
+      if (levelKeyMode(inst.settings) === "meter") {
+        if (meterPaths(inst.settings).includes(address)) {
+          inst.peakLevels.set(address, Number(rawValue));
+          inst.peakValue = Math.max(...inst.peakLevels.values());
+          renderLevelKey(inst);
+        }
+      } else if (address === levelKeyPath(inst.settings)) {
+        inst.value = Number(rawValue); renderLevelKey(inst);
+      } else if (address === levelKeyMutePath(inst.settings)) {
+        inst.muted = Number(rawValue) > 0.5; renderLevelKey(inst);
+      }
     } else if (inst.action === ACTION_TOGGLE) {
       const spec = toggleSpec(inst.settings);
       if (spec.paths.includes(address)) {
@@ -490,7 +516,7 @@ function handleOsc(port, message) {
     for (const inst of instances.values()) if (matchesReceiver(inst, port)) inst.connected = message.args[0] > 0.5;
     return;
   }
-  if (typeof message.args[0] !== "number") return;
+  if (typeof message.args[0] !== "number" || Number.isNaN(message.args[0])) return;
   const value = guardedValue(port, message.address, message.args[0]);
   if (value === undefined) return;
   applyValueToMatching(port, message.address, value);
@@ -499,6 +525,9 @@ function handleOsc(port, message) {
 function requestState(inst) {
   if (!instances.has(inst.context)) return;
   const s = inst.settings;
+  // Peak data is streamed by TotalMix when Send Level Messages is enabled.
+  // /sendchan only fetches static channel parameters; it cannot request live peaks.
+  if (inst.action === ACTION_LEVEL_KEY && levelKeyMode(s) === "meter") return;
   if (inst.action === ACTION_OUTPUT) {
     sendPacket(s, `/sendchan/output/${outputSpec(s).outputIndex}`, 1);
   } else if (inst.action === ACTION_MIX || (inst.action === ACTION_LEVEL_KEY && levelKeyIsMix(s))) {
@@ -519,7 +548,7 @@ function isReady(inst, operation) {
   }
   if (inst.action === ACTION_LEVEL_KEY) {
     if (levelKeyMode(inst.settings) === "mute") return inst.muted !== undefined;
-    if (levelKeyMode(inst.settings) === "meter") return inst.value !== undefined;
+    if (levelKeyMode(inst.settings) === "meter") return true; // passive stream: no polling
     return inst.value !== undefined && inst.muted !== undefined;
   }
   if (inst.action === ACTION_TOGGLE) {
@@ -566,6 +595,8 @@ async function configureInstance(msg, replacing = false) {
       configuring: true,
       value: undefined,
       muted: undefined,
+      peakValue: undefined,
+      peakLevels: new Map(),
       toggleStates: new Map(),
       snapshotState: undefined,
       lastFeedbackAt: 0,
@@ -582,6 +613,8 @@ async function configureInstance(msg, replacing = false) {
     if (replacing) {
       inst.value = undefined;
       inst.muted = undefined;
+      inst.peakValue = undefined;
+      inst.peakLevels.clear();
       inst.toggleStates.clear();
       inst.snapshotState = undefined;
     }
