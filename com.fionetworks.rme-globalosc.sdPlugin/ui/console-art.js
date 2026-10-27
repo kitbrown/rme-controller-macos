@@ -86,7 +86,8 @@ export function renderStackKey({level, muted=false, segments=3, position=1, know
     '</linearGradient></defs>'+
     '<rect width="144" height="144" fill="#0b1720"/>'+
     '<rect x="16" y="0" width="112" height="144" fill="#152734"/>'+
-    '<rect x="16" y="0" width="112" height="144" fill="none" stroke="#304653" stroke-width="2"/>'+
+    '<rect x="15" width="2" height="144" fill="#304653"/>'+
+    '<rect x="127" width="2" height="144" fill="#304653"/>'+
     (known && fillHeight > 0 ? '<rect x="17" y="'+fillY.toFixed(3)+'" width="110" height="'+fillHeight.toFixed(3)+'" fill="'+(muted?'#a83743':'url(#meter)')+'"/>' : '')+
     '</svg>';
   return uri(svg);
