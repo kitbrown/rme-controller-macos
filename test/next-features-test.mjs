@@ -28,7 +28,7 @@ function osc(address,value){const type=typeof value==="string"?"s":Number.isInte
 const chunks=[oscString(address),oscString(","+type)];
 if(type==="s")chunks.push(oscString(value)); else{const b=Buffer.alloc(4);if(type==="i")b.writeInt32BE(value);else b.writeFloatBE(value);chunks.push(b);}return Buffer.concat(chunks);}
 function decode(buf){let at=0;const read=()=>{const end=buf.indexOf(0,at);const text=buf.toString("utf8",at,end);at=p4(end+1);return text;};
-const address=read(),tag=read(),value=tag===",i"?buf.readInt32BE(at):tag===",f"?buf.readFloatBE(at):read();return{address,value};}
+const address=read(),tag=read(),value=tag===",i"?buf.readInt32BE(at):tag===",f"?buf.readFloatBE(at):read();return{address,value,tag};}
 class FakeWebSocket {static OPEN=1; static instance;listeners=new Map();sent=[];readyState=1;
 constructor(){FakeWebSocket.instance=this;queueMicrotask(()=>this.listeners.get("open")?.({}));}
 addEventListener(name,cb){this.listeners.set(name,cb);}send(json){this.sent.push(JSON.parse(json));}
@@ -58,6 +58,7 @@ send("/input/0/eq/band1gain",-3);
 await until(()=>events("eq","setFeedback").some(e=>e.payload.value?.value==="-3.0 dB"),"confirmed EQ feedback missing");
 ws.message({event:"dialRotate",context:"eq",payload:{ticks:2}});
 await until(()=>packets.some(p=>p.address==="/input/0/eq/band1gain"&&Math.abs(p.value+2)<0.0001),"EQ step OSC command missing");
+assert(packets.some(p=>p.address==="/input/0/eq/band1gain"&&p.tag===",f"),"EQ numeric command must be OSC float");
 
 appear("parameter","pan",{paramKey:"mixPan",paramBus:"playback",sourceIndex:3,outputIndex:6,stepValue:0.05});
 send("/mix/pb/3/6/balpan",0);
