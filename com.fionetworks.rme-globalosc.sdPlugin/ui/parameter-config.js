@@ -19,7 +19,9 @@ const idx = value => Math.max(0,Math.min(999,Math.trunc(Number.isFinite(Number(v
 export function resolveParameter(s={}) {
   const key=Object.hasOwn(PARAMETERS,s.paramKey)?s.paramKey:"mixPan";
   const def=PARAMETERS[key];
-  const bus=s.paramBus==="output"?"output":s.paramBus==="playback"?"playback":"input";
+  const requestedBus=s.paramBus==="output"?"output":s.paramBus==="playback"?"playback":"input";
+  const bus=def.scope==="mix"?(requestedBus==="playback"?"playback":"input"):
+    def.scope==="channel"?(requestedBus==="output"?"output":"input"):requestedBus;
   const sourceIndex=idx(s.sourceIndex),outputIndex=idx(s.outputIndex);
   const path=def.scope==="mix"?"/mix/"+(bus==="playback"?"pb":"in")+"/"+sourceIndex+"/"+outputIndex+"/"+def.suffix:
     def.scope==="output"?"/output/"+outputIndex+"/"+def.suffix:
