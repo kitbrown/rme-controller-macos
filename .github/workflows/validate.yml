@@ -3,7 +3,7 @@ name: Validate Stream Deck Plugin
 on:
   workflow_dispatch:
   push:
-    branches: [main, feature/console-surface-next]
+    branches: [main, feature/console-surface-next, feature/console-ui-improvements]
     paths:
       - "com.fionetworks.rme-globalosc.sdPlugin/**"
       - "test/**"
