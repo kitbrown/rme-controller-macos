@@ -120,7 +120,8 @@
       "States": [
         {
           "Image": "imgs/toggle",
-          "Title": ""
+          "Title": "",
+          "ShowTitle": false
         }
       ],
       "PropertyInspectorPath": "ui/level-key.html"
