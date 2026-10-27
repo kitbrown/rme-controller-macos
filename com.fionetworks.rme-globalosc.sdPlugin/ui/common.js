@@ -99,6 +99,15 @@ function updateVisibility() {
   document.querySelectorAll("[data-param-target]").forEach(el=>{
     el.hidden=!el.dataset.paramTarget.split(",").includes(scope);
   });
+  const paramBus=document.querySelector("[data-setting='paramBus']");
+  if(paramBus) {
+    for(const option of paramBus.options)
+      option.hidden=(scope==="channel"&&option.value==="playback")||(scope==="mix"&&option.value==="output");
+    if(paramBus.selectedOptions[0]?.hidden) {
+      const allowed=[...paramBus.options].find(option=>!option.hidden);
+      if(allowed)paramBus.value=allowed.value;
+    }
+  }
   document.querySelectorAll("[data-show-preset]").forEach(el => {
     el.hidden = presetSelect?.value !== el.dataset.showPreset;
   });
