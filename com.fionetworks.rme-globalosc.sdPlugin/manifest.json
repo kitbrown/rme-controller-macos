@@ -165,6 +165,24 @@
         }
       ],
       "PropertyInspectorPath": "ui/parameter.html"
+    },
+    {
+      "UUID": "com.fionetworks.rme-globalosc.diagnostic",
+      "Name": "OSC Connection Monitor",
+      "Tooltip": "Check UDP OSC receive health; press to request read-only TotalMix state.",
+      "Icon": "imgs/action-meter",
+      "Controllers": [
+        "Keypad"
+      ],
+      "DisableAutomaticStates": true,
+      "States": [
+        {
+          "Image": "imgs/toggle",
+          "Title": "",
+          "ShowTitle": false
+        }
+      ],
+      "PropertyInspectorPath": "ui/diagnostic.html"
     }
   ]
 }
