@@ -23,7 +23,7 @@ input:focus,select:focus{border-color:var(--blue);outline:2px solid #4fb8ef33}
 <label>Source index (zero-based)</label><input type="number" min="0" max="999" data-setting="sourceIndex" value="0">
 <p>Custom source-to-output mapping uses existing verified Global OSC paths.</p>
 </div></div>
-<div class="panel"><h3>Key behavior</h3>
+<div class="panel"><h3>Discovered channel</h3><select data-channel-picker data-channel-buses="output"><option value="">Waiting for OSC channel names…</option></select></div><div class="panel"><h3>Key behavior</h3>
 <label>On key press</label><select data-setting="keyMode"><option value="up">Level + step</option><option value="down">Level − step</option><option value="mute">Mute / unmute</option><option value="meter">Live audio peak meter — display only</option></select>
 <div data-show-mode="meter">
 <label>Audio meter channels</label><select data-setting="meterChannels"><option value="mono">Selected channel</option><option value="stereo">Selected + next channel (highest peak)</option></select>
