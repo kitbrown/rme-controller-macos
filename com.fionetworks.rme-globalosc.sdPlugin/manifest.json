@@ -2,7 +2,7 @@
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
   "UUID": "com.fionetworks.rme-globalosc",
   "Name": "RME Controller for macOS",
-  "Version": "1.1.8.2",
+  "Version": "1.1.8.3",
   "Author": "FiO Networks",
   "Description": "Bidirectional Stream Deck control for RME TotalMix FX using Global OSC.",
   "Icon": "imgs/plugin",
@@ -112,7 +112,7 @@
     {
       "UUID": "com.fionetworks.rme-globalosc.levelkey",
       "Name": "Live Channel Fader",
-      "Tooltip": "Show the live TotalMix fader level on a key; press to change level or mute.",
+      "Tooltip": "Show and control TotalMix fader position on a single key. For actual audio peaks, use Live Audio Peak Meter.",
       "Icon": "imgs/action-mix",
       "Controllers": [
         "Keypad"
@@ -125,6 +125,24 @@
         }
       ],
       "PropertyInspectorPath": "ui/level-key.html"
+    },
+    {
+      "UUID": "com.fionetworks.rme-globalosc.peakmeter",
+      "Name": "Live Audio Peak Meter",
+      "Tooltip": "Displays actual TotalMix audio peaks in dBFS on a seamless vertical stack of 1–4 keys. Display only.",
+      "Icon": "imgs/action-output",
+      "Controllers": [
+        "Keypad"
+      ],
+      "DisableAutomaticStates": true,
+      "States": [
+        {
+          "Image": "imgs/toggle",
+          "Title": "",
+          "ShowTitle": false
+        }
+      ],
+      "PropertyInspectorPath": "ui/peak-meter.html"
     }
   ]
 }
