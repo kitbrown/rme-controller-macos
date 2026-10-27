@@ -28,7 +28,8 @@ const SNAPSHOT_IMAGES = [pngDataUri("../imgs/snapshot.png"), pngDataUri("../imgs
 const OUTPUT_PRESETS = {
   main: {label: "Main", outputIndex: 0},
   phones1: {label: "Phones 1", outputIndex: 6},
-  spdif: {label: "SPDIF Out", outputIndex: 8}
+  spdif: {label: "SPDIF Out", outputIndex: 8},
+  spdifOut: {label: "SPDIF Out", outputIndex: 8}
 };
 const MIX_PRESETS = {
   input12: {label: "Analog 1/2 In", bus: "in", sourceIndex: 0, outputIndex: 0},
