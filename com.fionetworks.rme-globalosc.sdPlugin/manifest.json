@@ -32,7 +32,7 @@
         "Encoder"
       ],
       "Encoder": {
-        "layout": "$B1",
+        "layout": "ui/console-strip.json",
         "TriggerDescription": {
           "Rotate": "Adjust volume",
           "Push": "Mute / unmute"
@@ -54,7 +54,7 @@
         "Encoder"
       ],
       "Encoder": {
-        "layout": "$B1",
+        "layout": "ui/console-strip.json",
         "TriggerDescription": {
           "Rotate": "Adjust send level",
           "Push": "Mute / unmute"
@@ -108,6 +108,22 @@
         }
       ],
       "PropertyInspectorPath": "ui/snapshot.html"
+    },
+    {
+      "UUID": "com.fionetworks.rme-globalosc.levelkey",
+      "Name": "Live Channel Fader",
+      "Tooltip": "Show the live TotalMix fader level on a key; press to change level or mute.",
+      "Icon": "imgs/action-mix",
+      "Controllers": [
+        "Keypad"
+      ],
+      "States": [
+        {
+          "Image": "imgs/toggle",
+          "Title": ""
+        }
+      ],
+      "PropertyInspectorPath": "ui/level-key.html"
     }
   ]
 }
