@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node test/plugin-sandbox-test.mjs com.fionetworks.rme-globalosc.sdPlugin/bin/plugin.js && node test/plugin-v1.1-race-test.mjs com.fionetworks.rme-globalosc.sdPlugin/bin/plugin.js && node test/plugin-v1.1.5-toggle-regression-test.mjs com.fionetworks.rme-globalosc.sdPlugin/bin/plugin.js && node test/meter-stack-test.mjs && node test/live-meter-osc-test.mjs com.fionetworks.rme-globalosc.sdPlugin/bin/plugin.js"
+    "test": "node test/plugin-sandbox-test.mjs com.fionetworks.rme-globalosc.sdPlugin/bin/plugin.js && node test/plugin-v1.1-race-test.mjs com.fionetworks.rme-globalosc.sdPlugin/bin/plugin.js && node test/plugin-v1.1.5-toggle-regression-test.mjs com.fionetworks.rme-globalosc.sdPlugin/bin/plugin.js && node test/meter-stack-test.mjs && node test/live-meter-osc-test.mjs com.fionetworks.rme-globalosc.sdPlugin/bin/plugin.js && node test/peak-meter-action-ui-test.mjs"
   },
   "engines": {
     "node": ">=24"
