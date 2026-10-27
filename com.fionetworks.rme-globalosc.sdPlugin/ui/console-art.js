@@ -63,7 +63,7 @@ export function renderLevelKey({ label, value, level, muted, mode, mix }) {
 // Each vertically adjacent key is a window onto the SAME continuous meter.
 // position: 1 = physical bottom; position = segments = physical top.
 // No labels, tick marks, discrete blocks, or per-key bezels. Gaps come only from hardware.
-export function renderStackKey({level, muted=false, segments=3, position=1, known=true}) {
+export function renderStackKey({level, clipped=false, segments=3, position=1, known=true}) {
   segments=Math.max(1,Math.min(4,Math.trunc(Number(segments)||1)));
   position=Math.max(1,Math.min(segments,Math.trunc(Number(position)||1)));
   level=Math.max(0,Math.min(100,Number(level)||0));
@@ -88,7 +88,7 @@ export function renderStackKey({level, muted=false, segments=3, position=1, know
     '<rect x="16" y="0" width="112" height="144" fill="#152734"/>'+
     '<rect x="15" width="2" height="144" fill="#304653"/>'+
     '<rect x="127" width="2" height="144" fill="#304653"/>'+
-    (known && fillHeight > 0 ? '<rect x="17" y="'+fillY.toFixed(3)+'" width="110" height="'+fillHeight.toFixed(3)+'" fill="'+(muted?'#a83743':'url(#meter)')+'"/>' : '')+
+    (known && fillHeight > 0 ? '<rect x="17" y="'+fillY.toFixed(3)+'" width="110" height="'+fillHeight.toFixed(3)+'" fill="'+(clipped?'#ed4e5c':'url(#meter)')+'"/>' : '')+
     '</svg>';
   return uri(svg);
 }
