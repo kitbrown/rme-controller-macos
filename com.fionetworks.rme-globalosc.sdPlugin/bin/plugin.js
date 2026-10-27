@@ -1,11 +1,13 @@
 import dgram from "node:dgram";
 import {readFileSync} from "node:fs";
+import {renderConsoleKey, renderLevelKey} from "../ui/console-art.js";
 
 const PLUGIN_UUID = "com.fionetworks.rme-globalosc";
 const ACTION_OUTPUT = `${PLUGIN_UUID}.outputvolume`;
 const ACTION_MIX = `${PLUGIN_UUID}.mixfader`;
 const ACTION_TOGGLE = `${PLUGIN_UUID}.toggle`;
 const ACTION_SNAPSHOT = `${PLUGIN_UUID}.snapshot`;
+const ACTION_LEVEL_KEY = `${PLUGIN_UUID}.levelkey`;
 
 const DEFAULT_HOST = "127.0.0.1";
 const DEFAULT_SEND_PORT = 7008;
@@ -105,6 +107,11 @@ function toggleSpec(s = {}) {
   };
 }
 function toggleFeedbackPaths(spec) { return spec.feedbackPaths || spec.paths; }
+function levelKeyIsMix(s) { return s.target === "mix"; }
+function levelKeyPath(s) { return levelKeyIsMix(s) ? mixPath(s) : outputPath(s); }
+function levelKeyMutePath(s) { return levelKeyIsMix(s) ? mixMutePath(s) : outputMutePath(s); }
+function levelKeyLabel(s) { return levelKeyIsMix(s) ? mixSpec(s).label : outputSpec(s).label; }
+function levelKeyMode(s) { return ["up","down","mute"].includes(s.keyMode) ? s.keyMode : "up"; }
 function outputPath(s) { return `/output/${outputSpec(s).outputIndex}/volume`; }
 function outputMutePath(s) { return `/output/${outputSpec(s).outputIndex}/mute`; }
 function mixPath(s) {
@@ -236,21 +243,32 @@ function keyStatus(inst, active) {
   return active ? "ON" : "OFF";
 }
 function keyImage(inst, active) {
-  const token = xml(keyToken(inst));
-  const accent = keyAccent(inst);
-  const bg = active ? accent : "#0b1118";
-  const fg = active ? "#071016" : "#edf4fb";
-  const ring = active ? "#ffffff" : accent;
-  const status = xml(keyStatus(inst, active));
-  const statusSize = status.length > 6 ? 13 : 16;
-  const statusSpacing = status.length > 6 ? 1 : 2;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
-    <rect x="5" y="5" width="134" height="134" rx="24" fill="${bg}" stroke="${ring}" stroke-width="5"/>
-    <rect x="17" y="17" width="110" height="5" rx="2.5" fill="${accent}"/>
-    <text x="72" y="77" text-anchor="middle" fill="${fg}" font-family="-apple-system,BlinkMacSystemFont,Arial,sans-serif" font-size="${token.length > 5 ? 23 : 29}" font-weight="750">${token}</text>
-    <text x="72" y="108" text-anchor="middle" fill="${active ? fg : "#8fa1b2"}" font-family="-apple-system,BlinkMacSystemFont,Arial,sans-serif" font-size="${statusSize}" font-weight="650" letter-spacing="${statusSpacing}">${status}</text>
-  </svg>`;
-  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+  return renderConsoleKey({token: keyToken(inst), status: keyStatus(inst, active), accent: keyAccent(inst), active});
+}
+function levelKeyImage(inst) {
+  return renderLevelKey({
+    label: levelKeyLabel(inst.settings),
+    value: inst.value === undefined ? "SYNC" : inst.muted === true ? "MUTED" : formatDb(inst.value),
+    level: inst.value === undefined ? 0 : indicator(inst.settings, inst.value),
+    muted: inst.muted === true,
+    mode: levelKeyMode(inst.settings),
+    mix: levelKeyIsMix(inst.settings)
+  });
+}
+function flushLevelKey(inst) {
+  inst.feedbackTimer = null;
+  if (!instances.has(inst.context)) return;
+  setImage(inst.context, levelKeyImage(inst));
+  inst.lastFeedbackAt = Date.now();
+}
+function renderLevelKey(inst, immediate = false) {
+  if (inst.action !== ACTION_LEVEL_KEY) return;
+  if (immediate || !inst.lastFeedbackAt || Date.now() - inst.lastFeedbackAt >= FEEDBACK_INTERVAL_MS) {
+    clearTimeout(inst.feedbackTimer);
+    flushLevelKey(inst);
+  } else if (!inst.feedbackTimer) {
+    inst.feedbackTimer = setTimeout(() => flushLevelKey(inst), FEEDBACK_INTERVAL_MS - (Date.now() - inst.lastFeedbackAt));
+  }
 }
 function renderKeyState(inst, active) {
   const state = active ? 1 : 0;
@@ -289,6 +307,11 @@ function feedbackPayload(inst) {
       background,
       bar_bg_c: muted ? "#5a171c" : "#13202b",
       bar_fill_c: accent
+    },
+    status: {
+      value: muted ? "MUTE ACTIVE" : inst.value === undefined ? "AWAITING OSC FEEDBACK" : inst.action === ACTION_MIX ? "SUBMIX SEND LEVEL" : "HARDWARE OUTPUT LEVEL",
+      color: muted ? "#ffbabd" : "#9ab0c0",
+      background
     }
   };
 }
@@ -417,6 +440,7 @@ function guardedValue(port, address, value) {
 function actionPaths(inst) {
   if (inst.action === ACTION_OUTPUT) return [outputPath(inst.settings), outputMutePath(inst.settings)];
   if (inst.action === ACTION_MIX) return [mixPath(inst.settings), mixMutePath(inst.settings)];
+  if (inst.action === ACTION_LEVEL_KEY) return [levelKeyPath(inst.settings), levelKeyMutePath(inst.settings)];
   if (inst.action === ACTION_TOGGLE) return toggleSpec(inst.settings).paths;
   if (inst.action === ACTION_SNAPSHOT) return [`/snapshot/load/${integer(inst.settings.snapshot, 1, 1, 8)}`];
   return [];
@@ -431,6 +455,9 @@ function applyValueToMatching(port, address, rawValue) {
     } else if (inst.action === ACTION_MIX) {
       if (address === mixPath(inst.settings)) { inst.value = Number(rawValue); renderDial(inst); }
       else if (address === mixMutePath(inst.settings)) { inst.muted = Number(rawValue) > 0.5; renderDial(inst); }
+    } else if (inst.action === ACTION_LEVEL_KEY) {
+      if (address === levelKeyPath(inst.settings)) { inst.value = Number(rawValue); renderLevelKey(inst); }
+      else if (address === levelKeyMutePath(inst.settings)) { inst.muted = Number(rawValue) > 0.5; renderLevelKey(inst); }
     } else if (inst.action === ACTION_TOGGLE) {
       const spec = toggleSpec(inst.settings);
       if (spec.paths.includes(address)) {
@@ -464,10 +491,12 @@ function requestState(inst) {
   const s = inst.settings;
   if (inst.action === ACTION_OUTPUT) {
     sendPacket(s, `/sendchan/output/${outputSpec(s).outputIndex}`, 1);
-  } else if (inst.action === ACTION_MIX) {
+  } else if (inst.action === ACTION_MIX || (inst.action === ACTION_LEVEL_KEY && levelKeyIsMix(s))) {
     const x = mixSpec(s);
     sendPacket(s, `/sendchan/${x.bus === "playback" ? "playback" : "input"}/${x.sourceIndex}`, 1);
     requestGlobalState(s);
+  } else if (inst.action === ACTION_LEVEL_KEY) {
+    sendPacket(s, `/sendchan/output/${outputSpec(s).outputIndex}`, 1);
   } else {
     requestGlobalState(s);
   }
@@ -477,6 +506,10 @@ function isReady(inst, operation) {
   if (inst.action === ACTION_OUTPUT || inst.action === ACTION_MIX) {
     if (operation === "rotate") return inst.value !== undefined && (inst.settings.muteOnPress === false || inst.muted !== undefined);
     return inst.muted !== undefined;
+  }
+  if (inst.action === ACTION_LEVEL_KEY) {
+    if (levelKeyMode(inst.settings) === "mute") return inst.muted !== undefined;
+    return inst.value !== undefined && inst.muted !== undefined;
   }
   if (inst.action === ACTION_TOGGLE) {
     const spec = toggleSpec(inst.settings);
@@ -558,7 +591,10 @@ async function configureInstance(msg, replacing = false) {
     else await acquireReceiver(newPort);
   }
   if (inst.action === ACTION_OUTPUT || inst.action === ACTION_MIX) renderDial(inst, true);
-  else if (inst.action === ACTION_TOGGLE) {
+  else if (inst.action === ACTION_LEVEL_KEY) {
+    setTitle(inst.context, "");
+    renderLevelKey(inst, true);
+  } else if (inst.action === ACTION_TOGGLE) {
     setTitle(inst.context, "");
     setImage(inst.context, keyImage(inst, false));
   } else if (inst.action === ACTION_SNAPSHOT) {
@@ -628,7 +664,19 @@ function onKeyUp(msg) {
 function onKeyDown(msg) {
   const inst = instances.get(msg.context);
   if (!inst) return;
-  if (inst.action === ACTION_TOGGLE) {
+  if (inst.action === ACTION_LEVEL_KEY) {
+    if (!isReady(inst, "key")) return blockUntilReady(inst);
+    const mode = levelKeyMode(inst.settings);
+    if (mode === "mute") {
+      sendCommand(inst, levelKeyMutePath(inst.settings), inst.muted ? 0 : 1);
+    } else if (inst.muted !== true) {
+      const step = Math.max(0.1, Math.min(24, finite(inst.settings.stepDb, 1)));
+      const minimum = Math.min(finite(inst.settings.minDb, -65), finite(inst.settings.maxDb, 6));
+      const current = inst.value < minimum && mode === "up" ? minimum : inst.value;
+      const next = clampDb(inst.settings, current + (mode === "up" ? step : -step));
+      sendCommand(inst, levelKeyPath(inst.settings), next, true);
+    }
+  } else if (inst.action === ACTION_TOGGLE) {
     if (!isReady(inst, "toggle")) return blockUntilReady(inst);
     const spec = toggleSpec(inst.settings);
     if (spec.momentary) {
