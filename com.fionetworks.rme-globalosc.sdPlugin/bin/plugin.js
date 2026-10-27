@@ -234,20 +234,16 @@ function keyToken(inst) {
     talkback: "TALK"
   })[preset] || "OSC";
 }
+// Fixed idle colors by functional key family; all engaged keys render red.
+// Snapshot: purple, mute: blue, other toggles (Dim/Mono/Talkback/48V): green.
 function keyAccent(inst) {
   if (inst.action === ACTION_SNAPSHOT) return "#c88cff";
-  const preset = inst.settings.preset || "mainMute";
-  return ({
-    mainMute: "#38d9ff",
-    dim: "#58e6a9",
-    mono: "#9aa8ff",
-    micMute: "#ffb84d",
-    tvSpdifMute: "#c88cff",
-    spdifOutMute: "#58e6a9",
-    phonesMute: "#9aa8ff",
-    mic48v: "#ff8e4d",
-    talkback: "#ff5d69"
-  })[preset] || "#38d9ff";
+  const preset = inst.settings.preset || ((typeof inst.settings.path === "string" || typeof inst.settings.title === "string") ? "custom" : "mainMute");
+  if (["mainMute", "micMute", "tvSpdifMute", "spdifOutMute", "phonesMute"].includes(preset) ||
+      (preset === "custom" && toggleSpec(inst.settings).paths.some(path => path.endsWith("/mute")))) {
+    return "#38d9ff";
+  }
+  return "#58e6a9";
 }
 function keyStatus(inst, active) {
   if (inst.action === ACTION_SNAPSHOT) return active ? "ACTIVE" : "READY";
