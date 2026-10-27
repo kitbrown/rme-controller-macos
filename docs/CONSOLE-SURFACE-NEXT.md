@@ -1,6 +1,16 @@
-# RME Console Surface — Unreleased Test Build 1.1.8.2
+# RME Console Surface — Unreleased Test Build 1.1.8.4
 
 Production version **1.1.8.0** remains unchanged and under Marketplace review. This branch is an independent candidate with a higher **test-only** version to prevent same-version installation conflicts; it is not a new public release.
+
+## Status color palette — graphics unchanged
+
+- **CONFIRMED:** Snapshot keys (1–8) use violet `#c88cff` while inactive.
+- **CONFIRMED:** Mute keys (including custom OSC paths ending in `/mute`) use cyan `#38d9ff` while inactive.
+- **CONFIRMED:** Other toggle controls (Dim, Mono, Talkback, 48V, custom non-mute controls) use green `#58e6a9` while inactive.
+- **CONFIRMED:** All key categories display red `#ff5d69` when active, preserving their original shapes, text, SVG positioning, and OSC logic.
+- **CONFIRMED:** Automated cases assert every snapshot, preset class, custom mute and non-mute appearance, and active red.
+- **UNKNOWN:** Visual appearance and readability on physical Stream Deck keys until hardware acceptance.
+- **REJECTED:** Any redesign of key imagery, typography, layouts or changes to the submitted Marketplace version.
 
 ## State ledger
 
@@ -29,7 +39,7 @@ The meter depends on real streaming level feedback; static fader-state replies a
 ## Three-key Live Audio Peak Meter
 
 1. Export/back up the current Stream Deck profile. Installing the test candidate keeps the same plugin UUID and may replace the locally installed plugin.
-2. Install the CI-generated **UNRELEASED** candidate `1.1.8.2` when ready for hardware acceptance.
+2. Install the CI-generated **UNRELEASED** candidate `1.1.8.4` when ready for hardware acceptance.
 3. On Page 3, place three **Live Channel Fader** actions on consecutive vertically aligned keys.
 4. For each: **Channel type** = Hardware output, **Preset** = Control Room — Main (or choose another source independently), **On key press** = Live audio peak meter, **Stack height** = 3, **Meter floor** = -60 dBFS, and **Meter channels** = Selected channel (or select Selected + next channel for stereo maximum). The three buttons must use matching source, meter floor, channels and transport settings.
 5. Set **Position in stack** to **3 top, 2 middle, 1 bottom**.
