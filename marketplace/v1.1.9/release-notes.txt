@@ -1,0 +1,11 @@
+Version 1.1.9
+
+• Added a continuous, live audio peak meter spanning 1–4 Stream Deck keys, using actual TotalMix Global OSC level feedback (not fader position).
+• Added OSC Connection Monitor with read-only state refresh.
+• Added Processor and Routing encoders for selected pan, balance, EQ, dynamics, reverb and echo parameters.
+• Expanded EQ, Dynamics, Low Cut, Auto Level, Reverb and Echo enable-toggle presets.
+• Added optional live channel-name discovery and configurable channel selection where TotalMix reports names.
+• Updated mixer-console app icon, retained the accepted key design, and standardized active-red key indicators.
+• Preserved existing output/submix, mute, snapshots and transport behavior.
+
+Hardware support for advanced parameters varies by interface; controls require corresponding Global OSC feedback before adjustments are enabled.
