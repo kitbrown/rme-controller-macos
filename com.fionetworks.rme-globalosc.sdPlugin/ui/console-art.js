@@ -17,7 +17,7 @@ export function renderConsoleKey({ token, status, active, accent }) {
   status = esc(status);
   accent = /^#[0-9a-f]{6}$/i.test(accent) ? accent : "#56caff";
   const mute = status === "MUTED";
-  const light = active ? (mute ? "#ff7079" : accent) : "#3d5262";
+  const light = active ? "#ff5d69" : accent;
   const bars = Array.from({length:7}, (_,i) =>
     '<rect x="' + (30 + i*13) + '" y="' + (92 - [9,16,23,11,19,7,15][i]) +
     '" width="8" height="' + [9,16,23,11,19,7,15][i] + '" rx="2" fill="' +
