@@ -77,6 +77,8 @@ send("/output/2/volume",-10);
 send("/output/2/mute",0);
 await until(()=>events("named","setFeedback").some(e=>e.payload.title?.value==="Live Monitors"),"live TotalMix channel name missing");
 
+ws.message({event:"sendToPlugin",context:"named",payload:{kind:"channelNames"}});
+await until(()=>events("named","sendToPropertyInspector").some(e=>e.payload.names?.some(n=>n.name==="Live Monitors")),"channel picker feedback missing");
 appear("diagnostic","connection",{});
 await until(()=>events("connection","setImage").length,"diagnostic artwork missing");
 const initial=events("connection","setImage").at(-1).payload.image;
