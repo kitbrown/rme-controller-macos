@@ -52,6 +52,14 @@ function updateVisibility() {
   const mode = document.querySelector("[data-setting='keyMode']")?.value;
   document.querySelectorAll("[data-show-mode]").forEach(el => { el.hidden = mode !== el.dataset.showMode; });
   document.querySelectorAll("[data-hide-mode]").forEach(el => { el.hidden = mode === el.dataset.hideMode; });
+  const keys=["eqEnable","dynEnable","lowcutEnable","autoLevelEnable"];
+  document.querySelectorAll("[data-show-processing]").forEach(el => {
+    el.hidden=!keys.includes(document.querySelector("[data-setting='preset']")?.value);
+  });
+  const scope=document.querySelector("[data-setting='paramKey']")?.selectedOptions?.[0]?.dataset.paramScope;
+  document.querySelectorAll("[data-param-target]").forEach(el=>{
+    el.hidden=!el.dataset.paramTarget.split(",").includes(scope);
+  });
   document.querySelectorAll("[data-show-preset]").forEach(el => {
     el.hidden = presetSelect?.value !== el.dataset.showPreset;
   });
