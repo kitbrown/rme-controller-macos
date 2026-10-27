@@ -179,14 +179,14 @@ function oscString(value) {
   raw.copy(out);
   return out;
 }
-function encodeOsc(address, args = []) {
-  const tags = `,${args.map(v => typeof v === "string" ? "s" : Number.isInteger(v) ? "i" : "f").join("")}`;
+function encodeOsc(address, args = [], forceFloat = false) {
+  const tags = `,${args.map(v => typeof v === "string" ? "s" : forceFloat ? "f" : Number.isInteger(v) ? "i" : "f").join("")}`;
   const parts = [oscString(address), oscString(tags)];
   for (const value of args) {
     if (typeof value === "string") parts.push(oscString(value));
     else {
       const b = Buffer.alloc(4);
-      if (Number.isInteger(value)) b.writeInt32BE(value, 0);
+      if (Number.isInteger(value) && !forceFloat) b.writeInt32BE(value, 0);
       else b.writeFloatBE(Number(value), 0);
       parts.push(b);
     }
@@ -461,9 +461,9 @@ function releaseReceiver(port) {
   receivers.delete(port);
   try { entry.socket.close(); } catch {}
 }
-function sendPacket(settings, address, value) {
+function sendPacket(settings, address, value, forceFloat = false) {
   const c = cfg(settings);
-  const packet = encodeOsc(address, [value]);
+  const packet = encodeOsc(address, [value], forceFloat);
   oscTx.send(packet, c.sendPort, c.host, error => {
     if (error) console.error(`OSC TX ${address}:`, error.message || error);
   });
@@ -483,19 +483,20 @@ function requestGlobalState(settings) {
   }, GLOBAL_REQUEST_DEBOUNCE_MS);
   queuedGlobalRequests.set(key, item);
 }
-function queuePacket(settings, address, value) {
+function queuePacket(settings, address, value, forceFloat = false) {
   const c = cfg(settings);
   const key = `${c.host}:${c.sendPort}:${address}`;
   const queued = queuedSends.get(key);
   if (queued) {
     queued.value = value;
     queued.settings = settings;
+    queued.forceFloat = forceFloat;
     return;
   }
-  const item = {settings, address, value, timer: null};
+  const item = {settings, address, value, forceFloat, timer: null};
   item.timer = setTimeout(() => {
     queuedSends.delete(key);
-    sendPacket(item.settings, item.address, item.value);
+    sendPacket(item.settings, item.address, item.value, item.forceFloat);
   }, COMMAND_COALESCE_MS);
   queuedSends.set(key, item);
 }
@@ -507,8 +508,8 @@ function markPending(settings, path, expected) {
 function sendCommand(inst, path, value, coalesce = false) {
   markPending(inst.settings, path, value);
   applyValueToMatching(cfg(inst.settings).receivePort, path, value);
-  if (coalesce) queuePacket(inst.settings, path, value);
-  else sendPacket(inst.settings, path, value);
+  if (coalesce) queuePacket(inst.settings, path, value, inst.action===ACTION_PARAMETER);
+  else sendPacket(inst.settings, path, value, inst.action===ACTION_PARAMETER);
   clearTimeout(inst.reconcileTimer);
   inst.reconcileTimer = setTimeout(() => requestState(inst), RECONCILE_MS);
 }
