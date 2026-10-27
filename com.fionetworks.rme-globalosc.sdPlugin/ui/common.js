@@ -49,6 +49,8 @@ function updateVisibility() {
     }
   }
   document.querySelectorAll("[data-show-target]").forEach(el => { el.hidden = target !== el.dataset.showTarget; });
+  const mode = document.querySelector("[data-setting='keyMode']")?.value;
+  document.querySelectorAll("[data-show-mode]").forEach(el => { el.hidden = mode !== el.dataset.showMode; });
   document.querySelectorAll("[data-show-preset]").forEach(el => {
     el.hidden = presetSelect?.value !== el.dataset.showPreset;
   });
@@ -99,6 +101,12 @@ function validate() {
       errors.push(`${name} must be a whole index from 0 to 999.`);
       el.style.borderColor = "#ff5d69";
     }
+  }
+  const segments = document.querySelector("[data-setting='stackSegments']");
+  const position = document.querySelector("[data-setting='stackPosition']");
+  if (segments && position && Number(position.value) > Number(segments.value)) {
+    errors.push("Stack position cannot exceed stack height.");
+    position.style.borderColor = "#ff5d69";
   }
   const min = document.querySelector("[data-setting='minDb']");
   const max = document.querySelector("[data-setting='maxDb']");
