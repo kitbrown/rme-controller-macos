@@ -38,7 +38,7 @@ input:focus,select:focus{outline:2px solid #49c49d50;border-color:var(--accent)}
     <label>Source index (zero-based)</label><input data-setting="sourceIndex" type="number" value="0" min="0" max="999">
   </div>
 </div>
-<label>Audio channels</label><select data-setting="meterChannels"><option value="mono">Selected channel</option><option value="stereo">Selected + next channel (higher peak)</option></select>
+<label>Discovered TotalMix channel</label><select data-channel-picker data-channel-buses="output"><option value="">Waiting for OSC channel names…</option></select><label>Audio channels</label><select data-setting="meterChannels"><option value="mono">Selected channel</option><option value="stereo">Selected + next channel (higher peak)</option></select>
 </div>
 <div class="section"><h3>Vertical meter</h3>
 <label>Stack height</label><select data-setting="stackSegments">
