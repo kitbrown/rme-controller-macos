@@ -1,6 +1,6 @@
 import dgram from "node:dgram";
 import {readFileSync} from "node:fs";
-import {renderConsoleKey, renderLevelKey} from "../ui/console-art.js";
+import {renderConsoleKey, renderLevelKey, renderStackKey} from "../ui/console-art.js";
 
 const PLUGIN_UUID = "com.fionetworks.rme-globalosc";
 const ACTION_OUTPUT = `${PLUGIN_UUID}.outputvolume`;
@@ -112,7 +112,7 @@ function levelKeyIsMix(s) { return s.target === "mix"; }
 function levelKeyPath(s) { return levelKeyIsMix(s) ? mixPath(s) : outputPath(s); }
 function levelKeyMutePath(s) { return levelKeyIsMix(s) ? mixMutePath(s) : outputMutePath(s); }
 function levelKeyLabel(s) { return typeof s.label === "string" && s.label.trim() ? s.label.trim() : (levelKeyIsMix(s) ? mixSpec(s).label : outputSpec(s).label); }
-function levelKeyMode(s) { return ["up","down","mute"].includes(s.keyMode) ? s.keyMode : "up"; }
+function levelKeyMode(s) { return ["up","down","mute","meter"].includes(s.keyMode) ? s.keyMode : "up"; }
 function outputPath(s) { return `/output/${outputSpec(s).outputIndex}/volume`; }
 function outputMutePath(s) { return `/output/${outputSpec(s).outputIndex}/mute`; }
 function mixPath(s) {
@@ -247,6 +247,15 @@ function keyImage(inst, active) {
   return renderConsoleKey({token: keyToken(inst), status: keyStatus(inst, active), accent: keyAccent(inst), active});
 }
 function levelKeyImage(inst) {
+  if (levelKeyMode(inst.settings) === "meter") {
+    return renderStackKey({
+      level: inst.value === undefined ? 0 : indicator(inst.settings, inst.value),
+      known: inst.value !== undefined,
+      muted: inst.muted === true,
+      segments: inst.settings.stackSegments,
+      position: inst.settings.stackPosition
+    });
+  }
   return renderLevelKey({
     label: levelKeyLabel(inst.settings),
     value: inst.value === undefined ? "SYNC" : inst.muted === true ? "MUTED" : formatDb(inst.value),
@@ -510,6 +519,7 @@ function isReady(inst, operation) {
   }
   if (inst.action === ACTION_LEVEL_KEY) {
     if (levelKeyMode(inst.settings) === "mute") return inst.muted !== undefined;
+    if (levelKeyMode(inst.settings) === "meter") return inst.value !== undefined;
     return inst.value !== undefined && inst.muted !== undefined;
   }
   if (inst.action === ACTION_TOGGLE) {
@@ -666,8 +676,9 @@ function onKeyDown(msg) {
   const inst = instances.get(msg.context);
   if (!inst) return;
   if (inst.action === ACTION_LEVEL_KEY) {
-    if (!isReady(inst, "key")) return blockUntilReady(inst);
     const mode = levelKeyMode(inst.settings);
+    if (mode === "meter") return; // Visual-only monitor; no OSC side effects.
+    if (!isReady(inst, "key")) return blockUntilReady(inst);
     if (mode === "mute") {
       sendCommand(inst, levelKeyMutePath(inst.settings), inst.muted ? 0 : 1);
     } else if (inst.muted !== true) {
