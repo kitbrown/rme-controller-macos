@@ -105,12 +105,15 @@ function validate() {
   }
   const segments = document.querySelector("[data-setting='stackSegments']");
   const position = document.querySelector("[data-setting='stackPosition']");
-  if (document.querySelector("[data-setting='keyMode']")?.value === "meter" && segments && position && Number(position.value) > Number(segments.value)) {
+  if ((!document.querySelector("[data-setting='keyMode']") ||
+     document.querySelector("[data-setting='keyMode']").value === "meter") &&
+     segments && position && Number(position.value) > Number(segments.value)) {
     errors.push("Stack position cannot exceed stack height.");
     position.style.borderColor = "#ff5d69";
   }
   const floor = document.querySelector("[data-setting='meterFloorDb']");
-  if (floor && document.querySelector("[data-setting='keyMode']")?.value === "meter" &&
+  if (floor && (!document.querySelector("[data-setting='keyMode']") ||
+      document.querySelector("[data-setting='keyMode']").value === "meter") &&
       (!Number.isFinite(Number(floor.value)) || Number(floor.value) < -120 || Number(floor.value) > -6)) {
     errors.push("Audio meter floor must be between -120 and -6 dBFS.");
     floor.style.borderColor = "#ff5d69";
