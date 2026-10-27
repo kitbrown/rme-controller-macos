@@ -59,6 +59,7 @@ const instances = new Map();
 const contextOperations = new Map();
 const receivers = new Map();
 const channelNames = new Map();
+const openInspectors = new Set();
 const portTelemetry = new Map();
 const pendingPaths = new Map();
 const queuedSends = new Map();
@@ -342,6 +343,18 @@ function accentForInstance(inst) {
   }
   return "#38d9ff";
 }
+function sendChannelList(context) {
+  const inst=instances.get(context);if(!inst)return;
+  const prefix=cfg(inst.settings).receivePort+":";
+  const names=[...channelNames.entries()]
+    .filter(([key])=>key.startsWith(prefix))
+    .map(([key,name])=>{
+      const parts=key.slice(prefix.length).split(":");
+      return {bus:parts[0],index:Number(parts[1]),name};
+    }).filter(v=>Number.isInteger(v.index)&&v.index>=0&&v.index<=999)
+    .slice(0,256).sort((a,b)=>a.bus.localeCompare(b.bus)||a.index-b.index);
+  sendSD("sendToPropertyInspector",context,{kind:"channelNames",names});
+}
 function channelDisplayName(inst) {
   if (inst.settings.followName !== true) return null;
   const c=cfg(inst.settings);
@@ -572,6 +585,10 @@ function handleOsc(port, message) {
   const channelName=/^\/(input|playback|output)\/(\d+)\/name$/.exec(message.address);
   if(channelName && typeof message.args[0]==="string") {
     channelNames.set(port+":"+channelName[1]+":"+Number(channelName[2]),message.args[0].slice(0,64));
+    for(const context of openInspectors) {
+      const inspector=instances.get(context);
+      if(inspector && matchesReceiver(inspector,port))sendChannelList(context);
+    }
     for(const inst of instances.values())if(matchesReceiver(inst,port) && inst.settings.followName===true) {
       if(inst.action===ACTION_OUTPUT||inst.action===ACTION_MIX)renderDial(inst);
       else if(inst.action===ACTION_LEVEL_KEY)renderLevelKey(inst);
@@ -757,6 +774,7 @@ function removeInstance(context) {
   const inst = instances.get(context);
   if (!inst) return;
   instances.delete(context);
+  openInspectors.delete(context);
   clearTimeout(inst.feedbackTimer);
   clearInterval(inst.diagnosticTimer);
   clearTimeout(inst.reconcileTimer);
@@ -859,6 +877,17 @@ function connectStreamDeck() {
       else if (msg.event === "keyDown") onKeyDown(msg);
       else if (msg.event === "keyUp") onKeyUp(msg);
       else if (msg.event === "didReceiveSettings") void queueConfiguration(msg, true);
+      else if (msg.event === "sendToPlugin" && msg.payload?.kind==="channelNames") {
+        openInspectors.add(msg.context);
+        sendChannelList(msg.context);
+        const inst=instances.get(msg.context);
+        if(inst)requestGlobalState(inst.settings);
+      } else if (msg.event === "propertyInspectorDidAppear") {
+        openInspectors.add(msg.context);
+        sendChannelList(msg.context);
+      } else if (msg.event === "propertyInspectorDidDisappear") {
+        openInspectors.delete(msg.context);
+      }
     } catch (error) {
       console.error("Stream Deck message:", error.message || error);
     }
