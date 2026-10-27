@@ -17,7 +17,7 @@ for (const segments of [1,2,3,4]) {
     assert.equal(fill(full).height,144);
     assert(!noLevel.includes("<text"),"meter must never display labels");
     assert(!noLevel.includes("<path"),"meter must never display tick marks");
-    assert(!/<line(?:\\s|>)/.test(noLevel),"meter must never display per-key divisions");
+    assert(!noLevel.includes("<line "),"meter must never display per-key divisions");
     assert(full.includes('y1="'+(position*144)+'"'),"shared gradient bottom coordinate mismatch");
     assert(full.includes('y2="'+((position-segments)*144)+'"'),"shared gradient top coordinate mismatch");
     assert(full.includes("url(#meter)"),"gradient required");
