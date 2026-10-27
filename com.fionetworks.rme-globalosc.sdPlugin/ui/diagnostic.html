@@ -1,0 +1,20 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><style>
+:root{color-scheme:dark}body{background:#101822;color:#e9f3fb;padding:14px;font:13px -apple-system,Arial,sans-serif}
+section{background:#182533;border:1px solid #344b5c;border-radius:10px;padding:13px;margin:0 0 11px}
+h2{font-size:18px;margin:0 0 8px}h3{font-size:12px;margin:0 0 8px;color:#86dcbd}
+label{display:block;margin:10px 0 4px;color:#c6d9e5}
+input{width:100%;box-sizing:border-box;color:#fff;background:#0e1821;border:1px solid #3b5364;border-radius:6px;padding:8px}
+p{font-size:11px;color:#a9bfce;line-height:1.5}
+.note{border-left:3px solid #58e6a9;padding:8px 10px;background:#122b27}
+</style></head><body>
+<section><h2>OSC Connection Monitor</h2><p>Green RX LIVE means recent OSC packets reached the configured local UDP port. It does not authenticate their sender or prove a specific TotalMix channel works.</p>
+<p class="note">Press the key to send a read-only <code>/sendall</code> request. If TotalMix replies, the key shows RX LIVE. Yellow NO DATA or STALE means no recent feedback.</p></section>
+<section><h3>Global OSC transport</h3><label>TotalMix host</label><input data-setting="host" value="127.0.0.1">
+<label>TotalMix incoming port</label><input type="number" data-setting="sendPort" value="7008">
+<label>Plugin feedback port</label><input type="number" data-setting="receivePort" value="9008"></section>
+<section><h3>Setup checklist</h3><p>1. TotalMix → Options → Enable OSC Control.</p><p>2. Settings → OSC → enabled controller → Compatibility: Global OSC.</p>
+<p>3. Remote address: 127.0.0.1; incoming 7008; outgoing 9008.</p>
+<p>4. Details → Send Changes, Send Status, and Send Level Data (for peak meters).</p>
+<p>5. Press the monitor key to request state. Check the on-key RX indicator.</p>
+<p>One application may listen on a given feedback port. Restart Stream Deck after replacing the plugin if another instance already holds it.</p></section>
+<script src="common.js"></script></body></html>
