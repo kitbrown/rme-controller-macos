@@ -11,6 +11,7 @@ const ACTION_SNAPSHOT = `${PLUGIN_UUID}.snapshot`;
 const ACTION_LEVEL_KEY = `${PLUGIN_UUID}.levelkey`;
 const ACTION_PEAK_METER = `${PLUGIN_UUID}.peakmeter`;
 const ACTION_PARAMETER = `${PLUGIN_UUID}.parameter`;
+const ACTION_DIAGNOSTIC = `${PLUGIN_UUID}.diagnostic`;
 const isMeter = inst => inst.action === ACTION_PEAK_METER || (inst.action === ACTION_LEVEL_KEY && levelKeyMode(inst.settings) === "meter");
 
 const DEFAULT_HOST = "127.0.0.1";
@@ -57,6 +58,8 @@ const TOGGLE_PRESETS = {
 const instances = new Map();
 const contextOperations = new Map();
 const receivers = new Map();
+const channelNames = new Map();
+const portTelemetry = new Map();
 const pendingPaths = new Map();
 const queuedSends = new Map();
 const queuedGlobalRequests = new Map();
@@ -259,6 +262,13 @@ function keyStatus(inst, active) {
   if (preset === "talkback") return active ? "ACTIVE" : "READY";
   return active ? "ON" : "OFF";
 }
+function diagnosticImage(inst) {
+  const last=portTelemetry.get(cfg(inst.settings).receivePort);
+  const age=last?Date.now()-last.lastAt:Infinity;
+  const status=age<5000?"RX LIVE":last?"STALE":"NO DATA";
+  return renderConsoleKey({token:"OSC",status,active:false,accent:age<5000?"#58e6a9":"#f3be67"});
+}
+function renderDiagnostic(inst) {if(instances.has(inst.context))setImage(inst.context,diagnosticImage(inst));}
 function keyImage(inst, active) {
   return renderConsoleKey({token: keyToken(inst), status: keyStatus(inst, active), accent: keyAccent(inst), active});
 }
@@ -273,7 +283,7 @@ function levelKeyImage(inst) {
     });
   }
   return drawLevelKey({
-    label: levelKeyLabel(inst.settings),
+    label: channelDisplayName(inst) || levelKeyLabel(inst.settings),
     value: inst.value === undefined ? "SYNC" : inst.muted === true ? "MUTED" : formatDb(inst.value),
     level: inst.value === undefined ? 0 : indicator(inst.settings, inst.value),
     muted: inst.muted === true,
@@ -318,6 +328,22 @@ function accentForInstance(inst) {
   }
   return "#38d9ff";
 }
+function channelDisplayName(inst) {
+  if (inst.settings.followName !== true) return null;
+  const c=cfg(inst.settings);
+  if(inst.action===ACTION_OUTPUT)return channelNames.get(c.receivePort+":output:"+outputSpec(inst.settings).outputIndex)||null;
+  if(inst.action===ACTION_MIX) {
+    const x=mixSpec(inst.settings),bus=x.bus==="in"?"input":"playback";
+    return channelNames.get(c.receivePort+":"+bus+":"+x.sourceIndex)||null;
+  }
+  if(inst.action===ACTION_LEVEL_KEY && !isMeter(inst)) {
+    if(levelKeyIsMix(inst.settings)) {
+      const x=mixSpec(inst.settings);return channelNames.get(c.receivePort+":"+(x.bus==="in"?"input":"playback")+":"+x.sourceIndex)||null;
+    }
+    return channelNames.get(c.receivePort+":output:"+outputSpec(inst.settings).outputIndex)||null;
+  }
+  return null;
+}
 function feedbackPayload(inst) {
   const muted = inst.muted === true;
   const background = muted ? "#5a171c" : "#0b1118";
@@ -325,7 +351,8 @@ function feedbackPayload(inst) {
   let label = "RME";
   if (inst.action === ACTION_OUTPUT) label = outputSpec(inst.settings).label;
   else if (inst.action === ACTION_MIX) label = mixSpec(inst.settings).label;
-  else if (inst.action === ACTION_PARAMETER) label = resolveParameter(inst.settings).label;
+  else if (inst.action === ACTION_PARAMETER) label = typeof inst.settings.label === "string" && inst.settings.label.trim()?inst.settings.label.trim():resolveParameter(inst.settings).label;
+  label = channelDisplayName(inst) || label;
   const spec = inst.action === ACTION_PARAMETER ? resolveParameter(inst.settings) : null;
   const value = spec ? displayParameter(inst.value,spec) :
     inst.value === undefined ? "SYNCING" : muted ? "MUTED" : formatDb(inst.value);
@@ -472,6 +499,7 @@ function guardedValue(port, address, value) {
 }
 
 function actionPaths(inst) {
+  if (inst.action === ACTION_DIAGNOSTIC) return [];
   if (inst.action === ACTION_PARAMETER) return [resolveParameter(inst.settings).path];
   if (inst.action === ACTION_OUTPUT) return [outputPath(inst.settings), outputMutePath(inst.settings)];
   if (inst.action === ACTION_MIX) return [mixPath(inst.settings), mixMutePath(inst.settings)];
@@ -526,6 +554,15 @@ function applyValueToMatching(port, address, rawValue) {
   }
 }
 function handleOsc(port, message) {
+  portTelemetry.set(port,{lastAt:Date.now(),count:(portTelemetry.get(port)?.count||0)+1,lastPath:message.address});
+  const channelName=/^\/(input|playback|output)\/(\d+)\/name$/.exec(message.address);
+  if(channelName && typeof message.args[0]==="string") {
+    channelNames.set(port+":"+channelName[1]+":"+Number(channelName[2]),message.args[0].slice(0,64));
+    for(const inst of instances.values())if(matchesReceiver(inst,port) && inst.settings.followName===true) {
+      if(inst.action===ACTION_OUTPUT||inst.action===ACTION_MIX)renderDial(inst);
+      else if(inst.action===ACTION_LEVEL_KEY)renderLevelKey(inst);
+    }
+  }
   if (message.address === "/status/connection" && typeof message.args[0] === "number") {
     for (const inst of instances.values()) if (matchesReceiver(inst, port)) inst.connected = message.args[0] > 0.5;
     return;
@@ -542,6 +579,7 @@ function requestState(inst) {
   // Peak data is streamed by TotalMix when Send Level Messages is enabled.
   // /sendchan only fetches static channel parameters; it cannot request live peaks.
   if (isMeter(inst)) return;
+  if (inst.action === ACTION_DIAGNOSTIC) {requestGlobalState(s);return;}
   if (inst.action === ACTION_PARAMETER) {
     const spec=resolveParameter(s);
     if(spec.scope==="global")requestGlobalState(s);
@@ -564,6 +602,7 @@ function requestState(inst) {
 }
 function isReady(inst, operation) {
   if (inst.configuring) return false;
+  if (inst.action===ACTION_DIAGNOSTIC) return true;
   if (inst.action===ACTION_PARAMETER) return inst.confirmedParameter===true && Number.isFinite(inst.value);
   if (inst.action === ACTION_OUTPUT || inst.action === ACTION_MIX) {
     if (operation === "rotate") return inst.value !== undefined && (inst.settings.muteOnPress === false || inst.muted !== undefined);
@@ -620,6 +659,7 @@ async function configureInstance(msg, replacing = false) {
       value: undefined,
       muted: undefined,
       confirmedParameter: false,
+      diagnosticTimer: null,
       peakValue: undefined,
       peakLevels: new Map(),
       toggleStates: new Map(),
@@ -661,6 +701,10 @@ async function configureInstance(msg, replacing = false) {
     else await acquireReceiver(newPort);
   }
   if (inst.action === ACTION_OUTPUT || inst.action === ACTION_MIX || inst.action===ACTION_PARAMETER) renderDial(inst, true);
+  else if(inst.action===ACTION_DIAGNOSTIC) {
+    setTitle(inst.context,"");renderDiagnostic(inst);
+    clearInterval(inst.diagnosticTimer);inst.diagnosticTimer=setInterval(()=>renderDiagnostic(inst),1000);
+  }
   else if (inst.action === ACTION_LEVEL_KEY || inst.action === ACTION_PEAK_METER) {
     setTitle(inst.context, "");
     renderLevelKey(inst, true);
@@ -700,6 +744,7 @@ function removeInstance(context) {
   if (!inst) return;
   instances.delete(context);
   clearTimeout(inst.feedbackTimer);
+  clearInterval(inst.diagnosticTimer);
   clearTimeout(inst.reconcileTimer);
   clearTimeout(inst.resyncTimer);
   releaseReceiver(cfg(inst.settings).receivePort);
@@ -745,6 +790,7 @@ function onKeyUp(msg) {
 function onKeyDown(msg) {
   const inst = instances.get(msg.context);
   if (!inst) return;
+  if (inst.action === ACTION_DIAGNOSTIC) {requestGlobalState(inst.settings);return;}
   if (inst.action === ACTION_PEAK_METER) return; // Dedicated audio peak meter is always read-only.
   if (inst.action === ACTION_LEVEL_KEY) {
     const mode = levelKeyMode(inst.settings);
