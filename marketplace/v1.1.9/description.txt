@@ -1,0 +1,7 @@
+RME Controller for macOS puts TotalMix FX controls on Stream Deck using bidirectional Global OSC. Adjust hardware outputs and submix levels with Stream Deck + dials; use keys for mute, Dim, Mono, Talkback and snapshots 1–8.
+
+Version 1.1.9 adds a continuous live audio peak meter spanning up to four vertically stacked keys, a local OSC connection monitor, configurable pan/balance and processing dials, and optional live channel names from TotalMix. Available advanced parameters include select EQ, dynamics, reverb and echo controls. Controls requiring hardware-specific feedback do not accept changes until matching state is received.
+
+Requires macOS 13+, Stream Deck 7.1+, and an RME interface running Global OSC-capable TotalMix FX. Key actions work on compatible Stream Deck models; encoder actions require Stream Deck +. Hardware support and ranges for advanced processing functions vary by interface and channel. Audio peak meters require Send Level Messages in TotalMix. Default OSC ports: 7008 to TotalMix and 9008 for feedback.
+
+Free, independent FiO Networks software; not affiliated with or endorsed by RME Audio or Elgato. AI assisted software development, testing, listing copy and media design under maker direction.

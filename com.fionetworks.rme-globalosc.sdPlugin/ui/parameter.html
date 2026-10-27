@@ -1,0 +1,45 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><style>
+:root{color-scheme:dark;--accent:#f3be67;--muted:#9ab0c0;--line:#354555;--bg:#0d151e}
+*{box-sizing:border-box}body{background:var(--bg);color:#e8f2fc;padding:14px;margin:0;font:13px -apple-system,BlinkMacSystemFont,Arial,sans-serif}
+.hero,.section{padding:13px;border:1px solid var(--line);border-radius:10px;background:linear-gradient(150deg,#1a2a38,#111923);margin:0 0 10px}
+h2{font-size:18px;margin:3px 0 8px}h3{font-size:11px;color:#a8c3d5;letter-spacing:.11em;margin:0 0 8px}
+.kicker{color:var(--accent);font-size:10px;letter-spacing:.13em;font-weight:750}
+p{color:var(--muted);font-size:11px;line-height:1.45}
+label{display:block;color:#cddcea;margin:10px 0 4px}
+input,select{width:100%;background:#0b141c;color:#fff;border:1px solid #395266;border-radius:6px;padding:8px}
+input:focus,select:focus{border-color:var(--accent);outline:2px solid #f3be6733}
+.note{border-left:3px solid var(--accent);background:#1d211e;padding:10px;border-radius:5px}
+[hidden]{display:none!important}</style></head><body>
+<div class="hero"><div class="kicker">FIO / GLOBAL OSC</div><h2>Processor &amp; Routing</h2><p>Feedback-gated parameter control. The dial is blocked until TotalMix confirms a value for the selected parameter.</p></div>
+<div class="section"><h3>Parameter</h3><label>Function</label>
+<select data-setting="paramKey">
+<option value="mixPan" data-param-scope="mix">Submix Pan</option>
+<option value="outputPan" data-param-scope="output">Output Balance</option>
+<option value="eq1Gain" data-param-scope="channel">EQ Band 1 Gain</option>
+<option value="eq2Gain" data-param-scope="channel">EQ Band 2 Gain</option>
+<option value="eq3Gain" data-param-scope="channel">EQ Band 3 Gain</option>
+<option value="eq1Freq" data-param-scope="channel">EQ Band 1 Frequency</option>
+<option value="eq2Freq" data-param-scope="channel">EQ Band 2 Frequency</option>
+<option value="eq3Freq" data-param-scope="channel">EQ Band 3 Frequency</option>
+<option value="compThreshold" data-param-scope="channel">Compressor Threshold</option>
+<option value="compRatio" data-param-scope="channel">Compressor Ratio</option>
+<option value="makeupGain" data-param-scope="channel">Dynamics Makeup Gain</option>
+<option value="reverbVolume" data-param-scope="global">Reverb Volume</option>
+<option value="echoVolume" data-param-scope="global">Echo Volume</option>
+</select>
+<div data-param-target="mix,channel"><label>Source bus</label><select data-setting="paramBus">
+<option value="input">Hardware input</option><option value="playback">Software playback (submix only)</option><option value="output">Hardware output (processing only)</option></select>
+<label>Source index (zero-based)</label><input type="number" min="0" max="999" value="0" data-setting="sourceIndex"></div>
+<div data-param-target="mix,output"><label>Output / destination index (zero-based)</label>
+<input type="number" min="0" max="999" value="0" data-setting="outputIndex"></div>
+<label>Custom screen title (optional)</label><input type="text" data-setting="label" value="" maxlength="32">
+</div>
+<div class="section"><h3>Encoder</h3><label>Units per detent (blank = parameter default)</label>
+<input data-setting="stepValue" type="number" placeholder="Parameter default" step="any">
+<p>Press has no effect. Parameters only write after feedback is received; unavailable hardware functions remain blocked.</p></div>
+<div class="section"><h3>Global OSC connection</h3>
+<label>Host</label><input data-setting="host" value="127.0.0.1">
+<label>TotalMix receive port</label><input data-setting="sendPort" type="number" value="7008">
+<label>Plugin receive port</label><input data-setting="receivePort" type="number" value="9008">
+<p class="note">Enable Global OSC and Send Changes in TotalMix. EQ/dynamics/FX availability varies by RME interface. Numeric guardrails are client limits, not confirmed hardware capabilities. Do not turn on processing until its operation is verified on your interface.</p></div>
+<script src="common.js"></script></body></html>

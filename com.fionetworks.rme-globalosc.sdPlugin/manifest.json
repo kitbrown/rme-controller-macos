@@ -2,7 +2,7 @@
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
   "UUID": "com.fionetworks.rme-globalosc",
   "Name": "RME Controller for macOS",
-  "Version": "1.1.8.0",
+  "Version": "1.1.9.0",
   "Author": "FiO Networks",
   "Description": "Bidirectional Stream Deck control for RME TotalMix FX using Global OSC.",
   "Icon": "imgs/plugin",
@@ -32,7 +32,7 @@
         "Encoder"
       ],
       "Encoder": {
-        "layout": "$B1",
+        "layout": "ui/console-strip.json",
         "TriggerDescription": {
           "Rotate": "Adjust volume",
           "Push": "Mute / unmute"
@@ -54,7 +54,7 @@
         "Encoder"
       ],
       "Encoder": {
-        "layout": "$B1",
+        "layout": "ui/console-strip.json",
         "TriggerDescription": {
           "Rotate": "Adjust send level",
           "Push": "Mute / unmute"
@@ -86,7 +86,7 @@
           "Title": "ON"
         }
       ],
-      "PropertyInspectorPath": "ui/toggle.html"
+      "PropertyInspectorPath": "ui/toggle-advanced.html"
     },
     {
       "UUID": "com.fionetworks.rme-globalosc.snapshot",
@@ -108,6 +108,81 @@
         }
       ],
       "PropertyInspectorPath": "ui/snapshot.html"
+    },
+    {
+      "UUID": "com.fionetworks.rme-globalosc.levelkey",
+      "Name": "Live Channel Fader",
+      "Tooltip": "Show and control TotalMix fader position on a single key. For actual audio peaks, use Live Audio Peak Meter.",
+      "Icon": "imgs/action-mix",
+      "Controllers": [
+        "Keypad"
+      ],
+      "States": [
+        {
+          "Image": "imgs/toggle",
+          "Title": "",
+          "ShowTitle": false
+        }
+      ],
+      "PropertyInspectorPath": "ui/level-key.html"
+    },
+    {
+      "UUID": "com.fionetworks.rme-globalosc.peakmeter",
+      "Name": "Live Audio Peak Meter",
+      "Tooltip": "Displays actual TotalMix audio peaks in dBFS on a seamless vertical stack of 1–4 keys. Display only.",
+      "Icon": "imgs/action-meter",
+      "Controllers": [
+        "Keypad"
+      ],
+      "DisableAutomaticStates": true,
+      "States": [
+        {
+          "Image": "imgs/toggle",
+          "Title": "",
+          "ShowTitle": false
+        }
+      ],
+      "PropertyInspectorPath": "ui/peak-meter.html"
+    },
+    {
+      "UUID": "com.fionetworks.rme-globalosc.parameter",
+      "Name": "Processor and Routing",
+      "Tooltip": "Feedback-gated TotalMix EQ, dynamics, effects, and submix pan dial.",
+      "Icon": "imgs/action-mix",
+      "Controllers": [
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "ui/console-strip.json",
+        "TriggerDescription": {
+          "Rotate": "Adjust confirmed parameter",
+          "Push": "No action"
+        }
+      },
+      "States": [
+        {
+          "Image": "imgs/dial"
+        }
+      ],
+      "PropertyInspectorPath": "ui/parameter.html"
+    },
+    {
+      "UUID": "com.fionetworks.rme-globalosc.diagnostic",
+      "Name": "OSC Connection Monitor",
+      "Tooltip": "Check UDP OSC receive health; press to request read-only TotalMix state.",
+      "Icon": "imgs/action-meter",
+      "Controllers": [
+        "Keypad"
+      ],
+      "DisableAutomaticStates": true,
+      "States": [
+        {
+          "Image": "imgs/toggle",
+          "Title": "",
+          "ShowTitle": false
+        }
+      ],
+      "PropertyInspectorPath": "ui/diagnostic.html"
     }
   ]
 }

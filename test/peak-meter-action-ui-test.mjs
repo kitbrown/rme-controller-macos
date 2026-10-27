@@ -1,0 +1,27 @@
+import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
+
+const pluginRoot = new URL("../com.fionetworks.rme-globalosc.sdPlugin/", import.meta.url);
+const manifest = JSON.parse(readFileSync(new URL("manifest.json", pluginRoot), "utf8"));
+const meter = manifest.Actions.find(action => action.UUID === "com.fionetworks.rme-globalosc.peakmeter");
+const fader = manifest.Actions.find(action => action.UUID === "com.fionetworks.rme-globalosc.levelkey");
+assert(meter, "Dedicated peak meter must be registered");
+assert(fader, "Existing Live Channel Fader must be preserved");
+assert.equal(meter.Name, "Live Audio Peak Meter");
+assert.equal(meter.PropertyInspectorPath, "ui/peak-meter.html");
+assert.equal(meter.Icon, "imgs/action-meter");
+assert.equal(meter.States[0].ShowTitle, false);
+assert.deepEqual(meter.Controllers, ["Keypad"]);
+const inspector = readFileSync(new URL(meter.PropertyInspectorPath, pluginRoot), "utf8");
+assert.match(inspector, /<h2>Live Audio Peak Meter<\/h2>/);
+assert.match(inspector, /Send Level Messages/);
+assert.match(inspector, /data-setting="stackSegments"/);
+assert.match(inspector, /data-setting="stackPosition"/);
+assert.match(inspector, /data-setting="meterFloorDb"/);
+assert.match(inspector, /data-setting="meterChannels"/);
+assert.match(inspector, /data-setting="target"/);
+assert.match(inspector, /data-setting="preset"/);
+assert.doesNotMatch(inspector, /data-setting="keyMode"|Fader dB step|Level \+ step|Mute \/ unmute/);
+for(const name of ["host","sendPort","receivePort"])assert.match(inspector,new RegExp('data-setting="'+name+'"'));
+assert.equal(manifest.Version, "1.1.9.0");
+console.log("PASS: independent Live Audio Peak Meter action and configuration registered");

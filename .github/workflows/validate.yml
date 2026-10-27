@@ -3,10 +3,11 @@ name: Validate Stream Deck Plugin
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [main, feature/console-surface-next, feature/console-ui-improvements]
     paths:
       - "com.fionetworks.rme-globalosc.sdPlugin/**"
       - "test/**"
+      - "tools/**"
       - "package.json"
       - ".github/workflows/validate.yml"
 
@@ -20,7 +21,22 @@ jobs:
           node-version: "24"
       - name: Run automated tests
         run: npm test
+      - name: Render app icons
+        run: |
+          npm install --no-save @resvg/resvg-js@2.6.2
+          node tools/render-console-icon.mjs
       - name: Install Stream Deck CLI
         run: npm install --global @elgato/cli@latest
       - name: Validate plugin
         run: streamdeck validate com.fionetworks.rme-globalosc.sdPlugin
+      - name: Package unreleased hardware test candidate
+        run: streamdeck pack com.fionetworks.rme-globalosc.sdPlugin --output dist --no-update-check
+      - name: Upload unreleased hardware test candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: console-surface-next-UNRELEASED
+          path: |
+            dist/*.streamDeckPlugin
+            dist/console-marketplace-icon-288.png
+          if-no-files-found: error
+          retention-days: 14

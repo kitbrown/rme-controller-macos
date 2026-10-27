@@ -7,13 +7,52 @@ window.connectElgatoStreamDeckSocket = (port, propertyInspectorUUID, registerEve
   ws.onopen = () => {
     ws.send(JSON.stringify({event: registerEvent, uuid}));
     fill(actionInfo.payload?.settings || {});
+    ws.send(JSON.stringify({event:"sendToPlugin",context:uuid,payload:{kind:"channelNames"}}));
   };
   ws.onmessage = e => {
     const m = JSON.parse(e.data);
     if (m.event === "didReceiveSettings") fill(m.payload?.settings || {});
+    if (m.event === "sendToPropertyInspector" && m.payload?.kind==="channelNames")
+      populateChannelPicker(m.payload.names||[]);
   };
 };
 
+function populateChannelPicker(names) {
+  const picker=document.querySelector("[data-channel-picker]");
+  if(!picker)return;
+  const type=document.querySelector("[data-setting='target']")?.value;
+  const allowed=type==="output"||!document.querySelector("[data-setting='target']") ?
+    picker.dataset.channelBuses.split(",") :
+    ["input","playback"];
+  const previous=picker.value;
+  picker.replaceChildren(new Option("Select a reported channel…",""));
+  for(const item of names) {
+    if(!allowed.includes(item.bus) || !Number.isInteger(item.index))continue;
+    picker.add(new Option(item.bus+" "+item.index+" · "+item.name,item.bus+":"+item.index));
+  }
+  if([...picker.options].some(o=>o.value===previous))picker.value=previous;
+}
+function useChannelPicker(picker) {
+  if(!picker.value)return;
+  const [bus,indexText]=picker.value.split(":"),index=Number(indexText);
+  if(!Number.isInteger(index)||index<0||index>999)return;
+  const preset=document.querySelector("[data-setting='preset']");
+  if(preset)preset.value="custom";
+  const target=document.querySelector("[data-setting='target']");
+  if(target)target.value=bus==="output"?"output":"mix";
+  const out=document.querySelector("[data-setting='outputIndex']");
+  const source=document.querySelector("[data-setting='sourceIndex']");
+  const sourceBus=document.querySelector("[data-setting='bus']");
+  if(bus==="output" && out)out.value=String(index);
+  if(bus!=="output" && source)source.value=String(index);
+  if(bus!=="output" && sourceBus)sourceBus.value=bus==="playback"?"playback":"in";
+  const title=document.querySelector("[data-setting='label']");
+  const option=picker.selectedOptions[0];
+  if(title && option)title.value=option.textContent.split(" · ").slice(1).join(" · ");
+  const follow=document.querySelector("[data-setting='followName']");
+  if(follow)follow.checked=true;
+  updateVisibility(); save();
+}
 function validationBox() {
   let box = document.getElementById("validation-message");
   if (box) return box;
@@ -37,9 +76,40 @@ function fill(s) {
 }
 
 function updateVisibility() {
+  const target = document.querySelector("[data-setting='target']")?.value;
+  const presetSelect = document.querySelector("[data-setting='preset']");
+  if (target && presetSelect) {
+    for (const option of presetSelect.options) {
+      if (option.dataset.target) option.hidden = option.dataset.target !== target && option.dataset.target !== "both";
+    }
+    if (presetSelect.selectedOptions[0]?.hidden) {
+      const first = [...presetSelect.options].find(option => !option.hidden);
+      if (first) presetSelect.value = first.value;
+    }
+  }
+  document.querySelectorAll("[data-show-target]").forEach(el => { el.hidden = target !== el.dataset.showTarget; });
+  const mode = document.querySelector("[data-setting='keyMode']")?.value;
+  document.querySelectorAll("[data-show-mode]").forEach(el => { el.hidden = mode !== el.dataset.showMode; });
+  document.querySelectorAll("[data-hide-mode]").forEach(el => { el.hidden = mode === el.dataset.hideMode; });
+  const keys=["eqEnable","dynEnable","lowcutEnable","autoLevelEnable"];
+  document.querySelectorAll("[data-show-processing]").forEach(el => {
+    el.hidden=!keys.includes(document.querySelector("[data-setting='preset']")?.value);
+  });
+  const scope=document.querySelector("[data-setting='paramKey']")?.selectedOptions?.[0]?.dataset.paramScope;
+  document.querySelectorAll("[data-param-target]").forEach(el=>{
+    el.hidden=!el.dataset.paramTarget.split(",").includes(scope);
+  });
+  const paramBus=document.querySelector("[data-setting='paramBus']");
+  if(paramBus) {
+    for(const option of paramBus.options)
+      option.hidden=(scope==="channel"&&option.value==="playback")||(scope==="mix"&&option.value==="output");
+    if(paramBus.selectedOptions[0]?.hidden) {
+      const allowed=[...paramBus.options].find(option=>!option.hidden);
+      if(allowed)paramBus.value=allowed.value;
+    }
+  }
   document.querySelectorAll("[data-show-preset]").forEach(el => {
-    const preset = document.querySelector("[data-setting='preset']")?.value;
-    el.hidden = preset !== el.dataset.showPreset;
+    el.hidden = presetSelect?.value !== el.dataset.showPreset;
   });
 }
 
@@ -75,6 +145,35 @@ function validate() {
     }
   }
 
+  const step = document.querySelector("[data-setting='stepDb']");
+  if (step && (!Number.isFinite(Number(step.value)) || Number(step.value) <= 0 || Number(step.value) > 24)) {
+    errors.push("dB step must be greater than 0 and no more than 24.");
+    step.style.borderColor = "#ff5d69";
+  }
+  for (const name of ["outputIndex", "sourceIndex"]) {
+    const el = document.querySelector(`[data-setting='${name}']`);
+    if (!el) continue;
+    const value = Number(el.value);
+    if (!Number.isInteger(value) || value < 0 || value > 999) {
+      errors.push(`${name} must be a whole index from 0 to 999.`);
+      el.style.borderColor = "#ff5d69";
+    }
+  }
+  const segments = document.querySelector("[data-setting='stackSegments']");
+  const position = document.querySelector("[data-setting='stackPosition']");
+  if ((!document.querySelector("[data-setting='keyMode']") ||
+     document.querySelector("[data-setting='keyMode']").value === "meter") &&
+     segments && position && Number(position.value) > Number(segments.value)) {
+    errors.push("Stack position cannot exceed stack height.");
+    position.style.borderColor = "#ff5d69";
+  }
+  const floor = document.querySelector("[data-setting='meterFloorDb']");
+  if (floor && (!document.querySelector("[data-setting='keyMode']") ||
+      document.querySelector("[data-setting='keyMode']").value === "meter") &&
+      (!Number.isFinite(Number(floor.value)) || Number(floor.value) < -120 || Number(floor.value) > -6)) {
+    errors.push("Audio meter floor must be between -120 and -6 dBFS.");
+    floor.style.borderColor = "#ff5d69";
+  }
   const min = document.querySelector("[data-setting='minDb']");
   const max = document.querySelector("[data-setting='maxDb']");
   if (min && max && Number(min.value) >= Number(max.value)) {
@@ -100,7 +199,10 @@ function save() {
   ws.send(JSON.stringify({event:"setSettings", context:uuid, payload:settingsFromForm()}));
 }
 
-document.addEventListener("change", () => {
+document.addEventListener("change", event => {
+  if(event.target?.matches?.("[data-channel-picker]")) {
+    useChannelPicker(event.target);return;
+  }
   updateVisibility();
   save();
 });

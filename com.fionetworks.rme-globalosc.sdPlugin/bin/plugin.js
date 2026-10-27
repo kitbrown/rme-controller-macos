@@ -1,11 +1,18 @@
 import dgram from "node:dgram";
 import {readFileSync} from "node:fs";
+import {renderConsoleKey, renderLevelKey as drawLevelKey, renderStackKey} from "../ui/console-art.js";
+import {resolveParameter,parameterRange,displayParameter} from "../ui/parameter-config.js";
 
 const PLUGIN_UUID = "com.fionetworks.rme-globalosc";
 const ACTION_OUTPUT = `${PLUGIN_UUID}.outputvolume`;
 const ACTION_MIX = `${PLUGIN_UUID}.mixfader`;
 const ACTION_TOGGLE = `${PLUGIN_UUID}.toggle`;
 const ACTION_SNAPSHOT = `${PLUGIN_UUID}.snapshot`;
+const ACTION_LEVEL_KEY = `${PLUGIN_UUID}.levelkey`;
+const ACTION_PEAK_METER = `${PLUGIN_UUID}.peakmeter`;
+const ACTION_PARAMETER = `${PLUGIN_UUID}.parameter`;
+const ACTION_DIAGNOSTIC = `${PLUGIN_UUID}.diagnostic`;
+const isMeter = inst => inst.action === ACTION_PEAK_METER || (inst.action === ACTION_LEVEL_KEY && levelKeyMode(inst.settings) === "meter");
 
 const DEFAULT_HOST = "127.0.0.1";
 const DEFAULT_SEND_PORT = 7008;
@@ -26,7 +33,8 @@ const SNAPSHOT_IMAGES = [pngDataUri("../imgs/snapshot.png"), pngDataUri("../imgs
 const OUTPUT_PRESETS = {
   main: {label: "Main", outputIndex: 0},
   phones1: {label: "Phones 1", outputIndex: 6},
-  spdif: {label: "SPDIF Out", outputIndex: 8}
+  spdif: {label: "SPDIF Out", outputIndex: 8},
+  spdifOut: {label: "SPDIF Out", outputIndex: 8}
 };
 const MIX_PRESETS = {
   input12: {label: "Analog 1/2 In", bus: "in", sourceIndex: 0, outputIndex: 0},
@@ -50,6 +58,9 @@ const TOGGLE_PRESETS = {
 const instances = new Map();
 const contextOperations = new Map();
 const receivers = new Map();
+const channelNames = new Map();
+const openInspectors = new Set();
+const portTelemetry = new Map();
 const pendingPaths = new Map();
 const queuedSends = new Map();
 const queuedGlobalRequests = new Map();
@@ -95,9 +106,22 @@ function mixSpec(s = {}) {
     outputIndex: integer(s.outputIndex, 0, 0, 999)
   };
 }
+const PROCESSOR_SWITCHES = Object.freeze({
+  eqEnable: {label:"EQ",suffix:"eq/enable"},
+  dynEnable: {label:"Dynamics",suffix:"dynamics/enable"},
+  lowcutEnable: {label:"Low Cut",suffix:"lowcut/enable"},
+  autoLevelEnable: {label:"Auto Level",suffix:"autolevel/enable"},
+  reverbEnable: {label:"Reverb",global:"/reverb/enable"},
+  echoEnable: {label:"Echo",global:"/echo/enable"}
+});
 function toggleSpec(s = {}) {
   const preset = s.preset || ((typeof s.path === "string" || typeof s.title === "string") ? "custom" : "mainMute");
   if (preset !== "custom" && TOGGLE_PRESETS[preset]) return TOGGLE_PRESETS[preset];
+  if(Object.hasOwn(PROCESSOR_SWITCHES,preset)) {
+    const selected=PROCESSOR_SWITCHES[preset],bus=s.processingBus==="output"?"output":"input";
+    const index=integer(s.processingIndex,0,0,999);
+    return {label:selected.label,paths:[selected.global||"/"+bus+"/"+index+"/"+selected.suffix]};
+  }
   const path = typeof s.path === "string" && s.path.startsWith("/") ? s.path.trim() : "/controlroom/dim";
   return {
     label: typeof s.title === "string" && s.title.trim() ? s.title.trim() : "Toggle",
@@ -105,6 +129,27 @@ function toggleSpec(s = {}) {
   };
 }
 function toggleFeedbackPaths(spec) { return spec.feedbackPaths || spec.paths; }
+function levelKeyIsMix(s) { return s.target === "mix"; }
+function levelKeyPath(s) { return levelKeyIsMix(s) ? mixPath(s) : outputPath(s); }
+function levelKeyMutePath(s) { return levelKeyIsMix(s) ? mixMutePath(s) : outputMutePath(s); }
+function levelKeyLabel(s) { return typeof s.label === "string" && s.label.trim() ? s.label.trim() : (levelKeyIsMix(s) ? mixSpec(s).label : outputSpec(s).label); }
+function levelKeyMode(s) { return ["up","down","mute","meter"].includes(s.keyMode) ? s.keyMode : "up"; }
+// RME Global OSC live peak-level paths, independent of the channel's fader position.
+// A stereo meter displays the maximum of the selected and following channel.
+function meterPaths(s) {
+  const base = levelKeyIsMix(s) ?
+    `/level/${mixSpec(s).bus === "playback" ? "pb" : "in"}/${mixSpec(s).sourceIndex}` :
+    `/level/out/${outputSpec(s).outputIndex}`;
+  if (s.meterChannels !== "stereo") return [base];
+  const parts = base.split("/");
+  parts[3] = String(Number(parts[3]) + 1);
+  return [base, parts.join("/")];
+}
+function meterIndicator(s, value) {
+  const floor = Math.max(-120, Math.min(-6, finite(s.meterFloorDb, -60)));
+  if (value === undefined || Number.isNaN(value)) return 0;
+  return Math.max(0, Math.min(100, ((value - floor) / (-floor)) * 100));
+}
 function outputPath(s) { return `/output/${outputSpec(s).outputIndex}/volume`; }
 function outputMutePath(s) { return `/output/${outputSpec(s).outputIndex}/mute`; }
 function mixPath(s) {
@@ -134,14 +179,14 @@ function oscString(value) {
   raw.copy(out);
   return out;
 }
-function encodeOsc(address, args = []) {
-  const tags = `,${args.map(v => typeof v === "string" ? "s" : Number.isInteger(v) ? "i" : "f").join("")}`;
+function encodeOsc(address, args = [], forceFloat = false) {
+  const tags = `,${args.map(v => typeof v === "string" ? "s" : forceFloat ? "f" : Number.isInteger(v) ? "i" : "f").join("")}`;
   const parts = [oscString(address), oscString(tags)];
   for (const value of args) {
     if (typeof value === "string") parts.push(oscString(value));
     else {
       const b = Buffer.alloc(4);
-      if (Number.isInteger(value)) b.writeInt32BE(value, 0);
+      if (Number.isInteger(value) && !forceFloat) b.writeInt32BE(value, 0);
       else b.writeFloatBE(Number(value), 0);
       parts.push(b);
     }
@@ -205,23 +250,20 @@ function keyToken(inst) {
     spdifOutMute: "SPDIF",
     phonesMute: "PHONES",
     mic48v: "48V",
-    talkback: "TALK"
+    talkback: "TALK", eqEnable:"EQ", dynEnable:"COMP", lowcutEnable:"LC",
+    autoLevelEnable:"AL", reverbEnable:"REV", echoEnable:"ECHO"
   })[preset] || "OSC";
 }
+// Fixed idle colors by functional key family; all engaged keys render red.
+// Snapshot: purple, mute: blue, other toggles (Dim/Mono/Talkback/48V): green.
 function keyAccent(inst) {
   if (inst.action === ACTION_SNAPSHOT) return "#c88cff";
-  const preset = inst.settings.preset || "mainMute";
-  return ({
-    mainMute: "#38d9ff",
-    dim: "#58e6a9",
-    mono: "#9aa8ff",
-    micMute: "#ffb84d",
-    tvSpdifMute: "#c88cff",
-    spdifOutMute: "#58e6a9",
-    phonesMute: "#9aa8ff",
-    mic48v: "#ff8e4d",
-    talkback: "#ff5d69"
-  })[preset] || "#38d9ff";
+  const preset = inst.settings.preset || ((typeof inst.settings.path === "string" || typeof inst.settings.title === "string") ? "custom" : "mainMute");
+  if (["mainMute", "micMute", "tvSpdifMute", "spdifOutMute", "phonesMute"].includes(preset) ||
+      (preset === "custom" && toggleSpec(inst.settings).paths.some(path => path.endsWith("/mute")))) {
+    return "#38d9ff";
+  }
+  return "#58e6a9";
 }
 function keyStatus(inst, active) {
   if (inst.action === ACTION_SNAPSHOT) return active ? "ACTIVE" : "READY";
@@ -235,22 +277,49 @@ function keyStatus(inst, active) {
   if (preset === "talkback") return active ? "ACTIVE" : "READY";
   return active ? "ON" : "OFF";
 }
+function diagnosticImage(inst) {
+  const last=portTelemetry.get(cfg(inst.settings).receivePort);
+  const age=last?Date.now()-last.lastAt:Infinity;
+  const status=age<5000?"RX LIVE":last?"STALE":"NO DATA";
+  return renderConsoleKey({token:"OSC",status,active:false,accent:age<5000?"#58e6a9":"#f3be67"});
+}
+function renderDiagnostic(inst) {if(instances.has(inst.context))setImage(inst.context,diagnosticImage(inst));}
 function keyImage(inst, active) {
-  const token = xml(keyToken(inst));
-  const accent = keyAccent(inst);
-  const bg = active ? accent : "#0b1118";
-  const fg = active ? "#071016" : "#edf4fb";
-  const ring = active ? "#ffffff" : accent;
-  const status = xml(keyStatus(inst, active));
-  const statusSize = status.length > 6 ? 13 : 16;
-  const statusSpacing = status.length > 6 ? 1 : 2;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">
-    <rect x="5" y="5" width="134" height="134" rx="24" fill="${bg}" stroke="${ring}" stroke-width="5"/>
-    <rect x="17" y="17" width="110" height="5" rx="2.5" fill="${accent}"/>
-    <text x="72" y="77" text-anchor="middle" fill="${fg}" font-family="-apple-system,BlinkMacSystemFont,Arial,sans-serif" font-size="${token.length > 5 ? 23 : 29}" font-weight="750">${token}</text>
-    <text x="72" y="108" text-anchor="middle" fill="${active ? fg : "#8fa1b2"}" font-family="-apple-system,BlinkMacSystemFont,Arial,sans-serif" font-size="${statusSize}" font-weight="650" letter-spacing="${statusSpacing}">${status}</text>
-  </svg>`;
-  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+  return renderConsoleKey({token: keyToken(inst), status: keyStatus(inst, active), accent: keyAccent(inst), active});
+}
+function levelKeyImage(inst) {
+  if (isMeter(inst)) {
+    return renderStackKey({
+      level: meterIndicator(inst.settings, inst.peakValue),
+      known: inst.peakValue !== undefined,
+      clipped: inst.peakValue >= 0,
+      segments: inst.settings.stackSegments,
+      position: inst.settings.stackPosition
+    });
+  }
+  return drawLevelKey({
+    label: channelDisplayName(inst) || levelKeyLabel(inst.settings),
+    value: inst.value === undefined ? "SYNC" : inst.muted === true ? "MUTED" : formatDb(inst.value),
+    level: inst.value === undefined ? 0 : indicator(inst.settings, inst.value),
+    muted: inst.muted === true,
+    mode: levelKeyMode(inst.settings),
+    mix: levelKeyIsMix(inst.settings)
+  });
+}
+function flushLevelKey(inst) {
+  inst.feedbackTimer = null;
+  if (!instances.has(inst.context)) return;
+  setImage(inst.context, levelKeyImage(inst));
+  inst.lastFeedbackAt = Date.now();
+}
+function renderLevelKey(inst, immediate = false) {
+  if (inst.action !== ACTION_LEVEL_KEY && inst.action !== ACTION_PEAK_METER) return;
+  if (immediate || !inst.lastFeedbackAt || Date.now() - inst.lastFeedbackAt >= FEEDBACK_INTERVAL_MS) {
+    clearTimeout(inst.feedbackTimer);
+    flushLevelKey(inst);
+  } else if (!inst.feedbackTimer) {
+    inst.feedbackTimer = setTimeout(() => flushLevelKey(inst), FEEDBACK_INTERVAL_MS - (Date.now() - inst.lastFeedbackAt));
+  }
 }
 function renderKeyState(inst, active) {
   const state = active ? 1 : 0;
@@ -258,6 +327,7 @@ function renderKeyState(inst, active) {
   setImage(inst.context, keyImage(inst, active));
 }
 function accentForInstance(inst) {
+  if (inst.action === ACTION_PARAMETER) return "#f3be67";
   if (inst.action === ACTION_OUTPUT) {
     const preset = inst.settings.preset || "main";
     if (preset === "main") return "#38d9ff";
@@ -273,6 +343,34 @@ function accentForInstance(inst) {
   }
   return "#38d9ff";
 }
+function sendChannelList(context) {
+  const inst=instances.get(context);if(!inst)return;
+  const prefix=cfg(inst.settings).receivePort+":";
+  const names=[...channelNames.entries()]
+    .filter(([key])=>key.startsWith(prefix))
+    .map(([key,name])=>{
+      const parts=key.slice(prefix.length).split(":");
+      return {bus:parts[0],index:Number(parts[1]),name};
+    }).filter(v=>Number.isInteger(v.index)&&v.index>=0&&v.index<=999)
+    .slice(0,256).sort((a,b)=>a.bus.localeCompare(b.bus)||a.index-b.index);
+  sendSD("sendToPropertyInspector",context,{kind:"channelNames",names});
+}
+function channelDisplayName(inst) {
+  if (inst.settings.followName !== true) return null;
+  const c=cfg(inst.settings);
+  if(inst.action===ACTION_OUTPUT)return channelNames.get(c.receivePort+":output:"+outputSpec(inst.settings).outputIndex)||null;
+  if(inst.action===ACTION_MIX) {
+    const x=mixSpec(inst.settings),bus=x.bus==="in"?"input":"playback";
+    return channelNames.get(c.receivePort+":"+bus+":"+x.sourceIndex)||null;
+  }
+  if(inst.action===ACTION_LEVEL_KEY && !isMeter(inst)) {
+    if(levelKeyIsMix(inst.settings)) {
+      const x=mixSpec(inst.settings);return channelNames.get(c.receivePort+":"+(x.bus==="in"?"input":"playback")+":"+x.sourceIndex)||null;
+    }
+    return channelNames.get(c.receivePort+":output:"+outputSpec(inst.settings).outputIndex)||null;
+  }
+  return null;
+}
 function feedbackPayload(inst) {
   const muted = inst.muted === true;
   const background = muted ? "#5a171c" : "#0b1118";
@@ -280,15 +378,28 @@ function feedbackPayload(inst) {
   let label = "RME";
   if (inst.action === ACTION_OUTPUT) label = outputSpec(inst.settings).label;
   else if (inst.action === ACTION_MIX) label = mixSpec(inst.settings).label;
-  const value = inst.value === undefined ? "SYNCING" : muted ? "MUTED" : formatDb(inst.value);
+  else if (inst.action === ACTION_PARAMETER) label = typeof inst.settings.label === "string" && inst.settings.label.trim()?inst.settings.label.trim():resolveParameter(inst.settings).label;
+  label = channelDisplayName(inst) || label;
+  const spec = inst.action === ACTION_PARAMETER ? resolveParameter(inst.settings) : null;
+  const value = spec ? displayParameter(inst.value,spec) :
+    inst.value === undefined ? "SYNCING" : muted ? "MUTED" : formatDb(inst.value);
   return {
     title: {value: label, color: "#ffffff", background},
     value: {value, color: "#ffffff", background},
     indicator: {
-      value: inst.value === undefined ? 0 : indicator(inst.settings, inst.value),
+      value: spec ? (inst.value===undefined?0:Math.max(0,Math.min(100,
+        (inst.value-parameterRange(inst.settings,spec).min)/(parameterRange(inst.settings,spec).max-
+        parameterRange(inst.settings,spec).min)*100))) :
+        inst.value === undefined ? 0 : indicator(inst.settings, inst.value),
       background,
       bar_bg_c: muted ? "#5a171c" : "#13202b",
       bar_fill_c: accent
+    },
+    status: {
+      value: spec ? (inst.value===undefined?"WAITING FOR PARAMETER FEEDBACK":"PROCESSING / ROUTING") :
+        muted ? "MUTE ACTIVE" : inst.value === undefined ? "AWAITING OSC FEEDBACK" : inst.action === ACTION_MIX ? "SUBMIX SEND LEVEL" : "HARDWARE OUTPUT LEVEL",
+      color: muted ? "#ffbabd" : "#9ab0c0",
+      background
     }
   };
 }
@@ -299,7 +410,7 @@ function flushFeedback(inst) {
   inst.lastFeedbackAt = Date.now();
 }
 function renderDial(inst, immediate = false) {
-  if (inst.action !== ACTION_OUTPUT && inst.action !== ACTION_MIX) return;
+  if (inst.action !== ACTION_OUTPUT && inst.action !== ACTION_MIX && inst.action !== ACTION_PARAMETER) return;
   if (immediate || !inst.lastFeedbackAt || Date.now() - inst.lastFeedbackAt >= FEEDBACK_INTERVAL_MS) {
     clearTimeout(inst.feedbackTimer);
     flushFeedback(inst);
@@ -350,9 +461,9 @@ function releaseReceiver(port) {
   receivers.delete(port);
   try { entry.socket.close(); } catch {}
 }
-function sendPacket(settings, address, value) {
+function sendPacket(settings, address, value, forceFloat = false) {
   const c = cfg(settings);
-  const packet = encodeOsc(address, [value]);
+  const packet = encodeOsc(address, [value], forceFloat);
   oscTx.send(packet, c.sendPort, c.host, error => {
     if (error) console.error(`OSC TX ${address}:`, error.message || error);
   });
@@ -372,19 +483,20 @@ function requestGlobalState(settings) {
   }, GLOBAL_REQUEST_DEBOUNCE_MS);
   queuedGlobalRequests.set(key, item);
 }
-function queuePacket(settings, address, value) {
+function queuePacket(settings, address, value, forceFloat = false) {
   const c = cfg(settings);
   const key = `${c.host}:${c.sendPort}:${address}`;
   const queued = queuedSends.get(key);
   if (queued) {
     queued.value = value;
     queued.settings = settings;
+    queued.forceFloat = forceFloat;
     return;
   }
-  const item = {settings, address, value, timer: null};
+  const item = {settings, address, value, forceFloat, timer: null};
   item.timer = setTimeout(() => {
     queuedSends.delete(key);
-    sendPacket(item.settings, item.address, item.value);
+    sendPacket(item.settings, item.address, item.value, item.forceFloat);
   }, COMMAND_COALESCE_MS);
   queuedSends.set(key, item);
 }
@@ -396,8 +508,8 @@ function markPending(settings, path, expected) {
 function sendCommand(inst, path, value, coalesce = false) {
   markPending(inst.settings, path, value);
   applyValueToMatching(cfg(inst.settings).receivePort, path, value);
-  if (coalesce) queuePacket(inst.settings, path, value);
-  else sendPacket(inst.settings, path, value);
+  if (coalesce) queuePacket(inst.settings, path, value, inst.action===ACTION_PARAMETER);
+  else sendPacket(inst.settings, path, value, inst.action===ACTION_PARAMETER);
   clearTimeout(inst.reconcileTimer);
   inst.reconcileTimer = setTimeout(() => requestState(inst), RECONCILE_MS);
 }
@@ -415,8 +527,13 @@ function guardedValue(port, address, value) {
 }
 
 function actionPaths(inst) {
+  if (inst.action === ACTION_DIAGNOSTIC) return [];
+  if (inst.action === ACTION_PARAMETER) return [resolveParameter(inst.settings).path];
   if (inst.action === ACTION_OUTPUT) return [outputPath(inst.settings), outputMutePath(inst.settings)];
   if (inst.action === ACTION_MIX) return [mixPath(inst.settings), mixMutePath(inst.settings)];
+  if (inst.action === ACTION_PEAK_METER) return meterPaths(inst.settings);
+  if (inst.action === ACTION_LEVEL_KEY) return levelKeyMode(inst.settings) === "meter" ?
+    meterPaths(inst.settings) : [levelKeyPath(inst.settings), levelKeyMutePath(inst.settings)];
   if (inst.action === ACTION_TOGGLE) return toggleSpec(inst.settings).paths;
   if (inst.action === ACTION_SNAPSHOT) return [`/snapshot/load/${integer(inst.settings.snapshot, 1, 1, 8)}`];
   return [];
@@ -425,12 +542,28 @@ function matchesReceiver(inst, port) { return cfg(inst.settings).receivePort ===
 function applyValueToMatching(port, address, rawValue) {
   for (const inst of instances.values()) {
     if (!matchesReceiver(inst, port)) continue;
-    if (inst.action === ACTION_OUTPUT) {
+    if (inst.action === ACTION_PARAMETER) {
+      if (address===resolveParameter(inst.settings).path) {
+        inst.value=Number(rawValue);inst.confirmedParameter=true;renderDial(inst);
+      }
+    } else if (inst.action === ACTION_OUTPUT) {
       if (address === outputPath(inst.settings)) { inst.value = Number(rawValue); renderDial(inst); }
       else if (address === outputMutePath(inst.settings)) { inst.muted = Number(rawValue) > 0.5; renderDial(inst); }
     } else if (inst.action === ACTION_MIX) {
       if (address === mixPath(inst.settings)) { inst.value = Number(rawValue); renderDial(inst); }
       else if (address === mixMutePath(inst.settings)) { inst.muted = Number(rawValue) > 0.5; renderDial(inst); }
+    } else if (inst.action === ACTION_LEVEL_KEY || inst.action === ACTION_PEAK_METER) {
+      if (isMeter(inst)) {
+        if (meterPaths(inst.settings).includes(address)) {
+          inst.peakLevels.set(address, Number(rawValue));
+          inst.peakValue = Math.max(...inst.peakLevels.values());
+          renderLevelKey(inst);
+        }
+      } else if (address === levelKeyPath(inst.settings)) {
+        inst.value = Number(rawValue); renderLevelKey(inst);
+      } else if (address === levelKeyMutePath(inst.settings)) {
+        inst.muted = Number(rawValue) > 0.5; renderLevelKey(inst);
+      }
     } else if (inst.action === ACTION_TOGGLE) {
       const spec = toggleSpec(inst.settings);
       if (spec.paths.includes(address)) {
@@ -449,11 +582,24 @@ function applyValueToMatching(port, address, rawValue) {
   }
 }
 function handleOsc(port, message) {
+  portTelemetry.set(port,{lastAt:Date.now(),count:(portTelemetry.get(port)?.count||0)+1,lastPath:message.address});
+  const channelName=/^\/(input|playback|output)\/(\d+)\/name$/.exec(message.address);
+  if(channelName && typeof message.args[0]==="string") {
+    channelNames.set(port+":"+channelName[1]+":"+Number(channelName[2]),message.args[0].slice(0,64));
+    for(const context of openInspectors) {
+      const inspector=instances.get(context);
+      if(inspector && matchesReceiver(inspector,port))sendChannelList(context);
+    }
+    for(const inst of instances.values())if(matchesReceiver(inst,port) && inst.settings.followName===true) {
+      if(inst.action===ACTION_OUTPUT||inst.action===ACTION_MIX)renderDial(inst);
+      else if(inst.action===ACTION_LEVEL_KEY)renderLevelKey(inst);
+    }
+  }
   if (message.address === "/status/connection" && typeof message.args[0] === "number") {
     for (const inst of instances.values()) if (matchesReceiver(inst, port)) inst.connected = message.args[0] > 0.5;
     return;
   }
-  if (typeof message.args[0] !== "number") return;
+  if (typeof message.args[0] !== "number" || Number.isNaN(message.args[0])) return;
   const value = guardedValue(port, message.address, message.args[0]);
   if (value === undefined) return;
   applyValueToMatching(port, message.address, value);
@@ -462,21 +608,43 @@ function handleOsc(port, message) {
 function requestState(inst) {
   if (!instances.has(inst.context)) return;
   const s = inst.settings;
-  if (inst.action === ACTION_OUTPUT) {
+  // Peak data is streamed by TotalMix when Send Level Messages is enabled.
+  // /sendchan only fetches static channel parameters; it cannot request live peaks.
+  if (isMeter(inst)) return;
+  if (inst.action === ACTION_DIAGNOSTIC) {requestGlobalState(s);return;}
+  if (inst.action === ACTION_PARAMETER) {
+    const spec=resolveParameter(s);
+    if(spec.scope==="global")requestGlobalState(s);
+    else if(spec.scope==="output")sendPacket(s,"/sendchan/output/"+spec.outputIndex,1);
+    else {
+      sendPacket(s,"/sendchan/"+(spec.bus==="playback"?"playback":spec.bus)+"/"+spec.sourceIndex,1);
+      if(spec.scope==="mix")requestGlobalState(s);
+    }
+  } else if (inst.action === ACTION_OUTPUT) {
     sendPacket(s, `/sendchan/output/${outputSpec(s).outputIndex}`, 1);
-  } else if (inst.action === ACTION_MIX) {
+  } else if (inst.action === ACTION_MIX || (inst.action === ACTION_LEVEL_KEY && levelKeyIsMix(s))) {
     const x = mixSpec(s);
     sendPacket(s, `/sendchan/${x.bus === "playback" ? "playback" : "input"}/${x.sourceIndex}`, 1);
     requestGlobalState(s);
+  } else if (inst.action === ACTION_LEVEL_KEY) {
+    sendPacket(s, `/sendchan/output/${outputSpec(s).outputIndex}`, 1);
   } else {
     requestGlobalState(s);
   }
 }
 function isReady(inst, operation) {
   if (inst.configuring) return false;
+  if (inst.action===ACTION_DIAGNOSTIC) return true;
+  if (inst.action===ACTION_PARAMETER) return inst.confirmedParameter===true && Number.isFinite(inst.value);
   if (inst.action === ACTION_OUTPUT || inst.action === ACTION_MIX) {
     if (operation === "rotate") return inst.value !== undefined && (inst.settings.muteOnPress === false || inst.muted !== undefined);
     return inst.muted !== undefined;
+  }
+  if (inst.action === ACTION_PEAK_METER) return true; // passive Global OSC /level stream
+  if (inst.action === ACTION_LEVEL_KEY) {
+    if (levelKeyMode(inst.settings) === "mute") return inst.muted !== undefined;
+    if (isMeter(inst)) return true; // passive stream: no polling
+    return inst.value !== undefined && inst.muted !== undefined;
   }
   if (inst.action === ACTION_TOGGLE) {
     const spec = toggleSpec(inst.settings);
@@ -522,6 +690,10 @@ async function configureInstance(msg, replacing = false) {
       configuring: true,
       value: undefined,
       muted: undefined,
+      confirmedParameter: false,
+      diagnosticTimer: null,
+      peakValue: undefined,
+      peakLevels: new Map(),
       toggleStates: new Map(),
       snapshotState: undefined,
       lastFeedbackAt: 0,
@@ -538,6 +710,9 @@ async function configureInstance(msg, replacing = false) {
     if (replacing) {
       inst.value = undefined;
       inst.muted = undefined;
+      inst.confirmedParameter = false;
+      inst.peakValue = undefined;
+      inst.peakLevels.clear();
       inst.toggleStates.clear();
       inst.snapshotState = undefined;
     }
@@ -557,8 +732,15 @@ async function configureInstance(msg, replacing = false) {
     if (entry) await entry.ready;
     else await acquireReceiver(newPort);
   }
-  if (inst.action === ACTION_OUTPUT || inst.action === ACTION_MIX) renderDial(inst, true);
-  else if (inst.action === ACTION_TOGGLE) {
+  if (inst.action === ACTION_OUTPUT || inst.action === ACTION_MIX || inst.action===ACTION_PARAMETER) renderDial(inst, true);
+  else if(inst.action===ACTION_DIAGNOSTIC) {
+    setTitle(inst.context,"");renderDiagnostic(inst);
+    clearInterval(inst.diagnosticTimer);inst.diagnosticTimer=setInterval(()=>renderDiagnostic(inst),1000);
+  }
+  else if (inst.action === ACTION_LEVEL_KEY || inst.action === ACTION_PEAK_METER) {
+    setTitle(inst.context, "");
+    renderLevelKey(inst, true);
+  } else if (inst.action === ACTION_TOGGLE) {
     setTitle(inst.context, "");
     setImage(inst.context, keyImage(inst, false));
   } else if (inst.action === ACTION_SNAPSHOT) {
@@ -593,14 +775,26 @@ function removeInstance(context) {
   const inst = instances.get(context);
   if (!inst) return;
   instances.delete(context);
+  openInspectors.delete(context);
   clearTimeout(inst.feedbackTimer);
+  clearInterval(inst.diagnosticTimer);
   clearTimeout(inst.reconcileTimer);
   clearTimeout(inst.resyncTimer);
   releaseReceiver(cfg(inst.settings).receivePort);
 }
 function onDialRotate(msg) {
   const inst = instances.get(msg.context);
-  if (!inst || (inst.action !== ACTION_OUTPUT && inst.action !== ACTION_MIX)) return;
+  if (!inst || (inst.action !== ACTION_OUTPUT && inst.action !== ACTION_MIX && inst.action!==ACTION_PARAMETER)) return;
+  if (inst.action===ACTION_PARAMETER) {
+    if (!isReady(inst,"rotate")) return blockUntilReady(inst);
+    const ticks=finite(msg.payload?.ticks,0); if(!ticks)return;
+    const spec=resolveParameter(inst.settings),range=parameterRange(inst.settings,spec);
+    const requested=Math.abs(finite(inst.settings.stepValue,spec.step));
+    const step=requested>0?Math.min(requested,1000):spec.step;
+    const next=Math.max(range.min,Math.min(range.max,inst.value+ticks*step));
+    if(next!==inst.value)sendCommand(inst,spec.path,next,true);
+    return;
+  }
   if (!isReady(inst, "rotate")) return blockUntilReady(inst);
   if (inst.muted === true) return;
   const ticks = finite(msg.payload?.ticks, 0);
@@ -613,7 +807,8 @@ function onDialRotate(msg) {
 }
 function onDialDown(msg) {
   const inst = instances.get(msg.context);
-  if (!inst || (inst.action !== ACTION_OUTPUT && inst.action !== ACTION_MIX) || inst.settings.muteOnPress === false) return;
+  if (!inst || inst.action===ACTION_PARAMETER ||
+      (inst.action !== ACTION_OUTPUT && inst.action !== ACTION_MIX) || inst.settings.muteOnPress === false) return;
   if (!isReady(inst, "mute")) return blockUntilReady(inst);
   const path = inst.action === ACTION_OUTPUT ? outputMutePath(inst.settings) : mixMutePath(inst.settings);
   sendCommand(inst, path, inst.muted ? 0 : 1);
@@ -628,7 +823,22 @@ function onKeyUp(msg) {
 function onKeyDown(msg) {
   const inst = instances.get(msg.context);
   if (!inst) return;
-  if (inst.action === ACTION_TOGGLE) {
+  if (inst.action === ACTION_DIAGNOSTIC) {requestGlobalState(inst.settings);return;}
+  if (inst.action === ACTION_PEAK_METER) return; // Dedicated audio peak meter is always read-only.
+  if (inst.action === ACTION_LEVEL_KEY) {
+    const mode = levelKeyMode(inst.settings);
+    if (mode === "meter") return; // Legacy visual-only mode; no OSC side effects.
+    if (!isReady(inst, "key")) return blockUntilReady(inst);
+    if (mode === "mute") {
+      sendCommand(inst, levelKeyMutePath(inst.settings), inst.muted ? 0 : 1);
+    } else if (inst.muted !== true) {
+      const step = Math.max(0.1, Math.min(24, finite(inst.settings.stepDb, 1)));
+      const minimum = Math.min(finite(inst.settings.minDb, -65), finite(inst.settings.maxDb, 6));
+      const current = inst.value < minimum && mode === "up" ? minimum : inst.value;
+      const next = clampDb(inst.settings, current + (mode === "up" ? step : -step));
+      sendCommand(inst, levelKeyPath(inst.settings), next, true);
+    }
+  } else if (inst.action === ACTION_TOGGLE) {
     if (!isReady(inst, "toggle")) return blockUntilReady(inst);
     const spec = toggleSpec(inst.settings);
     if (spec.momentary) {
@@ -668,6 +878,17 @@ function connectStreamDeck() {
       else if (msg.event === "keyDown") onKeyDown(msg);
       else if (msg.event === "keyUp") onKeyUp(msg);
       else if (msg.event === "didReceiveSettings") void queueConfiguration(msg, true);
+      else if (msg.event === "sendToPlugin" && msg.payload?.kind==="channelNames") {
+        openInspectors.add(msg.context);
+        sendChannelList(msg.context);
+        const inst=instances.get(msg.context);
+        if(inst)requestGlobalState(inst.settings);
+      } else if (msg.event === "propertyInspectorDidAppear") {
+        openInspectors.add(msg.context);
+        sendChannelList(msg.context);
+      } else if (msg.event === "propertyInspectorDidDisappear") {
+        openInspectors.delete(msg.context);
+      }
     } catch (error) {
       console.error("Stream Deck message:", error.message || error);
     }

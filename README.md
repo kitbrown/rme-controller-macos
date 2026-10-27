@@ -1,5 +1,8 @@
 # RME Controller for macOS
 
+> **Development branch / v1.1.9.0:** Not yet released. The currently submitted Marketplace v1.1.8.0 is unchanged. This candidate includes the new Processor and Routing encoder, OSC Connection Monitor, TotalMix channel-name selection, real audio peak meter, new FiO mixer icon, and the accepted mixer-style key art. See [v1.1.9 engineering release gates](docs/NEXT-RELEASE-1.1.9.md). Hardware acceptance and a real exported Stream Deck profile are still required before any final Marketplace release.
+
+
 A bidirectional Stream Deck plugin for controlling RME TotalMix FX through Global OSC. Built by FiO Networks for macOS and Stream Deck + XL, with support for both keys and rotary encoders.
 
 ## Install
