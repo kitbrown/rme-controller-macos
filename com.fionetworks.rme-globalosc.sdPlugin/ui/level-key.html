@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{color-scheme:dark;--line:#304050;--text:#eaf2fb;--muted:#a0b3c5;--blue:#4fb8ef}
+*{box-sizing:border-box}body{margin:0;padding:14px;background:#0c121a;color:var(--text);font:13px -apple-system,BlinkMacSystemFont,Arial,sans-serif}
+.hero,.panel{border:1px solid var(--line);background:linear-gradient(155deg,#1a2633,#111923);border-radius:10px;padding:13px;margin-bottom:10px}
+.kicker{letter-spacing:.16em;font-size:10px;font-weight:700;color:var(--blue)}
+h2{font-size:19px;margin:5px 0 3px}h3{font-size:11px;color:#b5c8d9;letter-spacing:.12em;text-transform:uppercase;margin:0 0 8px}
+p{font-size:11px;color:var(--muted);line-height:1.45;margin:7px 0}
+label{display:block;margin:10px 0 4px;color:#ccdae5;font-size:12px}
+input,select{color:#fff;width:100%;padding:8px 9px;background:#0b141e;border:1px solid #3b4c5e;border-radius:6px}
+input:focus,select:focus{border-color:var(--blue);outline:2px solid #4fb8ef33}
+[hidden]{display:none!important}.tip{border-left:3px solid #4fb8ef;padding:8px 10px;background:#10212f;border-radius:5px}
+</style></head><body>
+<div class="hero"><div class="kicker">FIO / TOTALMIX CONSOLE</div><h2>Live Channel Fader</h2><p>Key shows the OSC fader position and mute status. Configure a step or mute operation.</p></div>
+<div class="panel"><h3>Channel</h3>
+<label>Channel type</label><select data-setting="target"><option value="output">Hardware output</option><option value="mix">Source submix</option></select>
+<label>Preset / mapping</label><select data-setting="preset"><option value="main">Control Room — Main</option><option value="spdif">SPDIF Output</option><option value="phones1">Control Room — Phones 1</option><option value="custom">Custom channel</option></select>
+<label>Label</label><input data-setting="label" value="Main" maxlength="32">
+<label>Output index (zero-based)</label><input type="number" min="0" max="999" data-setting="outputIndex" value="0">
+<div data-show-target="mix">
+<label>Source bus</label><select data-setting="bus"><option value="in">Hardware input</option><option value="playback">Software playback</option></select>
+<label>Source index (zero-based)</label><input type="number" min="0" max="999" data-setting="sourceIndex" value="0">
+<p>Custom source-to-output mapping uses existing verified Global OSC paths.</p>
+</div></div>
+<div class="panel"><h3>Key behavior</h3>
+<label>On key press</label><select data-setting="keyMode"><option value="up">Level + step</option><option value="down">Level − step</option><option value="mute">Mute / unmute</option></select>
+<label>dB step</label><input type="number" data-setting="stepDb" value="1" min="0.1" max="24" step="0.1">
+<label>Minimum dB</label><input type="number" data-setting="minDb" value="-65" step="0.1">
+<label>Maximum dB</label><input type="number" data-setting="maxDb" value="6" step="0.1">
+</div>
+<div class="panel"><h3>Global OSC transport</h3><label>TotalMix host</label><input data-setting="host" value="127.0.0.1">
+<label>TotalMix receive port</label><input data-setting="sendPort" type="number" value="7008">
+<label>Plugin receive port</label><input data-setting="receivePort" type="number" value="9008">
+<p class="tip">Needs Global OSC enabled in TotalMix. Shows SYNC until feedback arrives; this is not an audio signal meter. Muted channels block level changes.</p></div>
+<script src="common.js"></script></body></html>
