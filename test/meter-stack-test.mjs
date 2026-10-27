@@ -32,8 +32,8 @@ assert.equal(fill(bottom).height,144);
 assert.equal(fill(middle).height,72);
 assert.equal(fill(top).height,0);
 assert.equal(fill(middle).y,72);
-assert.equal(fill(svg({segments:3,position:2,level:50,muted:true})).height,72);
-assert(svg({segments:3,position:2,level:50,muted:true}).includes("#a83743"));
+assert.equal(fill(svg({segments:3,position:2,level:50,clipped:true})).height,72);
+assert(svg({segments:3,position:2,level:50,clipped:true}).includes("#ed4e5c"));
 assert.equal(fill(svg({segments:3,position:2,level:35})).height,7.2);
 
 console.log("PASS: continuous unlabeled vertical 1-4 key fader meter");
