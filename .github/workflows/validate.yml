@@ -24,3 +24,12 @@ jobs:
         run: npm install --global @elgato/cli@latest
       - name: Validate plugin
         run: streamdeck validate com.fionetworks.rme-globalosc.sdPlugin
+      - name: Package unreleased hardware test candidate
+        run: streamdeck pack com.fionetworks.rme-globalosc.sdPlugin --output dist --no-update-check
+      - name: Upload unreleased hardware test candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: console-surface-next-UNRELEASED
+          path: dist/*.streamDeckPlugin
+          if-no-files-found: error
+          retention-days: 14
