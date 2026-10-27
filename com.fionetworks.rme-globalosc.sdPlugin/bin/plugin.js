@@ -105,9 +105,22 @@ function mixSpec(s = {}) {
     outputIndex: integer(s.outputIndex, 0, 0, 999)
   };
 }
+const PROCESSOR_SWITCHES = Object.freeze({
+  eqEnable: {label:"EQ",suffix:"eq/enable"},
+  dynEnable: {label:"Dynamics",suffix:"dynamics/enable"},
+  lowcutEnable: {label:"Low Cut",suffix:"lowcut/enable"},
+  autoLevelEnable: {label:"Auto Level",suffix:"autolevel/enable"},
+  reverbEnable: {label:"Reverb",global:"/reverb/enable"},
+  echoEnable: {label:"Echo",global:"/echo/enable"}
+});
 function toggleSpec(s = {}) {
   const preset = s.preset || ((typeof s.path === "string" || typeof s.title === "string") ? "custom" : "mainMute");
   if (preset !== "custom" && TOGGLE_PRESETS[preset]) return TOGGLE_PRESETS[preset];
+  if(Object.hasOwn(PROCESSOR_SWITCHES,preset)) {
+    const selected=PROCESSOR_SWITCHES[preset],bus=s.processingBus==="output"?"output":"input";
+    const index=integer(s.processingIndex,0,0,999);
+    return {label:selected.label,paths:[selected.global||"/"+bus+"/"+index+"/"+selected.suffix]};
+  }
   const path = typeof s.path === "string" && s.path.startsWith("/") ? s.path.trim() : "/controlroom/dim";
   return {
     label: typeof s.title === "string" && s.title.trim() ? s.title.trim() : "Toggle",
@@ -236,7 +249,8 @@ function keyToken(inst) {
     spdifOutMute: "SPDIF",
     phonesMute: "PHONES",
     mic48v: "48V",
-    talkback: "TALK"
+    talkback: "TALK", eqEnable:"EQ", dynEnable:"COMP", lowcutEnable:"LC",
+    autoLevelEnable:"AL", reverbEnable:"REV", echoEnable:"ECHO"
   })[preset] || "OSC";
 }
 // Fixed idle colors by functional key family; all engaged keys render red.
