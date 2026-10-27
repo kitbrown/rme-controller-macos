@@ -23,5 +23,5 @@ assert.match(inspector, /data-setting="target"/);
 assert.match(inspector, /data-setting="preset"/);
 assert.doesNotMatch(inspector, /data-setting="keyMode"|Fader dB step|Level \+ step|Mute \/ unmute/);
 for(const name of ["host","sendPort","receivePort"])assert.match(inspector,new RegExp('data-setting="'+name+'"'));
-assert.match(manifest.Version, /^1\.1\.8\.[0-9]+$/, "unreleased test build must remain in accepted 1.1.8 series");
+assert.equal(manifest.Version, "1.1.9.0");
 console.log("PASS: independent Live Audio Peak Meter action and configuration registered");
