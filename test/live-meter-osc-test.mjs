@@ -31,10 +31,10 @@ await new Promise(resolve=>outgoing.bind(TX,HOST,resolve));
 const send=(path,val)=>feed.send(encode(path,val),RX,HOST);
 const settings=(position,extra={})=>({
   host:HOST,sendPort:TX,receivePort:RX,preset:"main",target:"output",
-  keyMode:"meter",stackSegments:"3",stackPosition:String(position),
+  stackSegments:"3",stackPosition:String(position),
   meterFloorDb:-60,meterChannels:"mono",...extra
 });
-const action="com.fionetworks.rme-globalosc.levelkey";
+const action="com.fionetworks.rme-globalosc.peakmeter";
 const images=ctx=>FakeWebSocket.instance.sent
   .filter(m=>m.context===ctx&&m.event==="setImage")
   .map(m=>decodeURIComponent(m.payload.image.split(",")[1]));
