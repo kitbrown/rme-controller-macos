@@ -2,7 +2,7 @@
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
   "UUID": "com.fionetworks.rme-globalosc",
   "Name": "RME Controller for macOS",
-  "Version": "1.1.8.4",
+  "Version": "1.1.9.0",
   "Author": "FiO Networks",
   "Description": "Bidirectional Stream Deck control for RME TotalMix FX using Global OSC.",
   "Icon": "imgs/plugin",
@@ -143,6 +143,28 @@
         }
       ],
       "PropertyInspectorPath": "ui/peak-meter.html"
+    },
+    {
+      "UUID": "com.fionetworks.rme-globalosc.parameter",
+      "Name": "Processor and Routing",
+      "Tooltip": "Feedback-gated TotalMix EQ, dynamics, effects, and submix pan dial.",
+      "Icon": "imgs/action-mix",
+      "Controllers": [
+        "Encoder"
+      ],
+      "Encoder": {
+        "layout": "ui/console-strip.json",
+        "TriggerDescription": {
+          "Rotate": "Adjust confirmed parameter",
+          "Push": "No action"
+        }
+      },
+      "States": [
+        {
+          "Image": "imgs/dial"
+        }
+      ],
+      "PropertyInspectorPath": "ui/parameter.html"
     }
   ]
 }
