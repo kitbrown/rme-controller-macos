@@ -60,30 +60,34 @@ export function renderLevelKey({ label, value, level, muted, mode, mix }) {
 }
 
 
-// One physical key is one segment in a vertical display. Position 1 is always bottom.
-// Each segment independently uses the same Global OSC fader path, avoiding a custom transport.
-export function renderStackKey({label, value, level, muted, segments, position, known}) {
-  segments=Math.max(1,Math.min(4,Math.floor(Number(segments)||1)));
-  position=Math.max(1,Math.min(segments,Math.floor(Number(position)||1)));
+// Each vertically adjacent key is a window onto the SAME continuous meter.
+// position: 1 = physical bottom; position = segments = physical top.
+// No labels, tick marks, discrete blocks, or per-key bezels. Gaps come only from hardware.
+export function renderStackKey({level, muted=false, segments=3, position=1, known=true}) {
+  segments=Math.max(1,Math.min(4,Math.trunc(Number(segments)||1)));
+  position=Math.max(1,Math.min(segments,Math.trunc(Number(position)||1)));
   level=Math.max(0,Math.min(100,Number(level)||0));
-  const segmentFill=known ? Math.max(0,Math.min(1,level*segments/100-(position-1))) : 0;
-  const accent=muted ? "#ec5d68" : position===segments ? "#e2aa58" : position===segments-1 ? "#b5cc74" : "#56caff";
-  const labelText=esc(String(label).slice(0,11).toUpperCase());
-  const valueText=esc(value);
-  const bars=Array.from({length:9},(_,i)=>{
-    const threshold=i/9;
-    const on=segmentFill>=threshold+1/9;
-    const partial=segmentFill>threshold && !on;
-    const x=25, y=99-i*8;
-    return '<rect x="'+x+'" y="'+y+'" width="94" height="6" rx="1.5" fill="'+
-      (on ? accent : partial ? accent : "#243b4d")+'" opacity="'+(partial ? "0.55" : "1")+'"/>';
-  }).join("");
-  const svg='<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">'+frame+
-    '<rect x="16" y="14" width="112" height="3" rx="1.5" fill="'+(muted?"#ff6c73":"#3b657d")+'"/>'+
-    '<text x="72" y="29" text-anchor="middle" font-size="10" font-weight="800" fill="#eaf6fc" font-family="Arial,sans-serif">'+labelText+'</text>'+
-    '<rect x="21" y="33" width="102" height="74" rx="5" fill="#0a1722" stroke="#41566a"/>'+bars+
-    '<text x="72" y="124" text-anchor="middle" font-size="12" font-weight="800" fill="'+(muted?"#ff9da6":"#e7f4fd")+'" font-family="Arial,sans-serif">'+valueText+'</text>'+
-    '<text x="124" y="132" text-anchor="end" font-size="7.5" font-weight="700" fill="#809aaa" font-family="Arial,sans-serif">'+position+'/'+segments+'</text>'+
+
+  // Fraction occupied within THIS one physical key, counting bottom upward.
+  const fillFraction=known ? Math.max(0,Math.min(1,level*segments/100-(position-1))) : 0;
+  const fillY=144*(1-fillFraction);
+  const fillHeight=144*fillFraction;
+
+  // Use shared global coordinates for all key slices. A color at the boundary
+  // of adjacent keys remains the same color even though the SVGs are separate.
+  const gradientBottom=position*144;
+  const gradientTop=(position-segments)*144;
+  const svg='<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">'+
+    '<defs><linearGradient id="meter" gradientUnits="userSpaceOnUse" x1="0" y1="'+gradientBottom+'" x2="0" y2="'+gradientTop+'">'+
+    '<stop offset="0" stop-color="#39beed"/>'+
+    '<stop offset=".54" stop-color="#4ddeb4"/>'+
+    '<stop offset=".82" stop-color="#f5c25e"/>'+
+    '<stop offset="1" stop-color="#f27970"/>'+
+    '</linearGradient></defs>'+
+    '<rect width="144" height="144" fill="#0b1720"/>'+
+    '<rect x="16" y="0" width="112" height="144" fill="#152734"/>'+
+    '<rect x="16" y="0" width="112" height="144" fill="none" stroke="#304653" stroke-width="2"/>'+
+    (known && fillHeight > 0 ? '<rect x="17" y="'+fillY.toFixed(3)+'" width="110" height="'+fillHeight.toFixed(3)+'" fill="'+(muted?'#a83743':'url(#meter)')+'"/>' : '')+
     '</svg>';
   return uri(svg);
 }
