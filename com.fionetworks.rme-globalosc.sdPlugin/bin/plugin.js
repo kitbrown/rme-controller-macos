@@ -110,7 +110,7 @@ function toggleFeedbackPaths(spec) { return spec.feedbackPaths || spec.paths; }
 function levelKeyIsMix(s) { return s.target === "mix"; }
 function levelKeyPath(s) { return levelKeyIsMix(s) ? mixPath(s) : outputPath(s); }
 function levelKeyMutePath(s) { return levelKeyIsMix(s) ? mixMutePath(s) : outputMutePath(s); }
-function levelKeyLabel(s) { return levelKeyIsMix(s) ? mixSpec(s).label : outputSpec(s).label; }
+function levelKeyLabel(s) { return typeof s.label === "string" && s.label.trim() ? s.label.trim() : (levelKeyIsMix(s) ? mixSpec(s).label : outputSpec(s).label); }
 function levelKeyMode(s) { return ["up","down","mute"].includes(s.keyMode) ? s.keyMode : "up"; }
 function outputPath(s) { return `/output/${outputSpec(s).outputIndex}/volume`; }
 function outputMutePath(s) { return `/output/${outputSpec(s).outputIndex}/mute`; }
