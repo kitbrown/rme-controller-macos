@@ -1,4 +1,4 @@
-# v1.1.9 Maker Console submission checkpoint
+# v1.1.9 submitted for review — 2026-10-27
 
 User authorization: restore starter profiles, verify connected hardware, and submit v1.1.9 with new icons; preserve controls and keep automatic publication OFF.
 
@@ -9,7 +9,10 @@ User authorization: restore starter profiles, verify connected hardware, and sub
 - Console recognition confirmed: SDK 3 or later, DRM Yes, default profiles Yes, + dials Yes.
 - New icon, matching thumbnail/cover, description and release notes prepared. Existing real media retained.
 - Automatic publication OFF.
-- Current action boundary: final console verification, then the explicitly authorized Submit for Review. Do not publish.
+- **SUBMITTED:** clicked Submit for Review under the user's explicit authorization. Maker Console returned "Succesfully uploaded new version" and **Pending review · 1.1.9.1**.
+- Automatic publication was directly verified **OFF immediately before submission**. No publication action was taken.
+- Matching new app icon, thumbnail and cover were saved; description/release notes and all five gallery items were checked.
+- Source and artifact are retained on `marketplace/v1.1.9-submission`; Elgato approval is pending.
 
 ## Earlier handoff (historical)
 

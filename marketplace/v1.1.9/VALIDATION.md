@@ -20,7 +20,7 @@
 - `streamdeck pack ... --no-update-check`: pass.
 - Native Stream Deck 7.6.0 upgrade: AllOk; runtime connected. Installed files equal the exact candidate archive.
 - Native import of bundled + XL profile: all 16 keys and six dials populate, then real TotalMix values appear. Temporary imported copy removed afterward.
-- Existing user profile files remain unchanged except the application's plugin version bookkeeping. User-added pages/actions remain present.
+- Existing user profile configurations remain unchanged. Stream Deck updated plugin version bookkeeping, serialized controller arrays in a different order on restart, and persisted live action State values; the final comparison normalized those three runtime details and found no configuration changes. User-added pages/actions remain present.
 - Profiles for the other five device models have automated contract/layout coverage; those physical models were not available.
 
 ## Real hardware scope
@@ -51,4 +51,4 @@ Positive cases: install the device-matched starter profile; observe live Main/Ph
 
 Negative cases: an unknown processing path must remain gated; muted fader rotation must not change level; disconnected/stale feedback must block unsafe controls and recover after feedback returns. Automated suites pass these cases; finite live checks above provide the specifically stated hardware evidence.
 
-Submission status is recorded in MAKER-CONSOLE-UPLOAD.md after direct console confirmation.
+Submission directly confirmed: **Pending review · 1.1.9.1**, after the successful upload notification. Automatic publication was OFF at submission; no publish action was performed. See MAKER-CONSOLE-UPLOAD.md.
