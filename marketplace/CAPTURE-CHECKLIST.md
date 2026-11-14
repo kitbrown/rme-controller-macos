@@ -1,3 +1,5 @@
+> **SUPERSEDED HISTORICAL RECORD — reconciled 2026-11-14.** Earlier candidate status, pending gates and upload/install tasks below describe their original date, not current release work. Shipped baseline: public v1.1.9 / manifest 1.1.9.1; Chris confirmed approval and first paid sale on 2026-11-05. Use [state ledger](../docs/STATE_LEDGER.md) and [v1.1.9 validation](v1.1.9/VALIDATION.md). Remaining untested hardware scenarios are preserved there. Do not execute these historical release instructions.
+
 # Chris’s capture checklist
 
 Install the v1.1.8.0 Marketplace candidate and use the current working profile. Its runtime is the accepted v1.1.7 build with SDK 3 manifest metadata. Capture lossless screenshots and original camera files; compose final gallery images at 1920 × 960 PNG. Use a landscape camera position, sharp focus and readable screens. Hide unrelated windows and personal information. Keep actual control labels and values intact.

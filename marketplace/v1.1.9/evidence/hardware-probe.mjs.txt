@@ -1,0 +1,37 @@
+import dgram from 'node:dgram';
+import {execFileSync} from 'node:child_process';
+import {writeFileSync} from 'node:fs';
+import {pathToFileURL} from 'node:url';
+const UUID='com.fionetworks.rme-globalosc';
+const ROOT='/Users/cbrown/Library/Application Support/com.elgato.StreamDeck/Plugins/'+UUID+'.sdPlugin';
+const sleep=ms=>new Promise(ok=>setTimeout(ok,ms));
+let decode,ws; const received=[],transmitted=[],messages=[];
+const create=dgram.createSocket;
+dgram.createSocket=function(...args){const s=create(...args);s.on('message',(b,r)=>{if(decode)for(const m of decode(b))received.push({time:Date.now(),...m,from:r.address});});const send=s.send.bind(s);s.send=function(...args){if(decode&&Buffer.isBuffer(args[0]))for(const m of decode(args[0]))transmitted.push({time:Date.now(),...m});return send(...args);};return s;};
+class Bridge {static OPEN=1;readyState=1;listeners=new Map();constructor(){ws=this;queueMicrotask(()=>this.listeners.get('open')?.({}));}addEventListener(n,f){this.listeners.set(n,f);}send(s){messages.push({time:Date.now(),...JSON.parse(s)});}message(s){this.listeners.get('message')?.({data:JSON.stringify(s)});}close(){}}
+globalThis.WebSocket=Bridge;
+const settings=x=>({host:'127.0.0.1',sendPort:7008,receivePort:9008,...x});
+const appear=(kind,id,x)=>ws.message({event:'willAppear',action:UUID+'.'+kind,context:id,payload:{settings:settings(x)}});
+const event=(event,context,payload={})=>ws.message({event,context,payload});
+let stopped=false;
+try {
+ await sleep(100);
+ process.argv.push('-port','12345','-pluginUUID',UUID,'-registerEvent','registerPlugin');
+ const mod=await import(pathToFileURL(ROOT+'/bin/plugin.js'));decode=mod.decodeOsc;await sleep(30);
+ for(const p of ['main','phones1','spdif'])appear('outputvolume','out-'+p,{preset:p});
+ for(const p of ['mic1','playback12','spdif'])appear('mixfader','mix-'+p,{preset:p});
+ for(const p of ['mainMute','dim','mono','micMute','tvSpdifMute','spdifOutMute','talkback','phonesMute'])appear('toggle','toggle-'+p,{preset:p});
+ for(let i=1;i<=8;i++)appear('snapshot','snap-'+i,{snapshot:i});
+ for(const paramKey of ['mixPan','outputPan','eq1Gain','eq2Gain','eq3Gain','eq1Freq','eq2Freq','eq3Freq','compThreshold','compRatio','makeupGain','reverbVolume','echoVolume'])appear('parameter','param-'+paramKey,{paramKey,paramBus:'input',sourceIndex:0,outputIndex:0});
+ for(const p of ['eqEnable','dynEnable','lowcutEnable','autoLevelEnable','reverbEnable','echoEnable'])appear('toggle','proc-'+p,{preset:p,processingBus:'input',processingIndex:0});
+ appear('diagnostic','monitor',{});
+ for(let i=1;i<=3;i++)appear('peakmeter','meter-'+i,{target:'mix',preset:'mic1',meterChannels:'mono',stackSize:3,stackPosition:i});
+ event('sendToPlugin','out-main',{kind:'channelNames'});
+ await sleep(6000);
+ const values=Object.fromEntries(received.map(m=>[m.address,m.args]));
+ const feedback=Object.fromEntries([...new Set(messages.map(m=>m.context).filter(Boolean))].map(c=>[c,messages.filter(m=>m.context===c&&['setFeedback','setState','sendToPropertyInspector'].includes(m.event)).slice(-2)]));
+ const summary={hardware:'Real UCX II Global OSC on loopback 7008/9008; Stream Deck events supplied by test bridge; physical actuation not claimed',received:received.length,transmitted:transmitted.length,values,feedback,images:messages.filter(m=>m.event==='setImage').map(m=>({context:m.context,image:decodeURIComponent(m.payload.image)})),writes:transmitted.filter(m=>!m.address.startsWith('/send'))};
+ writeFileSync(process.argv[2],JSON.stringify(summary,null,2));
+ console.log(JSON.stringify({received:received.length,transmitted:transmitted.length,values,feedback,writes:summary.writes},null,2));
+}finally{process.emit('SIGTERM');await sleep(200);}
+process.exit(0);

@@ -1,6 +1,6 @@
 # v1.1.9 submission validation — 2026-10-27
 
-**READY WITH DISCLOSED GAPS** for the user's authorized review submission. Elgato approval/publication is a separate state.
+**Released per Chris's 2026-11-05 confirmation of approval and first paid sale.** Technical evidence below remains the bounded 2026-10-27 validation; release approval does not convert untested hardware cases into passes. See the [state ledger](../../docs/STATE_LEDGER.md). No rebuild, reinstall or new hardware test during 2026-11-14 reconciliation.
 
 ## Exact artifact
 
@@ -39,7 +39,7 @@ Fireface UCX II, TotalMix Global OSC, local UDP 7008/9008. Production candidate 
 
 Not repeated: phantom-power switching, snapshot recall of all user mixes, physical USB unplug/replug, sleep/wake, and two-minute manual physical actuation. These are not claimed as current acceptance. Existing regression suites cover their relevant software paths; old physical acceptance remains historical.
 
-Raw local evidence and initial failed attempts are retained outside the repository in `../submission-evidence/v1.1.9-restored-profiles/`. Initial harness failures were a developer-mode-only CLI stop refusal/port conflict, a test instrumentation buffer-shape error, and an incorrect test expectation for TotalMix's -300 dB infinity sentinel. They were not plugin defects and were preserved before the bounded successful tests. No runtime code was changed to resolve them.
+Portable result records, historical harness sources and hashes are retained in [evidence/](evidence/README.md). Original raw local evidence and initial failed attempts remain outside the repository in `../submission-evidence/v1.1.9-restored-profiles/`; private user-profile backups and mixer-state dumps are intentionally not published. Initial harness failures were a developer-mode-only CLI stop refusal/port conflict, a test instrumentation buffer-shape error, and an incorrect test expectation for TotalMix's -300 dB infinity sentinel. They were not plugin defects and were preserved before the bounded successful tests. No runtime code was changed to resolve them.
 
 ## Maker Console preparation
 
@@ -52,3 +52,17 @@ Positive cases: install the device-matched starter profile; observe live Main/Ph
 Negative cases: an unknown processing path must remain gated; muted fader rotation must not change level; disconnected/stale feedback must block unsafe controls and recover after feedback returns. Automated suites pass these cases; finite live checks above provide the specifically stated hardware evidence.
 
 Submission directly confirmed: **Pending review · 1.1.9.1**, after the successful upload notification. Automatic publication was OFF at submission; no publish action was performed. See MAKER-CONSOLE-UPLOAD.md.
+
+## Reconciliation checks — 2026-11-14
+
+No plugin, profile, icon or package regeneration. Run `python3 tools/verify-shipped-release.py` for source/archive file-set and byte parity (excluding packaging-control `.sdignore` and the CLI-stripped manifest final newline) plus SDK/version/profile metadata and retained-media/evidence SHA-256 checks. Runtime regressions use `npm test` under Node 24. Profile checks without rebuilding profiles:
+
+```sh
+python3 test/starter-profiles-test.py StarterProfiles.test_existing_runtime_ui_and_actions_unchanged
+python3 test/starter-profiles-test.py StarterProfiles.test_new_icons_match_validated_ci_build
+python3 test/starter-profiles-test.py StarterProfiles.test_all_profiles_resolve_fit_and_preserve_control_settings
+```
+
+The original reproducibility test regenerates profiles, so it is intentionally not rerun for this no-rebuild reconciliation. Historical four-test success is retained above. CI runs only the three read-only profile checks, runtime regressions and immutable artifact verification. It never packages, installs, renders or publishes.
+
+Reconciliation result: PASS under Node 24.22.3 (all eight suites), PASS for all three read-only profile tests, and PASS for local Elgato CLI validation with `--no-update-check`. Shipped plugin/profile/icon/package/copy files are unchanged from `c9ca040`. Source/archive parity excludes only packaging-control `.sdignore` and normalizes the CLI-stripped final newline of manifest.json; all packaged runtime/UI/icon/profile bytes match exactly. No regeneration, installation, Marketplace change or new hardware test was performed. Retained output: `evidence/reconciliation-*.txt`.

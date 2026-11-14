@@ -1,0 +1,449 @@
+{
+  "hardware-readonly-real.json": {
+    "sha256": "b9f3c2daa1127c9805f9cd6369ae0802ec64d28295722f2645f7a2e4c99e806c",
+    "bytes": 268054,
+    "hardware": "Real UCX II Global OSC on loopback 7008/9008; Stream Deck events supplied by test bridge; physical actuation not claimed",
+    "results": [],
+    "error": null,
+    "received_count": 2036,
+    "transmitted_count": 18
+  },
+  "hardware-exercise-bounded.json": {
+    "sha256": "e7bc1a2e5d2824b8d9323001f4f8c5e088f42603186fc218fb722922b46a7906",
+    "bytes": 3520164,
+    "hardware": "Real UCX II Global OSC on loopback 7008/9008; Stream Deck events supplied by test bridge; physical actuation not claimed",
+    "results": [
+      {
+        "check": "real live level feedback",
+        "pass": true,
+        "count": 1333
+      },
+      {
+        "check": "out-main",
+        "path": "/output/0/volume",
+        "baseline": -16.5,
+        "changed": -17,
+        "pass": true
+      },
+      {
+        "check": "restored out-main",
+        "path": "/output/0/volume",
+        "value": -16.5,
+        "pass": true
+      },
+      {
+        "check": "out-phones1",
+        "path": "/output/6/volume",
+        "baseline": -65,
+        "changed": -64.5,
+        "pass": true
+      },
+      {
+        "check": "restored out-phones1",
+        "path": "/output/6/volume",
+        "value": -65,
+        "pass": true
+      },
+      {
+        "check": "out-spdif",
+        "path": "/output/8/volume",
+        "baseline": 0,
+        "changed": -0.5,
+        "pass": true
+      },
+      {
+        "check": "restored out-spdif",
+        "path": "/output/8/volume",
+        "value": 0,
+        "pass": true
+      },
+      {
+        "check": "mix-mic1",
+        "path": "/mix/in/0/0/fader",
+        "baseline": -4.099999904632568,
+        "changed": -4.599999904632568,
+        "pass": true
+      },
+      {
+        "check": "restored mix-mic1",
+        "path": "/mix/in/0/0/fader",
+        "value": -4.099999904632568,
+        "pass": true
+      },
+      {
+        "check": "mix-playback12",
+        "path": "/mix/pb/0/0/fader",
+        "baseline": -0.9099998474121094,
+        "changed": -1.4099998474121094,
+        "pass": true
+      },
+      {
+        "check": "restored mix-playback12",
+        "path": "/mix/pb/0/0/fader",
+        "value": -0.9099998474121094,
+        "pass": true
+      },
+      {
+        "check": "mix-spdif",
+        "path": "/mix/in/8/0/fader",
+        "baseline": -300,
+        "changed": -64.5,
+        "pass": true
+      },
+      {
+        "check": "restored mix-spdif",
+        "path": "/mix/in/8/0/fader",
+        "value": -300,
+        "pass": true
+      },
+      {
+        "check": "param-mixPan",
+        "path": "/mix/in/0/0/balpan",
+        "baseline": 0,
+        "changed": 0.04999999701976776,
+        "pass": true
+      },
+      {
+        "check": "restored param-mixPan",
+        "path": "/mix/in/0/0/balpan",
+        "value": 0,
+        "pass": true
+      },
+      {
+        "check": "param-outputPan",
+        "path": "/output/0/balpan",
+        "baseline": 0,
+        "changed": 0.04999999701976776,
+        "pass": true
+      },
+      {
+        "check": "restored param-outputPan",
+        "path": "/output/0/balpan",
+        "value": 0,
+        "pass": true
+      },
+      {
+        "check": "param-eq1Gain",
+        "path": "/input/0/eq/band1gain",
+        "baseline": 0,
+        "changed": -0.5,
+        "pass": true
+      },
+      {
+        "check": "restored param-eq1Gain",
+        "path": "/input/0/eq/band1gain",
+        "value": 0,
+        "pass": true
+      },
+      {
+        "check": "param-eq2Gain",
+        "path": "/input/0/eq/band2gain",
+        "baseline": 0,
+        "changed": -0.5,
+        "pass": true
+      },
+      {
+        "check": "restored param-eq2Gain",
+        "path": "/input/0/eq/band2gain",
+        "value": 0,
+        "pass": true
+      },
+      {
+        "check": "param-eq3Gain",
+        "path": "/input/0/eq/band3gain",
+        "baseline": 0,
+        "changed": -0.5,
+        "pass": true
+      },
+      {
+        "check": "restored param-eq3Gain",
+        "path": "/input/0/eq/band3gain",
+        "value": 0,
+        "pass": true
+      },
+      {
+        "check": "param-eq1Freq",
+        "path": "/input/0/eq/band1freq",
+        "baseline": 80,
+        "changed": 100,
+        "pass": true
+      },
+      {
+        "check": "restored param-eq1Freq",
+        "path": "/input/0/eq/band1freq",
+        "value": 80,
+        "pass": true
+      },
+      {
+        "check": "param-eq2Freq",
+        "path": "/input/0/eq/band2freq",
+        "baseline": 1000,
+        "changed": 1020,
+        "pass": true
+      },
+      {
+        "check": "restored param-eq2Freq",
+        "path": "/input/0/eq/band2freq",
+        "value": 1000,
+        "pass": true
+      },
+      {
+        "check": "param-eq3Freq",
+        "path": "/input/0/eq/band3freq",
+        "baseline": 5000,
+        "changed": 5020,
+        "pass": true
+      },
+      {
+        "check": "restored param-eq3Freq",
+        "path": "/input/0/eq/band3freq",
+        "value": 5000,
+        "pass": true
+      },
+      {
+        "check": "param-compThreshold",
+        "path": "/input/0/dynamics/compthres",
+        "baseline": -30,
+        "changed": -31,
+        "pass": true
+      },
+      {
+        "check": "restored param-compThreshold",
+        "path": "/input/0/dynamics/compthres",
+        "value": -30,
+        "pass": true
+      },
+      {
+        "check": "param-compRatio",
+        "path": "/input/0/dynamics/compratio",
+        "baseline": 1,
+        "changed": 1.100000023841858,
+        "pass": true
+      },
+      {
+        "check": "restored param-compRatio",
+        "path": "/input/0/dynamics/compratio",
+        "value": 1,
+        "pass": true
+      },
+      {
+        "check": "param-makeupGain",
+        "path": "/input/0/dynamics/gain",
+        "baseline": 0,
+        "changed": -0.5,
+        "pass": true
+      },
+      {
+        "check": "restored param-makeupGain",
+        "path": "/input/0/dynamics/gain",
+        "value": 0,
+        "pass": true
+      },
+      {
+        "check": "param-reverbVolume",
+        "path": "/reverb/volume",
+        "baseline": -3,
+        "changed": -3.5,
+        "pass": true
+      },
+      {
+        "check": "restored param-reverbVolume",
+        "path": "/reverb/volume",
+        "value": -3,
+        "pass": true
+      },
+      {
+        "check": "param-echoVolume",
+        "path": "/echo/volume",
+        "baseline": -3,
+        "changed": -3.5,
+        "pass": true
+      },
+      {
+        "check": "restored param-echoVolume",
+        "path": "/echo/volume",
+        "value": -3,
+        "pass": true
+      },
+      {
+        "check": "toggle-mainMute",
+        "path": "/output/0/mute",
+        "pass": true
+      },
+      {
+        "check": "restored toggle-mainMute",
+        "path": "/output/0/mute",
+        "value": 0,
+        "pass": true
+      },
+      {
+        "check": "toggle-dim",
+        "path": "/controlroom/dim",
+        "pass": true
+      },
+      {
+        "check": "restored toggle-dim",
+        "path": "/controlroom/dim",
+        "value": 0,
+        "pass": true
+      },
+      {
+        "check": "toggle-mono",
+        "path": "/controlroom/mainmono",
+        "pass": true
+      },
+      {
+        "check": "restored toggle-mono",
+        "path": "/controlroom/mainmono",
+        "value": 0,
+        "pass": true
+      },
+      {
+        "check": "toggle-micMute",
+        "path": "/input/0/mute",
+        "pass": true
+      },
+      {
+        "check": "restored toggle-micMute",
+        "path": "/input/0/mute",
+        "value": 0,
+        "pass": true
+      },
+      {
+        "check": "toggle-tvSpdifMute",
+        "path": "/input/8/mute",
+        "pass": true
+      },
+      {
+        "check": "restored toggle-tvSpdifMute",
+        "path": "/input/8/mute",
+        "value": 0,
+        "pass": true
+      },
+      {
+        "check": "toggle-spdifOutMute",
+        "path": "/output/8/mute",
+        "pass": true
+      },
+      {
+        "check": "restored toggle-spdifOutMute",
+        "path": "/output/8/mute",
+        "value": 0,
+        "pass": true
+      },
+      {
+        "check": "toggle-phonesMute",
+        "path": "/output/6/mute",
+        "pass": true
+      },
+      {
+        "check": "restored toggle-phonesMute",
+        "path": "/output/6/mute",
+        "value": 0,
+        "pass": true
+      }
+    ],
+    "error": null,
+    "received_count": 99122,
+    "transmitted_count": 124
+  },
+  "hardware-processing-switches.json": {
+    "sha256": "f981351819c6b0bd72d86889c76cd2439f5d8134c46e92fb1a82c934956acbf4",
+    "bytes": 914670,
+    "hardware": "Real UCX II Global OSC on loopback 7008/9008; Stream Deck events supplied by test bridge; physical actuation not claimed",
+    "results": [
+      {
+        "check": "real live level feedback",
+        "pass": true,
+        "count": 1351
+      },
+      {
+        "check": "toggle-eqEnable",
+        "path": "/input/2/eq/enable",
+        "pass": true
+      },
+      {
+        "check": "restored toggle-eqEnable",
+        "path": "/input/2/eq/enable",
+        "value": 0,
+        "pass": true
+      },
+      {
+        "check": "toggle-dynEnable",
+        "path": "/input/2/dynamics/enable",
+        "pass": true
+      },
+      {
+        "check": "restored toggle-dynEnable",
+        "path": "/input/2/dynamics/enable",
+        "value": 0,
+        "pass": true
+      },
+      {
+        "check": "toggle-lowcutEnable",
+        "path": "/input/2/lowcut/enable",
+        "pass": true
+      },
+      {
+        "check": "restored toggle-lowcutEnable",
+        "path": "/input/2/lowcut/enable",
+        "value": 0,
+        "pass": true
+      },
+      {
+        "check": "toggle-autoLevelEnable",
+        "path": "/input/2/autolevel/enable",
+        "pass": true
+      },
+      {
+        "check": "restored toggle-autoLevelEnable",
+        "path": "/input/2/autolevel/enable",
+        "value": 0,
+        "pass": true
+      },
+      {
+        "check": "toggle-reverbEnable",
+        "path": "/reverb/enable",
+        "pass": true
+      },
+      {
+        "check": "restored toggle-reverbEnable",
+        "path": "/reverb/enable",
+        "value": 0,
+        "pass": true
+      },
+      {
+        "check": "toggle-echoEnable",
+        "path": "/echo/enable",
+        "pass": true
+      },
+      {
+        "check": "restored toggle-echoEnable",
+        "path": "/echo/enable",
+        "value": 0,
+        "pass": true
+      }
+    ],
+    "error": null,
+    "received_count": 23863,
+    "transmitted_count": 41
+  },
+  "hardware-exercise-result.json": {
+    "sha256": "517915eed07c8bfdfcacd0e08f8c39c3e0d2b887b628ff823f68103e195d69a5",
+    "bytes": 7276341,
+    "hardware": null,
+    "results": [],
+    "error": "Error: Hardware did not acknowledge /mix/in/8/0/fader expected -299.5",
+    "received_count": 27167,
+    "transmitted_count": 44
+  },
+  "hardware-readonly.json": {
+    "sha256": "d0bdb78f82b9774e4f68f4d432d1c51f6bae29dec13427027e2ca335f6929813",
+    "bytes": 1324,
+    "hardware": "Real UCX II Global OSC on loopback 7008/9008; Stream Deck events supplied by test bridge; physical actuation not claimed",
+    "results": [],
+    "error": null,
+    "received_count": 0,
+    "transmitted_count": 0
+  }
+}

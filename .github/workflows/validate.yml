@@ -2,41 +2,27 @@ name: Validate Stream Deck Plugin
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches: [main]
   push:
-    branches: [main, feature/console-surface-next, feature/console-ui-improvements]
-    paths:
-      - "com.fionetworks.rme-globalosc.sdPlugin/**"
-      - "test/**"
-      - "tools/**"
-      - "package.json"
-      - ".github/workflows/validate.yml"
+    branches: [main, marketplace/v1.1.9-submission]
 
 jobs:
   validate:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
-      - name: Run automated tests
+      - name: Run runtime regressions
         run: npm test
-      - name: Render app icons
+      - name: Verify shipped source and retained artifacts without rebuilding
+        run: python3 tools/verify-shipped-release.py
+      - name: Check profile contracts without regenerating profiles
         run: |
-          npm install --no-save @resvg/resvg-js@2.6.2
-          node tools/render-console-icon.mjs
-      - name: Install Stream Deck CLI
-        run: npm install --global @elgato/cli@latest
-      - name: Validate plugin
-        run: streamdeck validate com.fionetworks.rme-globalosc.sdPlugin
-      - name: Package unreleased hardware test candidate
-        run: streamdeck pack com.fionetworks.rme-globalosc.sdPlugin --output dist --no-update-check
-      - name: Upload unreleased hardware test candidate
-        uses: actions/upload-artifact@v4
-        with:
-          name: console-surface-next-UNRELEASED
-          path: |
-            dist/*.streamDeckPlugin
-            dist/console-marketplace-icon-288.png
-          if-no-files-found: error
-          retention-days: 14
+          python3 test/starter-profiles-test.py StarterProfiles.test_existing_runtime_ui_and_actions_unchanged
+          python3 test/starter-profiles-test.py StarterProfiles.test_new_icons_match_validated_ci_build
+          python3 test/starter-profiles-test.py StarterProfiles.test_all_profiles_resolve_fit_and_preserve_control_settings

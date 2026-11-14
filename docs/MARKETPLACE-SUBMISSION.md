@@ -1,3 +1,5 @@
+> **SUPERSEDED HISTORICAL RECORD — reconciled 2026-11-14.** Earlier candidate status, pending gates and upload/install tasks below describe their original date, not current release work. Shipped baseline: public v1.1.9 / manifest 1.1.9.1; Chris confirmed approval and first paid sale on 2026-11-05. Use [state ledger](STATE_LEDGER.md) and [v1.1.9 validation](../marketplace/v1.1.9/VALIDATION.md). Remaining untested hardware scenarios are preserved there. Do not execute these historical release instructions.
+
 # Marketplace Submission — RME Controller for macOS
 
 Updated 2026-10-11. v1.1.7 is functionally accepted on real hardware. Maker Console exposed a concrete SDK 3/DRM blocker; v1.1.8 changes only manifest metadata and keeps runtime behavior frozen.

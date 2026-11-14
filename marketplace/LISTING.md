@@ -1,3 +1,5 @@
+> **SUPERSEDED HISTORICAL RECORD — reconciled 2026-11-14.** Earlier candidate status, pending gates and upload/install tasks below describe their original date, not current release work. Shipped baseline: public v1.1.9 / manifest 1.1.9.1; Chris confirmed approval and first paid sale on 2026-11-05. Use [state ledger](../docs/STATE_LEDGER.md) and [v1.1.9 validation](v1.1.9/VALIDATION.md). Remaining untested hardware scenarios are preserved there. Do not execute these historical release instructions.
+
 # Current v1.1.9 listing
 
 Use `marketplace/v1.1.9/description.txt`, `marketplace/v1.1.9/release-notes.txt`, and the matching mixer-console assets in `marketplace/v1.1.9/assets/`. The prior listing guidance follows for provenance.

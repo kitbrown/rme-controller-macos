@@ -1,3 +1,5 @@
+> **SUPERSEDED HISTORICAL RECORD — reconciled 2026-11-14.** Earlier candidate status, pending gates and upload/install tasks below describe their original date, not current release work. Shipped baseline: public v1.1.9 / manifest 1.1.9.1; Chris confirmed approval and first paid sale on 2026-11-05. Use [state ledger](STATE_LEDGER.md) and [v1.1.9 validation](../marketplace/v1.1.9/VALIDATION.md). Remaining untested hardware scenarios are preserved there. Do not execute these historical release instructions.
+
 # RME Console Surface — Unreleased Test Build 1.1.8.4
 
 Production version **1.1.8.0** remains unchanged and under Marketplace review. This branch is an independent candidate with a higher **test-only** version to prevent same-version installation conflicts; it is not a new public release.

@@ -1,4 +1,4 @@
-# v1.1.9 submitted for review — 2026-10-27
+# v1.1.9 release and submission record
 
 User authorization: restore starter profiles, verify connected hardware, and submit v1.1.9 with new icons; preserve controls and keep automatic publication OFF.
 
@@ -12,7 +12,10 @@ User authorization: restore starter profiles, verify connected hardware, and sub
 - **SUBMITTED:** clicked Submit for Review under the user's explicit authorization. Maker Console returned "Succesfully uploaded new version" and **Pending review · 1.1.9.1**.
 - Automatic publication was directly verified **OFF immediately before submission**. No publication action was taken.
 - Matching new app icon, thumbnail and cover were saved; description/release notes and all five gallery items were checked.
-- Source and artifact are retained on `marketplace/v1.1.9-submission`; Elgato approval is pending.
+- Source and artifact were retained on `marketplace/v1.1.9-submission` at `c9ca040` and are being reconciled into main.
+- **USER-CONFIRMED, 2026-11-05:** Chris reported approval and the first paid Marketplace sale. This supersedes the dated pending-review observation. Final status was not independently observed in Maker Console.
+- **UNKNOWN:** current price, exact publication time and current automatic-publication setting. Reconciliation performs no Marketplace action.
+- Final retained media: `media/`; portable evidence: `evidence/`; hashes: `ARTIFACTS.sha256`.
 
 ## Earlier handoff (historical)
 
