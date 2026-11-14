@@ -2,25 +2,27 @@ name: Validate Stream Deck Plugin
 
 on:
   workflow_dispatch:
-  push:
+  pull_request:
     branches: [main]
-    paths:
-      - "com.fionetworks.rme-globalosc.sdPlugin/**"
-      - "test/**"
-      - "package.json"
-      - ".github/workflows/validate.yml"
+  push:
+    branches: [main, marketplace/v1.1.9-submission]
 
 jobs:
   validate:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
-      - name: Run automated tests
+      - name: Run runtime regressions
         run: npm test
-      - name: Install Stream Deck CLI
-        run: npm install --global @elgato/cli@latest
-      - name: Validate plugin
-        run: streamdeck validate com.fionetworks.rme-globalosc.sdPlugin
+      - name: Verify shipped source and retained artifacts without rebuilding
+        run: python3 tools/verify-shipped-release.py
+      - name: Check profile contracts without regenerating profiles
+        run: |
+          python3 test/starter-profiles-test.py StarterProfiles.test_existing_runtime_ui_and_actions_unchanged
+          python3 test/starter-profiles-test.py StarterProfiles.test_new_icons_match_validated_ci_build
+          python3 test/starter-profiles-test.py StarterProfiles.test_all_profiles_resolve_fit_and_preserve_control_settings

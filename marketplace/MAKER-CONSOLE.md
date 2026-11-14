@@ -1,3 +1,9 @@
+> **SUPERSEDED HISTORICAL RECORD — reconciled 2026-11-14.** Earlier candidate status, pending gates and upload/install tasks below describe their original date, not current release work. Shipped baseline: public v1.1.9 / manifest 1.1.9.1; Chris confirmed approval and first paid sale on 2026-11-05. Use [state ledger](../docs/STATE_LEDGER.md) and [v1.1.9 validation](v1.1.9/VALIDATION.md). Remaining untested hardware scenarios are preserved there. Do not execute these historical release instructions.
+
+# Current release: v1.1.9
+
+Use [the v1.1.9 handoff](v1.1.9/MAKER-CONSOLE-UPLOAD.md), [validation](v1.1.9/VALIDATION.md), and [exact package identity](PACKAGE.md). The prior v1.1.8 notes below are historical.
+
 # Maker Console — observed state and remaining steps
 
 Checked live on 2026-10-11 after Chris signed in.

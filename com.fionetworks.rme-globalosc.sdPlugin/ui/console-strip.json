@@ -1,0 +1,80 @@
+{
+  "$schema": "https://schemas.elgato.com/streamdeck/plugins/layout.json",
+  "id": "fionetworks-console-strip",
+  "controller": "Encoder",
+  "items": [
+    {
+      "type": "text",
+      "key": "title",
+      "rect": [
+        12,
+        7,
+        176,
+        22
+      ],
+      "value": "TOTALMIX",
+      "color": "#d8e4f0",
+      "alignment": "center",
+      "font": {
+        "size": 16,
+        "weight": 700
+      },
+      "text-overflow": "ellipsis"
+    },
+    {
+      "type": "text",
+      "key": "value",
+      "rect": [
+        12,
+        32,
+        176,
+        37
+      ],
+      "value": "SYNCING",
+      "color": "#f5faff",
+      "alignment": "center",
+      "font": {
+        "size": 27,
+        "weight": 750
+      },
+      "text-overflow": "ellipsis"
+    },
+    {
+      "type": "bar",
+      "key": "indicator",
+      "rect": [
+        12,
+        76,
+        176,
+        12
+      ],
+      "value": 0,
+      "range": {
+        "min": 0,
+        "max": 100
+      },
+      "subtype": 0,
+      "bar_bg_c": "#263544",
+      "bar_fill_c": "#4bbcff",
+      "border_w": 0
+    },
+    {
+      "type": "text",
+      "key": "status",
+      "rect": [
+        12,
+        89,
+        176,
+        10
+      ],
+      "value": "GLOBAL OSC",
+      "color": "#8ba1b4",
+      "alignment": "center",
+      "font": {
+        "size": 9,
+        "weight": 600
+      },
+      "text-overflow": "ellipsis"
+    }
+  ]
+}
