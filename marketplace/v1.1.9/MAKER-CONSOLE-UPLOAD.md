@@ -12,7 +12,7 @@ User authorization: restore starter profiles, verify connected hardware, and sub
 - **SUBMITTED:** clicked Submit for Review under the user's explicit authorization. Maker Console returned "Succesfully uploaded new version" and **Pending review · 1.1.9.1**.
 - Automatic publication was directly verified **OFF immediately before submission**. No publication action was taken.
 - Matching new app icon, thumbnail and cover were saved; description/release notes and all five gallery items were checked.
-- Source and artifact were retained on `marketplace/v1.1.9-submission` at `c9ca040` and are being reconciled into main.
+- Source and artifact were retained on `marketplace/v1.1.9-submission` at `c9ca040` and are integrated into main through [PR #7](https://github.com/kitbrown/rme-controller-macos/pull/7), merge `cddab6eb88e6c3e9f7f0d7622a281999632513db`.
 - **USER-CONFIRMED, 2026-11-05:** Chris reported approval and the first paid Marketplace sale. This supersedes the dated pending-review observation. Final status was not independently observed in Maker Console.
 - **UNKNOWN:** current price, exact publication time and current automatic-publication setting. Reconciliation performs no Marketplace action.
 - Final retained media: `media/`; portable evidence: `evidence/`; hashes: `ARTIFACTS.sha256`.

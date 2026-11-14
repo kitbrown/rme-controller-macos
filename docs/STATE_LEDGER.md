@@ -9,7 +9,7 @@ Updated: 2026-11-14. This is the current release authority; older candidate docu
 - **CONFIRMED submission observation, 2026-10-27:** same Maker Console product `4805d54d-4d34-4f36-b392-e4f86172c12b`, build 1.1.9.1 pending review; SDK 3+, DRM Yes, default profiles Yes. Automatic publication was OFF immediately before submission.
 - **USER-CONFIRMED release outcome, 2026-11-05:** Chris reported Elgato approval and the first paid Marketplace sale. Approval/publication were not independently read from Maker Console because browser checks were blocked by lock/sign-in. The approval monitor was deleted after that report. Do not treat the historical pending-review snapshot as current.
 - **UNKNOWN current account state:** price, exact publication timestamp, and current automatic-publication setting. No Marketplace/account changes are part of reconciliation.
-- v1.1.8 publication/capture/profile tasks are **SUPERSEDED by v1.1.9**, not unfinished submission work. Historical PRs #4/#5/#6 must not be merged over this baseline.
+- v1.1.8 publication/capture/profile tasks are **SUPERSEDED by v1.1.9**, not unfinished submission work. Historical PRs #4/#5/#6 are closed as superseded and must not be merged over this baseline.
 
 ## Completed evidence
 
@@ -38,7 +38,7 @@ Owner: next authorized engineer with Chris and appropriate connected equipment. 
 
 ## Reconciliation, 2026-11-14
 
-User authorized documentation/source integration into main, GitHub updates and closure of superseded drafts; no rebuild or Marketplace changes. Preserve the shipped source/package byte-for-byte. Reconciliation checks: all eight suites pass under Node 24.22.3; three read-only profile tests pass; CLI validation passes. Package SHA-256 and original plugin tree remain unchanged. Source/archive parity excludes packaging-control `.sdignore` and accounts only for the CLI-stripped manifest final newline. Existing source history is merged, not squashed, so baseline-pinned profile tests remain reproducible in a full clone. Review/merge and remote verification are recorded in the reconciliation PR.
+User authorized documentation/source integration into main, GitHub updates and closure of superseded drafts; no rebuild or Marketplace changes. Preserve the shipped source/package byte-for-byte. Reconciliation checks: all eight suites pass under Node 24.22.3; three read-only profile tests pass; CLI validation passes. Package SHA-256 and original plugin tree remain unchanged. Source/archive parity excludes packaging-control `.sdignore` and accounts only for the CLI-stripped manifest final newline. Existing source history is merged, not squashed, so baseline-pinned profile tests remain reproducible in a full clone. PR #7 merged as `cddab6eb88e6c3e9f7f0d7622a281999632513db`; drafts #4/#5/#6 closed as superseded. Both branch and PR CI passed the runtime, immutable-artifact and read-only profile checks. Remote verification is recorded in the reconciliation PR and final chat handoff. The release tag `v1.1.9` identifies the reconciled source/records; it does not represent another Marketplace upload.
 
 ---
 
