@@ -1,0 +1,6 @@
+body { background: #111518; color: #edf1ef; }
+.hero, .panel, .section, section { background: #1c2125; border-color: #384147; border-radius: 7px; }
+h2, .title, h3 { font-family: "DIN Alternate", "Helvetica Neue", sans-serif; }
+h2, .title { letter-spacing: .025em; }
+input, select { font-variant-numeric: tabular-nums; }
+input:focus-visible, select:focus-visible { outline: 2px solid #9bd7e6; outline-offset: 1px; }

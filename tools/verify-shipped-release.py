@@ -1,4 +1,7 @@
 """Read-only verification of the retained v1.1.9 package, source and artifacts."""
+import io
+import subprocess
+import tarfile
 import hashlib
 import json
 from pathlib import Path
@@ -27,8 +30,12 @@ with zipfile.ZipFile(PACKAGE) as archive:
     members = {n[len(prefix):]: archive.read(n) for n in archive.namelist()
                if n.startswith(prefix) and not n.endswith('/')}
     # Elgato omits its packaging-control file .sdignore from the installer.
-    source = {str(p.relative_to(PLUGIN)): p.read_bytes()
-              for p in PLUGIN.rglob('*') if p.is_file() and p.name not in ('.DS_Store', '.sdignore')}
+    pinned = subprocess.check_output(['git', 'archive',
+        '488256a94fd2218f868dfb2b2096f23cd7d0e33c', PLUGIN.name], cwd=ROOT)
+    with tarfile.open(fileobj=io.BytesIO(pinned)) as original:
+        source = {item.name[len(prefix):]: original.extractfile(item).read()
+                  for item in original if item.isfile() and Path(item.name).name
+                  not in ('.DS_Store', '.sdignore')}
     require(set(members) == set(source), 'source/archive file sets differ')
     for name, data in members.items():
         if name == 'manifest.json':

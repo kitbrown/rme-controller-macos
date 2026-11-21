@@ -14,6 +14,12 @@ A bidirectional Stream Deck plugin for controlling RME TotalMix FX through Globa
 
 The plugin actions default to the matching host and ports.
 
+**Getting feedback.** Enable Send Changes in TotalMix Global OSC. For audio meters, also enable Send Level Messages in that controller’s Details. Use the OSC diagnostic key to check for incoming messages.
+
+**v1.1.10 candidate.** To try the workflow pages with the candidate installed, open Stream Deck Settings → Profiles → Import and choose the matching `rme-workflow-*.streamDeckProfile` from the [profiles directory](com.fionetworks.rme-globalosc.sdPlugin/profiles). Select **RME Workflow** in the profile selector. Your editable starter is a separate profile. Use the page arrows on key-only models or swipe the touch strip on dial models.
+
+Monitor provides Main Mute, Dim, Mono, Phones Mute, a Main stereo peak meter and OSC diagnostics. Mix provides half-decibel down/up pairs for Mic 1, Core Audio and SPDIF feeding Main. Processing targets hardware input 1 by default. Check that assignment in the action settings before engaging EQ, dynamics, low cut or auto level. Processing dials on + models adjust EQ band gains and compressor settings. Snapshots recalls the eight existing TotalMix slots. Smaller devices split a group across pages when necessary.
+
 ## Encoder presets
 
 - Core Audio — Analog 1/2 Playback
@@ -88,7 +94,7 @@ Phantom power can damage or stress incompatible connected equipment. Verify the 
 
 ## Status
 
-Version 1.1.7.0 release candidate. The plugin is free. Support: chris@fionetworks.com.
+Marketplace release v1.1.9. Support: chris@fionetworks.com.
 
 RME, TotalMix, Elgato, and Stream Deck are trademarks of their respective owners. This independent project is not affiliated with or endorsed by RME Audio or Elgato.
 

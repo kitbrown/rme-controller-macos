@@ -44,9 +44,9 @@
       "key": "indicator",
       "rect": [
         12,
-        76,
+        72,
         176,
-        12
+        8
       ],
       "value": 0,
       "range": {
@@ -62,16 +62,16 @@
       "type": "text",
       "key": "status",
       "rect": [
-        12,
-        89,
-        176,
-        10
+        10,
+        85,
+        180,
+        14
       ],
       "value": "GLOBAL OSC",
       "color": "#8ba1b4",
       "alignment": "center",
       "font": {
-        "size": 9,
+        "size": 11,
         "weight": 600
       },
       "text-overflow": "ellipsis"

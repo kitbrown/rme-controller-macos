@@ -1,5 +1,17 @@
 # v1.1.10 preparation — Stream Deck 7.6.1
 
+## Candidate 1.1.10.0 · November 21, 2026
+
+Chris authorized implementation and hardware-free verification. The draft contains typography and artwork refinements, touch-strip and inspector polish, the setup help button and six optional workflow profiles. The headless [comparison sheet](evidence/v1.1.10-candidate/key-preview.png) shows the actual SVG renderer with sample data. DIN Alternate uses local font resolution with Helvetica Neue and Arial fallbacks. Short key tokens retain the 24-unit maximum, longer tokens use 18 and status uses 12–15 on the original 144-unit canvas. Snapshots reserve the lower rail for Stream Deck’s title and edited marker. The six original starters match the shipped bytes.
+
+**Verified offline.** Eight runtime suites passed on the host’s Node 24.22.1. Four profile/contract tests passed, including deterministic regeneration. A headless Chromium check measured the bounds of the 12-wide-letter channel label. The Elgato CLI validated and packed the [candidate](../marketplace/v1.1.10/candidate), and its [checksum](../marketplace/v1.1.10/candidate/SHA256SUMS) and all 47 files match the checkout after the CLI’s manifest newline removal. Run `npm test`, `python3 test/starter-profiles-test.py`, `python3 tools/verify-candidate.py` and `python3 tools/verify-shipped-release.py` from a full clone.
+
+**Next hardware session.** Back up the active setup, install this exact package and import the matching optional workflow profile. Compare original page and control mappings before/after. Check all page transitions, key and touch-strip text at viewing distance, native snapshot titles including the edited marker, receiving and losing feedback, actual stereo peaks, and safe dial/button operations with restoration. Verify reconnect and sleep/wake separately. Record the tested models and leave the other [physical validation gaps](STATE_LEDGER.md) open.
+
+## Historical November 20 preparation record
+
+The following records the scope and results before implementation authorization.
+
 Updated: 2026-11-20. **PREPARATION ONLY — no implementation or release authorization.**
 
 The authoritative shipped baseline remains [STATE_LEDGER.md](STATE_LEDGER.md): public v1.1.9, manifest 1.1.9.1, Git main/tag `488256a94fd2218f868dfb2b2096f23cd7d0e33c`. This document scopes future work; it does not supersede the shipped validation record or authorize a new upload.
