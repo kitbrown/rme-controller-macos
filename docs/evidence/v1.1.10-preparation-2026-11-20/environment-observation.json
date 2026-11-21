@@ -1,0 +1,21 @@
+{
+  "observed_date": "2026-11-20",
+  "scope": "Read-only installed app/plugin and existing startup log; no hardware actuation or host restart",
+  "stream_deck_version": "7.6.1",
+  "stream_deck_build": "23033",
+  "plugin_version": "1.1.9.1",
+  "sdk": 3,
+  "node_major": "24",
+  "profiles": 6,
+  "installed_files_compared": 40,
+  "installed_files_match_shipped_package": true,
+  "differing_files": [],
+  "existing_startup_log": [
+    "inf int main(int, char **)                             Start Stream Deck App -> Version: 7.6.1.23033"
+  ],
+  "existing_plugin_connection_log": [
+    "[com.fionetworks.rme-globalosc] Plugin connected"
+  ],
+  "rme_hardware": "Unavailable per Chris; no new hardware validation",
+  "sales": "Three Marketplace sales reported by Chris on 2026-11-20; not independently queried"
+}
