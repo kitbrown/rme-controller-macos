@@ -1,0 +1,14 @@
+
+> rme-controller-macos@1.1.9 test
+> node test/plugin-sandbox-test.mjs com.fionetworks.rme-globalosc.sdPlugin/bin/plugin.js && node test/plugin-v1.1-race-test.mjs com.fionetworks.rme-globalosc.sdPlugin/bin/plugin.js && node test/plugin-v1.1.5-toggle-regression-test.mjs com.fionetworks.rme-globalosc.sdPlugin/bin/plugin.js && node test/meter-stack-test.mjs && node test/live-meter-osc-test.mjs com.fionetworks.rme-globalosc.sdPlugin/bin/plugin.js && node test/peak-meter-action-ui-test.mjs && node test/key-color-families-test.mjs com.fionetworks.rme-globalosc.sdPlugin/bin/plugin.js && node test/next-features-test.mjs com.fionetworks.rme-globalosc.sdPlugin/bin/plugin.js
+
+OSC decode: Malformed OSC string
+PASS: 22 outbound OSC packets and 32 Stream Deck messages validated
+OSC decode: Malformed OSC string
+PASS: event ordering, state readiness, two receive ports, mute guards, presets, snapshots, cleanup, and reconnect (56 OSC packets / 93 Stream Deck messages)
+v1.1.7 toggle/layout regressions passed
+PASS: continuous unlabeled vertical 1-4 key fader meter
+PASS: OSC /level audio peaks, isolated I/O, stereo, 3/4 keys, clip and read-only safety
+PASS: independent Live Audio Peak Meter action and configuration registered
+PASS: all 8 snapshots, 5 mute presets, custom mute, and other actions share category idle colors and active red
+PASS: feedback-gated EQ, mixer pan, processing switch, live names and read-only OSC diagnostics

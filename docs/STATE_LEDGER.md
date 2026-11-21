@@ -1,6 +1,6 @@
 # State Ledger
 
-Updated: 2026-11-14. This is the current release authority; older candidate documents are historical.
+Updated: 2026-11-20 (preparation branch only). This is the current release authority; older candidate documents are historical.
 
 ## Current shipped baseline
 
@@ -27,6 +27,14 @@ Final Marketplace photos/video, existing icon/thumbnail, descriptions/release no
 - Processing support/ranges remain device/channel specific. Numeric/boolean feedback gating must remain intact; finite UCX II checks do not certify every RME interface or channel.
 
 Owner: next authorized engineer with Chris and appropriate connected equipment. Record exact environment, actions, observations and restorations in the existing validation record; keep UNKNOWN where untested. No new hardware tests were performed during reconciliation.
+
+## v1.1.10 preparation checkpoint — 2026-11-20
+
+Preparation branch only: `prep/v1.1.10`. Chris permits hardware-free preparation and GitHub updates but requires explicit authorization before product changes. **HOLD implementation, merge, version bump, rebuild/install and all Marketplace actions.** RME hardware is unavailable per Chris. Main/tag v1.1.9 remains `488256a`; this checkpoint does not create a new release.
+
+See [v1.1.10 preparation](NEXT-RELEASE-1.1.10.md) for verified Stream Deck 7.6.1/build 23033 startup, all 40 installed package files matching shipped bytes, successful eight-suite regression run on host-bundled Node 24.22.1, three read-only profile checks, unchanged artifact verification, vendor sources, proposed scope and unexecuted hardware acceptance plan. No reproducible compatibility defect or mandatory migration was identified. Chris reports three Marketplace sales; account state was not queried. All existing hardware gaps remain open.
+
+Next action: Chris explicitly selects/authorizes an implementation scope, or supplies equipment and authorizes a safe hardware-test session. No automatic follow-up work, merge or release is authorized by the preparation record.
 
 ## Next authorized release workflow
 
