@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Apply Input Processing</title>
+<style>
+:root{color-scheme:dark}body{margin:12px;font:13px -apple-system,Arial,sans-serif}section{border:1px solid;padding:12px;margin-bottom:10px}h2{margin:0 0 8px}label{display:block;margin:8px 0}input,select{box-sizing:border-box;width:100%;padding:6px}p{line-height:1.4;color:#bcc8c9}
+</style><link rel="stylesheet" href="console.css"></head><body>
+<section><h2>Apply input processing</h2>
+<label>Hardware input (1 = first input)<input required data-setting="channel" type="number" min="1" max="1000" value="1"></label>
+<label>Processor<select data-setting="preset"><option value="eq">EQ · band 2</option><option value="compressor">Dynamics · compressor</option></select></label>
+<div data-show-preset="eq">
+<label>Band 2 frequency (Hz)<input required data-setting="frequency" type="number" min="20" max="20000" value="250"></label>
+<label>Band 2 gain (dB)<input required data-setting="gain" type="number" min="-20" max="20" step="0.1" value="-2"></label>
+<p>Applies these two settings and enables the channel EQ. The existing filter shape, width and other bands also affect the sound.</p></div>
+<div data-show-preset="compressor" hidden>
+<label>Threshold (dB)<input required data-setting="threshold" type="number" min="-80" max="0" step="0.1" value="-18"></label>
+<label>Ratio (:1)<input required data-setting="ratio" type="number" min="1" max="20" step="0.1" value="2"></label>
+<p>Enables the channel’s Dynamics section with these compressor settings. Existing makeup gain, timing and expander settings also apply.</p></div></section>
+<section><h2>TotalMix connection</h2>
+<label>Host (IPv4 address or localhost)<input data-setting="host" value="127.0.0.1"></label>
+<label>TotalMix receive port<input required data-setting="sendPort" type="number" min="1" max="65535" value="7008"></label>
+<label>Plugin receive port<input required data-setting="receivePort" type="number" min="1" max="65535" value="9008"></label>
+<p>Enable Send Changes in Global OSC. Press once to read, apply and verify. CHECK MIX means some settings may already have changed. Inspect TotalMix before pressing again.</p></section>
+<script src="common.js"></script></body></html>

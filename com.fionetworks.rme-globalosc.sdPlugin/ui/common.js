@@ -129,6 +129,13 @@ function validate() {
   const fields = [...document.querySelectorAll("[data-setting]")];
   for (const el of fields) el.style.borderColor = "";
 
+  for (const field of fields) {
+    if (field.required && !field.closest("[hidden]") && !field.validity.valid) {
+      errors.push(field.parentElement.textContent.trim() + ": " + field.validationMessage);
+      field.style.borderColor = "#ff5d69";
+    }
+  }
+
   const host = document.querySelector("[data-setting='host']");
   if (host && !host.value.trim()) {
     errors.push("Host is required.");

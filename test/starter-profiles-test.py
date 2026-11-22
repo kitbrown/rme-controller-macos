@@ -21,17 +21,22 @@ class StarterProfiles(unittest.TestCase):
             ['git', 'show', '9f0a413b5b7a5b6c8b61e7159c9764afff45eacd:com.fionetworks.rme-globalosc.sdPlugin/manifest.json'], cwd=ROOT))
         current = json.loads(json.dumps(MANIFEST))
         current.pop('Profiles')
-        self.assertEqual(current.pop('Version'), '1.1.10.0')
+        self.assertEqual(current.pop('Version'), '1.1.10.1')
         self.assertEqual(current.pop('SupportURL'), 'https://github.com/kitbrown/rme-controller-macos#install')
         snapshot = next(a for a in current['Actions'] if a['UUID'].endswith('.snapshot'))
         for state in snapshot['States']:
             self.assertEqual(state.pop('TitleAlignment'), 'bottom')
             self.assertEqual(state.pop('FontSize'), 10)
+        recipe = next(a for a in current['Actions'] if a['UUID'] == UUID + '.processingrecipe')
+        self.assertEqual(recipe['Controllers'], ['Keypad'])
+        self.assertTrue((PLUGIN / recipe['PropertyInspectorPath']).is_file())
+        current['Actions'].remove(recipe)
         original.pop('Version')
         self.assertEqual(current, original)
         for folder in ('bin', 'ui', 'imgs'):
             for path in (PLUGIN / folder).rglob('*'):
-                if path.name in ('console-art.js', 'console-strip.json', 'console.css'):
+                if path.name in ('console-art.js', 'console-strip.json', 'console.css', 'plugin.js', 'common.js',
+                                 'processing-recipe.js', 'processing-recipe.html'):
                     continue
                 if path.is_file() and path.name not in ('plugin.png', 'plugin@2x.png'):
                     old = subprocess.check_output(['git', 'show', '9f0a413b5b7a5b6c8b61e7159c9764afff45eacd:' + str(path.relative_to(ROOT))], cwd=ROOT)
@@ -78,6 +83,7 @@ class StarterProfiles(unittest.TestCase):
                     self.assertEqual(pages['Default'], pages['Pages'][0])
                     snapshots, toggles, presets = set(), set(), set()
                     titles = []
+                    recipes = []
                     for page_id in pages['Pages']:
                         page = json.loads(archive.read(root.rsplit('/', 1)[0] + '/Profiles/' + page_id.upper() + '/manifest.json'))
                         titles.append(page['Name'].split()[0])
@@ -112,6 +118,11 @@ class StarterProfiles(unittest.TestCase):
                                             self.assertEqual(settings['paramKey'], (
                                                 'eq1Gain','eq2Gain','eq3Gain','compThreshold','compRatio','makeupGain')[x])
                                             self.assertEqual((settings['paramBus'], settings['sourceIndex']), ('input', 0))
+                                        if kind == 'processingrecipe':
+                                            self.assertEqual(titles[-1], 'Recipes')
+                                            self.assertEqual(settings['channel'], 1)
+                                            recipes.append(tuple(settings.get(k) for k in (
+                                                'preset','frequency','gain','threshold','ratio')))
                                         if kind == 'snapshot':
                                             snapshots.add(settings['snapshot'])
                                         if kind == 'levelkey':
@@ -131,7 +142,9 @@ class StarterProfiles(unittest.TestCase):
                                     self.assertIn(action['UUID'], ('com.elgato.streamdeck.page.next', 'com.elgato.streamdeck.page.previous'))
                     self.assertEqual(snapshots, set(range(1, 9)))
                     if workflow:
-                        self.assertEqual(list(dict.fromkeys(titles)), ['Monitor','Mix','Processing','Snapshots'])
+                        self.assertEqual(list(dict.fromkeys(titles)), ['Monitor','Mix','Processing','Snapshots','Recipes'])
+                        self.assertEqual(recipes, [('eq',250,-2,None,None), ('eq',3000,2,None,None),
+                                                   ('compressor',None,None,-18,2)])
                         self.assertEqual(presets, {(p, m) for p in ('mic1','playback12','spdif') for m in ('down','up')})
                         self.assertEqual(toggles, {'mainMute','dim','mono','phonesMute','eqEnable','dynEnable','lowcutEnable','autoLevelEnable'})
                         continue

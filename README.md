@@ -20,6 +20,20 @@ The plugin actions default to the matching host and ports.
 
 Monitor provides Main Mute, Dim, Mono, Phones Mute, a Main stereo peak meter and OSC diagnostics. Mix provides half-decibel down/up pairs for Mic 1, Core Audio and SPDIF feeding Main. Processing targets hardware input 1 by default. Check that assignment in the action settings before engaging EQ, dynamics, low cut or auto level. Processing dials on + models adjust EQ band gains and compressor settings. Snapshots recalls the eight existing TotalMix slots. Smaller devices split a group across pages when necessary.
 
+### One-touch processing
+
+Open **Recipes** in the optional RME Workflow profile. On an earlier candidate installation, import the updated workflow as a separate profile or drag **Apply Input Processing** onto a key. Select your hardware input in the action settings (1 is the first input).
+
+| Key | What one press applies |
+|---|---|
+| EQ CUT | Band 2 at 250 Hz, −2 dB, then channel EQ on |
+| EQ LIFT | Band 2 at 3 kHz, +2 dB, then channel EQ on |
+| COMP | Compressor threshold −18 dB and ratio 2:1, then channel Dynamics on |
+
+These are editable starting points for hardware input 1. The two EQ keys are alternate settings for the same band. The channel’s existing EQ shape and width, or its existing dynamics timing, makeup gain and expander, also affect what you hear. Enabling a processor activates the whole section.
+
+Each press requests fresh channel data from the configured TotalMix IPv4 host (localhost by default). **MATCHES** means all targets already matched. **APPLIED** reports a successful final readback for the last press. **NO DATA** means required feedback did not arrive before any write. **CHECK MIX** means a write was attempted and the final result could not be verified. Inspect the channel before retrying. To bypass a section, use its existing EQ or Dynamics toggle on **Processing**. Bypassing retains its parameter values.
+
 ## Encoder presets
 
 - Core Audio — Analog 1/2 Playback

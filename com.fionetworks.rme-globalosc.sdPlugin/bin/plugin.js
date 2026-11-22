@@ -1,3 +1,4 @@
+import {RecipeRunner, recipePlan} from "./processing-recipe.js";
 import dgram from "node:dgram";
 import {readFileSync} from "node:fs";
 import {renderConsoleKey, renderLevelKey as drawLevelKey, renderStackKey} from "../ui/console-art.js";
@@ -12,6 +13,8 @@ const ACTION_LEVEL_KEY = `${PLUGIN_UUID}.levelkey`;
 const ACTION_PEAK_METER = `${PLUGIN_UUID}.peakmeter`;
 const ACTION_PARAMETER = `${PLUGIN_UUID}.parameter`;
 const ACTION_DIAGNOSTIC = `${PLUGIN_UUID}.diagnostic`;
+const ACTION_RECIPE = PLUGIN_UUID + ".processingrecipe";
+const recipes = new RecipeRunner();
 const isMeter = inst => inst.action === ACTION_PEAK_METER || (inst.action === ACTION_LEVEL_KEY && levelKeyMode(inst.settings) === "meter");
 
 const DEFAULT_HOST = "127.0.0.1";
@@ -283,6 +286,11 @@ function diagnosticImage(inst) {
   const status=age<5000?"RX LIVE":last?"STALE":"NO DATA";
   return renderConsoleKey({token:"OSC",status,active:false,accent:age<5000?"#58e6a9":"#f3be67"});
 }
+function renderRecipe(inst, status) {
+  const plan = recipePlan(inst.settings);
+  setImage(inst.context, renderConsoleKey({token: plan?.token || "SETUP",
+    status, active: false, accent: "#f3be67"}));
+}
 function renderDiagnostic(inst) {if(instances.has(inst.context))setImage(inst.context,diagnosticImage(inst));}
 function keyImage(inst, active) {
   return renderConsoleKey({token: keyToken(inst), status: keyStatus(inst, active), accent: keyAccent(inst), active});
@@ -435,9 +443,12 @@ async function acquireReceiver(port) {
     socket.once("listening", resolve);
     socket.once("error", reject);
   });
-  socket.on("message", packet => {
+  socket.on("message", (packet, peer) => {
     try {
-      for (const message of decodeOsc(packet)) handleOsc(port, message);
+      for (const message of decodeOsc(packet)) {
+        recipes.receive(port, peer.address, message.address, message.args[0]);
+        handleOsc(port, message);
+      }
     } catch (error) {
       console.error("OSC decode:", error.message || error);
     }
@@ -610,7 +621,7 @@ function requestState(inst) {
   const s = inst.settings;
   // Peak data is streamed by TotalMix when Send Level Messages is enabled.
   // /sendchan only fetches static channel parameters; it cannot request live peaks.
-  if (isMeter(inst)) return;
+  if (inst.action === ACTION_RECIPE || isMeter(inst)) return;
   if (inst.action === ACTION_DIAGNOSTIC) {requestGlobalState(s);return;}
   if (inst.action === ACTION_PARAMETER) {
     const spec=resolveParameter(s);
@@ -733,7 +744,11 @@ async function configureInstance(msg, replacing = false) {
     else await acquireReceiver(newPort);
   }
   if (inst.action === ACTION_OUTPUT || inst.action === ACTION_MIX || inst.action===ACTION_PARAMETER) renderDial(inst, true);
-  else if(inst.action===ACTION_DIAGNOSTIC) {
+  else if (inst.action === ACTION_RECIPE) {
+    setTitle(inst.context, "");
+    const plan = recipePlan(settings);
+    renderRecipe(inst, plan ? "IN " + plan.channel : "SETUP");
+  } else if(inst.action===ACTION_DIAGNOSTIC) {
     setTitle(inst.context,"");renderDiagnostic(inst);
     clearInterval(inst.diagnosticTimer);inst.diagnosticTimer=setInterval(()=>renderDiagnostic(inst),1000);
   }
@@ -761,6 +776,7 @@ function enqueueContext(context, operation) {
   return current;
 }
 function queueConfiguration(msg, replacing = false) {
+  recipes.cancel(msg.context);
   const existing = instances.get(msg.context);
   if (existing) existing.configuring = true;
   return enqueueContext(msg.context, async () => {
@@ -774,6 +790,7 @@ function queueConfiguration(msg, replacing = false) {
 function removeInstance(context) {
   const inst = instances.get(context);
   if (!inst) return;
+  recipes.cancel(context);
   instances.delete(context);
   openInspectors.delete(context);
   clearTimeout(inst.feedbackTimer);
@@ -823,6 +840,12 @@ function onKeyUp(msg) {
 function onKeyDown(msg) {
   const inst = instances.get(msg.context);
   if (!inst) return;
+  if (inst.action === ACTION_RECIPE) {
+    if (!inst.configuring) recipes.start(inst.context, inst.settings, cfg(inst.settings),
+      (path, value, float) => sendPacket(inst.settings, path, value, float),
+      status => renderRecipe(inst, status));
+    return;
+  }
   if (inst.action === ACTION_DIAGNOSTIC) {requestGlobalState(inst.settings);return;}
   if (inst.action === ACTION_PEAK_METER) return; // Dedicated audio peak meter is always read-only.
   if (inst.action === ACTION_LEVEL_KEY) {
@@ -895,6 +918,7 @@ function connectStreamDeck() {
   });
   sd.addEventListener("error", error => console.error("Stream Deck WebSocket:", error.message || error));
   sd.addEventListener("close", () => {
+    for (const context of recipes.runs.keys()) recipes.cancel(context);
     if (shuttingDown) return;
     clearTimeout(reconnectTimer);
     const delay = Math.min(10000, 250 * (2 ** reconnectAttempt++));

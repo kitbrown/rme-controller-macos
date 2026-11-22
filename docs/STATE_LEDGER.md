@@ -1,6 +1,6 @@
 # State Ledger
 
-Updated: 2026-11-21 (candidate branch). This is the current release authority; older candidate documents are historical.
+Updated: 2026-11-22 (candidate branch). This is the current release authority; older candidate documents are historical.
 
 ## Current shipped baseline
 
@@ -28,7 +28,11 @@ Final Marketplace photos/video, existing icon/thumbnail, descriptions/release no
 
 Owner: next authorized engineer with Chris and appropriate connected equipment. Record exact environment, actions, observations and restorations in the existing validation record; keep UNKNOWN where untested. No new hardware tests were performed during reconciliation.
 
-## v1.1.10 candidate checkpoint — 2026-11-21
+## v1.1.10 candidate checkpoint — 2026-11-22
+
+Build **1.1.10.1** supersedes the first test package. Three editable processing presets are included in six optional workflow profiles. The [current candidate record](NEXT-RELEASE-1.1.10.md) contains the exact archive, offline evidence and live confirmation/restoration procedure.
+
+## Historical v1.1.10 candidate checkpoint — 2026-11-21
 
 Build 1.1.10.0 is packaged on the draft branch for hardware testing. [Candidate evidence and physical test plan](NEXT-RELEASE-1.1.10.md). User authorized workflow pages and visual improvements and will assist with hardware. Candidate status is separate from the released v1.1.9 above.
 

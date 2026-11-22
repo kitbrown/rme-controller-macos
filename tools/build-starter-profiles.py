@@ -45,8 +45,11 @@ def workflow_pages():
            for p in ('mic1', 'playback12', 'spdif') for mode in ('down', 'up')]
     processing = [('toggle', {'preset': p, 'processingBus': 'input', 'processingIndex': 0})
                   for p in ('eqEnable', 'dynEnable', 'lowcutEnable', 'autoLevelEnable')]
+    recipes = [('processingrecipe', {'preset': 'eq', 'frequency': 250, 'gain': -2, 'channel': 1}),
+               ('processingrecipe', {'preset': 'eq', 'frequency': 3000, 'gain': 2, 'channel': 1}),
+               ('processingrecipe', {'preset': 'compressor', 'threshold': -18, 'ratio': 2, 'channel': 1})]
     return [('Monitor', monitor), ('Mix', mix), ('Processing', processing),
-            ('Snapshots', [('snapshot', {'snapshot': n}) for n in range(1, 9)])]
+            ('Snapshots', [('snapshot', {'snapshot': n}) for n in range(1, 9)]), ('Recipes', recipes)]
 
 
 def build():
