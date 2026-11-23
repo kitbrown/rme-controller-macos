@@ -4,12 +4,12 @@ section{padding:12px;margin-bottom:11px;border:1px solid #344657;border-radius:9
 h2{font-size:18px;margin:0 0 6px}h3{font-size:12px;margin:0 0 8px;color:#72dab5}
 label{display:block;margin:9px 0 4px}input,select{width:100%;box-sizing:border-box;background:#0a151f;color:white;border:1px solid #3d5264;border-radius:5px;padding:8px}
 p{font-size:11px;color:#a7bfcd;line-height:1.4}[hidden]{display:none!important}
-</style></head><body><section><h2>Control Toggle</h2><p>Feedback-driven state. Active keys turn red. Unsupported functions remain blocked until TotalMix reports their state.</p></section>
+</style><link rel="stylesheet" href="console.css"></head><body><section><h2>Control Toggle</h2><p>Feedback-driven state. Active keys turn red. Unsupported functions remain blocked until TotalMix reports their state.</p></section>
 <section><h3>Function</h3><label>Preset</label><select data-setting="preset">
 <option value="mainMute">Main Mute</option><option value="dim">Dim</option><option value="mono">Mono</option>
 <option value="micMute">Mic 1 Mute</option><option value="tvSpdifMute">TV SPDIF Input Mute</option><option value="spdifOutMute">SPDIF Output Mute</option>
 <option value="phonesMute">Phones 1 Mute</option><option value="mic48v">Analog 1/2 - 48V</option><option value="talkback">Talkback + Dim (hold)</option>
-<option value="eqEnable">Channel EQ</option><option value="dynEnable">Channel Dynamics</option><option value="lowcutEnable">Channel Low Cut</option>
+<option value="eqEnable">Channel EQ</option><option value="dynEnable">Channel Dynamics</option><option value="lowcutEnable">Channel HPF</option>
 <option value="autoLevelEnable">Channel Auto Level</option><option value="reverbEnable">Global Reverb</option><option value="echoEnable">Global Echo</option>
 <option value="custom">Custom Global OSC toggle</option></select>
 <div data-show-processing="true"><label>Processing bus</label><select data-setting="processingBus">

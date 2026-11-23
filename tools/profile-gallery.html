@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RME Controller for macOS · Stream Deck + XL profile preview</title>
+<style>
+*{box-sizing:border-box}html{background:#111718;color:#f4f3e9;font-family:"Helvetica Neue",Arial,sans-serif}body{margin:0}
+.frame{max-width:2040px;margin:auto;min-height:100vh;padding:3.15vw 4.2vw 2.1vw;background:radial-gradient(ellipse at 84% 46%,#233537 0,transparent 56%),linear-gradient(160deg,#141d1f,#101516 75%)}
+header,footer{display:flex;align-items:center;justify-content:space-between}
+header{padding-bottom:1.2vw;border-bottom:1px solid #475354}.brand{font-size:1.2vw;font-weight:650;letter-spacing:.06em}.mark{display:inline-flex;gap:3px;align-items:center;margin-right:.65em;height:1em}
+.mark i{width:3px;background:#87e6cd;height:95%}.mark i:nth-child(2){height:56%}.mark i:nth-child(3){height:78%}
+.product{font-size:1.2vw;color:#d2ded9}nav{display:flex;flex-wrap:wrap;gap:.4rem;margin:20px 0}nav a{font-size:.95rem;color:#c6d3ce;text-decoration:none;padding:.55rem .9rem;border:1px solid #536362;border-radius:20px}nav a[aria-current="page"]{background:#a6e4ce;color:#11241b}nav a:focus-visible{outline:3px solid white}
+section{display:none;align-items:center;grid-template-columns:27.3% 1fr;gap:3vw;min-height:39.7vw}
+section.active{display:grid}.eyebrow,footer,.group h2{font-family:Menlo,Consolas,monospace}.eyebrow{font-size:.94vw;line-height:1.65;color:#9ae3c8}
+h1{font-size:4.17vw;line-height:.99;letter-spacing:-.055em;margin:1.3vw 0 1.4vw;font-weight:630;text-wrap:balance}
+article p{font-size:1.37vw;line-height:1.48;margin:0;color:#c3cfca;max-width:22em;text-wrap:pretty}footer{font-size:.89vw;color:#b1c1bb;letter-spacing:.02em;border-top:1px solid #475354;padding-top:1.3vw}
+.board{background:linear-gradient(162deg,#293035,#111617 52%,#202728);border:1px solid #596567;border-bottom:4px solid #080c0e;box-shadow:0 1vw 2.5vw #0006,inset 0 1px #7f898955;border-radius:1.65vw;padding:1.25vw 1.8vw .9vw}
+.matrix{display:grid;grid-template-columns:repeat(9,1fr);gap:.38vw .65vw}.slot,.key{aspect-ratio:1;min-width:0;position:relative;overflow:hidden;border-radius:12%}
+.slot{background:linear-gradient(155deg,#22292a,#181c1d);box-shadow:inset 0 0 0 2px #0a1010,inset 0 4px 6px #070b0b,0 1px 1px #707c793b}
+.key img{display:block;width:100%;height:100%}.key span{position:absolute;bottom:9.2%;left:0;right:0;text-align:center;color:#f1f5f0;font:bold .65vw Arial}
+.strip,.knobs{display:grid;grid-template-columns:repeat(6,1fr);gap:.27vw}.strip{margin:.85vw 0 .5vw;border-radius:.45vw;overflow:hidden;background:#11191e;padding:2px;box-shadow:0 0 0 2px #080e0e}
+.dial{background:#0b1118;text-align:center;padding:.4vw .25vw;overflow:hidden}.dial b,.dial strong,.dial small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.dial b{font-size:.78vw}.dial strong{font-size:1.24vw;margin:.12vw 0 .22vw}.dial small{font-size:.48vw;letter-spacing:.035em;color:#a1b5be;margin-top:.15vw}
+.dial i{display:block;height:.2vw;margin:0 .35vw;background:linear-gradient(90deg,var(--accent) var(--fill),#22313b var(--fill));border-radius:.25vw}
+.knob{margin:auto;width:2.7vw;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 32% 30%,#434b4d,#262e30 60%,#151b1d 72%);border:2px solid #0b0e0e;box-shadow:0 2px 3px #030706,inset 0 1px #727d7d}.knob i{display:block;width:2px;height:22%;margin:7% auto;background:#a5b5b7;border-radius:2px}
+.library{padding:1.55vw 1.45vw 2.2vw;border:1px solid #445153;border-radius:1vw;background:#161e20}.group h2{font-size:1.18vw;font-weight:500;color:#d8e6df;margin:0 0 1.1vw}.group+.group{margin-top:2vw;border-top:1px solid #394547;padding-top:1.7vw}.keyrow{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:.25vw}
+.pagecards{display:grid;grid-template-columns:1fr 1fr;gap:.65vw}.pagecard{background:#161e20;border:1px solid #445153;border-radius:.7vw;padding:.65vw .75vw}.pagecard h2{font:500 1.05vw Menlo,monospace;margin:0 0 .35vw;color:#e5ede8}.pagecard>div{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:.1vw}.pagecard .key span{font-size:.38vw}.gallery nav{display:none}
+@media(max-width:850px){.frame{padding:20px}header{padding-bottom:14px}.brand,.product{font-size:13px}section.active{display:flex;flex-direction:column;align-items:stretch;gap:20px;padding:22px 0}h1{font-size:40px;margin:8px 0}article p{font-size:16px;max-width:45em}.eyebrow,footer,.group h2{font-size:12px}.board{padding:12px}.dial b{font-size:1.23vw}.dial strong{font-size:1.8vw}.key span{font-size:1.05vw}.dial small{font-size:.7vw}.knob{width:4vw}footer{gap:10px;flex-wrap:wrap}nav{gap:4px}nav a{font-size:13px}.library{padding:16px}}
+</style>
+<div class="frame"><header><div class="brand"><span class="mark" aria-hidden="true"><i></i><i></i><i></i></span>FiO Networks</div><div class="product">RME Controller for macOS</div></header>
+<nav aria-label="Profile pages"><!--NAV--></nav><main><!--VIEWS--></main>
+<footer><span>Stream Deck + XL &nbsp; / &nbsp; Candidate v1.1.10</span><span>Profile rendering · Simulated TotalMix feedback</span></footer></div>
+<script>
+document.body.classList.toggle('gallery',location.search === '?gallery');
+function choose(){
+  const id = document.getElementById(location.hash.slice(1))?.id || 'Starter';
+  for(const page of document.querySelectorAll('section'))page.classList.toggle('active',page.id===id);
+  for(const a of document.querySelectorAll('nav a'))a.setAttribute('aria-current',a.hash==='#'+id?'page':'false');
+}
+window.addEventListener('hashchange',choose);choose();
+</script></html>

@@ -2,7 +2,7 @@
   "$schema": "https://schemas.elgato.com/streamdeck/plugins/manifest.json",
   "UUID": "com.fionetworks.rme-globalosc",
   "Name": "RME Controller for macOS",
-  "Version": "1.1.9.1",
+  "Version": "1.1.10.4",
   "Author": "FiO Networks",
   "Description": "Bidirectional Stream Deck control for RME TotalMix FX using Global OSC.",
   "Icon": "imgs/plugin",
@@ -100,11 +100,15 @@
       "States": [
         {
           "Image": "imgs/snapshot",
-          "Title": "SNAP"
+          "Title": "SNAP",
+          "TitleAlignment": "bottom",
+          "FontSize": 10
         },
         {
           "Image": "imgs/snapshot-on",
-          "Title": "ACTIVE"
+          "Title": "ACTIVE",
+          "TitleAlignment": "bottom",
+          "FontSize": 10
         }
       ],
       "PropertyInspectorPath": "ui/snapshot.html"
@@ -183,6 +187,24 @@
         }
       ],
       "PropertyInspectorPath": "ui/diagnostic.html"
+    },
+    {
+      "UUID": "com.fionetworks.rme-globalosc.processingrecipe",
+      "Name": "Apply Input Processing",
+      "Tooltip": "Apply and verify an editable EQ or compressor setting on one hardware input.",
+      "Icon": "imgs/action-param",
+      "Controllers": [
+        "Keypad"
+      ],
+      "DisableAutomaticStates": true,
+      "States": [
+        {
+          "Image": "imgs/toggle",
+          "Title": "",
+          "ShowTitle": false
+        }
+      ],
+      "PropertyInspectorPath": "ui/processing-recipe.html"
     }
   ],
   "Profiles": [
@@ -194,9 +216,23 @@
       "Readonly": false
     },
     {
+      "Name": "profiles/rme-workflow-stream-deck",
+      "DeviceType": 0,
+      "AutoInstall": false,
+      "DontAutoSwitchWhenInstalled": true,
+      "Readonly": false
+    },
+    {
       "Name": "profiles/rme-starter-mini",
       "DeviceType": 1,
       "AutoInstall": true,
+      "DontAutoSwitchWhenInstalled": true,
+      "Readonly": false
+    },
+    {
+      "Name": "profiles/rme-workflow-mini",
+      "DeviceType": 1,
+      "AutoInstall": false,
       "DontAutoSwitchWhenInstalled": true,
       "Readonly": false
     },
@@ -208,9 +244,23 @@
       "Readonly": false
     },
     {
+      "Name": "profiles/rme-workflow-xl",
+      "DeviceType": 2,
+      "AutoInstall": false,
+      "DontAutoSwitchWhenInstalled": true,
+      "Readonly": false
+    },
+    {
       "Name": "profiles/rme-starter-plus",
       "DeviceType": 7,
       "AutoInstall": true,
+      "DontAutoSwitchWhenInstalled": true,
+      "Readonly": false
+    },
+    {
+      "Name": "profiles/rme-workflow-plus",
+      "DeviceType": 7,
+      "AutoInstall": false,
       "DontAutoSwitchWhenInstalled": true,
       "Readonly": false
     },
@@ -222,11 +272,26 @@
       "Readonly": false
     },
     {
+      "Name": "profiles/rme-workflow-neo",
+      "DeviceType": 9,
+      "AutoInstall": false,
+      "DontAutoSwitchWhenInstalled": true,
+      "Readonly": false
+    },
+    {
       "Name": "profiles/rme-starter-plus-xl",
       "DeviceType": 13,
       "AutoInstall": true,
       "DontAutoSwitchWhenInstalled": true,
       "Readonly": false
+    },
+    {
+      "Name": "profiles/rme-workflow-plus-xl",
+      "DeviceType": 13,
+      "AutoInstall": false,
+      "DontAutoSwitchWhenInstalled": true,
+      "Readonly": false
     }
-  ]
+  ],
+  "SupportURL": "https://github.com/kitbrown/rme-controller-macos#install"
 }

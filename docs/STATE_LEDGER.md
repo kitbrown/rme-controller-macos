@@ -1,6 +1,6 @@
 # State Ledger
 
-Updated: 2026-11-14. This is the current release authority; older candidate documents are historical.
+Updated: 2026-11-23 (candidate branch). This is the current release authority; older candidate documents are historical.
 
 ## Current shipped baseline
 
@@ -27,6 +27,34 @@ Final Marketplace photos/video, existing icon/thumbnail, descriptions/release no
 - Processing support/ranges remain device/channel specific. Numeric/boolean feedback gating must remain intact; finite UCX II checks do not certify every RME interface or channel.
 
 Owner: next authorized engineer with Chris and appropriate connected equipment. Record exact environment, actions, observations and restorations in the existing validation record; keep UNKNOWN where untested. No new hardware tests were performed during reconciliation.
+
+## v1.1.10.4 candidate checkpoint
+
+The current draft includes input-aware recipe captions and three + XL gallery proofs. The [candidate record](NEXT-RELEASE-1.1.10.md) links the exact package checksum, page explorer and open hardware checks. Build 1.1.10.3 remains recoverable at `bfa4e32`.
+
+## Historical v1.1.10.3 candidate checkpoint
+
+This draft added the EXP key and mixer-driven preset indicators in build **1.1.10.3**. The versioned package, visual evidence, and hardware checks are in the [current candidate record](NEXT-RELEASE-1.1.10.md). The prior 1.1.10.2 package is recoverable at `f892ca7`.
+
+## Historical v1.1.10 candidate checkpoint — 2026-11-23
+
+Build **1.1.10.2** adds the EQ and Compression pages. [Current package details and open hardware checks](NEXT-RELEASE-1.1.10.md). Build 1.1.10.1 remains recoverable at `6a2414f`.
+
+## Historical v1.1.10 candidate checkpoint — 2026-11-22
+
+Build **1.1.10.1** supersedes the first test package. Three editable processing presets are included in six optional workflow profiles. The [current candidate record](NEXT-RELEASE-1.1.10.md) contains the exact archive, offline evidence and live confirmation/restoration procedure.
+
+## Historical v1.1.10 candidate checkpoint — 2026-11-21
+
+Build 1.1.10.0 is packaged on the draft branch for hardware testing. [Candidate evidence and physical test plan](NEXT-RELEASE-1.1.10.md). User authorized workflow pages and visual improvements and will assist with hardware. Candidate status is separate from the released v1.1.9 above.
+
+## Historical v1.1.10 preparation checkpoint — 2026-11-20
+
+Preparation branch only: `prep/v1.1.10`. Chris permits hardware-free preparation and GitHub updates but requires explicit authorization before product changes. **HOLD implementation, merge, version bump, rebuild/install and all Marketplace actions.** RME hardware is unavailable per Chris. Main/tag v1.1.9 remains `488256a`; this checkpoint does not create a new release.
+
+See [v1.1.10 preparation](NEXT-RELEASE-1.1.10.md) for verified Stream Deck 7.6.1/build 23033 startup, all 40 installed package files matching shipped bytes, successful eight-suite regression run on host-bundled Node 24.22.1, three read-only profile checks, unchanged artifact verification, vendor sources, proposed scope and unexecuted hardware acceptance plan. No reproducible compatibility defect or mandatory migration was identified. Chris reports three Marketplace sales; account state was not queried. All existing hardware gaps remain open.
+
+Next action: Chris explicitly selects/authorizes an implementation scope, or supplies equipment and authorizes a safe hardware-test session. No automatic follow-up work, merge or release is authorized by the preparation record.
 
 ## Next authorized release workflow
 

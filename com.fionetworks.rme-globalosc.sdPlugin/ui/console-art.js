@@ -2,44 +2,63 @@
 const esc = input => String(input).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&apos;" }[c]));
 const uri = svg => "data:image/svg+xml," + encodeURIComponent(svg);
 
-const frame = (
-  '<defs>'+
-  '<linearGradient id="face" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#2b4051"/><stop offset=".46" stop-color="#172635"/><stop offset="1" stop-color="#0a121c"/></linearGradient>'+
-  '<linearGradient id="bezel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#a2b4c0"/><stop offset=".4" stop-color="#304656"/><stop offset="1" stop-color="#07121b"/></linearGradient>'+
-  '<linearGradient id="silver" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f2f7fa"/><stop offset=".55" stop-color="#a2b8c7"/><stop offset="1" stop-color="#587181"/></linearGradient>'+
-  '</defs>'+
-  '<rect x="2" y="2" width="140" height="140" rx="23" fill="url(#bezel)"/>'+
-  '<rect x="6" y="6" width="132" height="132" rx="20" fill="url(#face)" stroke="#08131d" stroke-width="2"/>'
-);
+const typeface = "DIN Alternate, Helvetica Neue, Arial, sans-serif";
+const frame = '<rect x="2" y="2" width="140" height="140" rx="16" fill="#171c20" stroke="#434c50" stroke-width="2"/>' +
+  '<defs><linearGradient id="silver" x2="0" y2="1"><stop stop-color="#e5e9e6"/><stop offset="1" stop-color="#869296"/></linearGradient></defs>';
 
-export function renderConsoleKey({ token, status, active, accent }) {
-  token = esc(token);
-  status = esc(status);
-  accent = /^#[0-9a-f]{6}$/i.test(accent) ? accent : "#56caff";
-  const mute = status === "MUTED";
-  const light = active ? "#ff5d69" : accent;
-  const bars = Array.from({length:7}, (_,i) =>
-    '<rect x="' + (30 + i*13) + '" y="' + (92 - [9,16,23,11,19,7,15][i]) +
-    '" width="8" height="' + [9,16,23,11,19,7,15][i] + '" rx="2" fill="' +
-    (active ? light : (i<3 ? "#36546a" : "#213647")) + '"/>').join('');
-  const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">'+frame+
-    '<rect x="16" y="16" width="112" height="3" rx="1.5" fill="' + light + '"/>'+
-    '<text x="20" y="34" fill="#91a7b9" font-family="Arial,sans-serif" font-size="8" font-weight="700" letter-spacing="2">FIO / FX</text>'+
-    '<circle cx="116" cy="29" r="5" fill="' + (active ? light : "#314655") + '" stroke="#9ab7c9"/>'+
-    '<rect x="21" y="45" width="102" height="35" rx="6" fill="#091824" stroke="#445a6e"/>'+
-    '<text x="72" y="68" text-anchor="middle" fill="#f1f8ff" font-family="Arial,sans-serif" font-size="' + (token.length > 5 ? 18 : 24) + '" font-weight="800" letter-spacing=".7">' + token + '</text>'+
-    bars+
-    '<rect x="19" y="111" width="106" height="22" rx="6" fill="' + (active ? "#304453" : "#132533") + '" stroke="' + light + '"/>'+
-    '<text x="72" y="126" text-anchor="middle" fill="#edf7ff" font-family="Arial,sans-serif" font-size="' + (status.length > 7 ? 12 : 15) + '" font-weight="700" letter-spacing=".5">' + status + '</text>'+
-    '</svg>';
-  return uri(svg);
+// Center pictograms leave the top and bottom rails available for lettering.
+const symbols = {
+  MAIN: "M45 67h11l16-13v39L56 80H45z M81 64q11 10 0 20 M87 56q20 18 0 36",
+  PHONES: "M48 82v-8a24 24 0 0 1 48 0v8 M48 80h9v14h-9z M87 80h9v14h-9z",
+  MIC: "M65 58a7 7 0 0 1 14 0v16a7 7 0 0 1-14 0z M57 72a15 15 0 0 0 30 0 M72 87v8 M62 95h20",
+  MONO: "M45 58l23 16-23 16 M99 58L76 74l23 16 M66 74h12",
+  DIM: "M47 68h10l13-12v34L57 78H47z M81 69l6 7 7-7",
+  TALK: "M46 57h51v29H68L54 97V86h-8z M57 71h7l4-7 7 13 5-6h6",
+  TV: "M46 56h52v32H46z M61 95h22",
+  SPDIF: "M43 78h12V62h14v22h14V66h17",
+  "48V": "M75 51L56 77h15l-3 18 21-30H73z",
+  "EQ CUT": "M41 63c17 0 17 24 31 24s14-24 31-24",
+  "EQ LIFT": "M41 85c17 0 17-24 31-24s14 24 31 24",
+  EQ: "M43 85c14 0 14-26 27-26s13 21 31 21",
+  HPF: "M43 90l17-18q6-9 17-9h24",
+  LPF: "M43 63h23q11 0 17 9l17 18",
+  "LOW SHELF": "M40 61h16c12 0 13 19 28 19h19",
+  "HIGH SHELF": "M40 80h16c12 0 13-19 28-19h19",
+  AL: "M43 78h13l5-14 8 24 8-34 6 18h17 M44 53h15 M84 89h16",
+  REV: "M43 63l12 14 10-22 8 32 7-23 6 17 6-12 6 7",
+  ECHO: "M44 88V55l9 8v25 M62 88V62l8 6v20 M80 88V69l8 5v14 M96 88V77",
+  EXP: "M44 52v42h57 M58 92l10-24 24-24",
+  DYN: "M44 52v42h57 M52 90l14-25 15-9 16-4",
+  COMP: "M47 93l25-25 25-7 M46 55v39h52",
+  OSC: "M40 76h15l7-17 12 32 9-22 5 7h16",
+  SNAP: "M50 54h36v29H50z M57 89h35V61 M64 95h34V68",
+  STRIP: "M51 55v39 M72 55v39 M93 55v39 M44 66h14 M65 83h14 M86 72h14"
+};
+
+export function renderConsoleKey({ token, status, active, accent, symbol = token, inputTag }) {
+  const snapshot = /^S[1-8]$/.test(symbol);
+  const path = snapshot ? symbols.SNAP : symbols[symbol] || symbols.STRIP;
+  const light = active ? "#ff5d69" : /^#[0-9a-f]{6}$/i.test(accent) ? accent : "#56caff";
+  // Stream Deck renders the native snapshot caption and its edited marker below the glyph.
+  const caption = snapshot ? "" :
+    `<text x="72" y="126" text-anchor="middle" fill="#f2f5f2" font-size="${status.length > 7 ? 12 : 15}">${esc(status)}</text>`;
+  return uri(`<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144" font-family="${typeface}" font-weight="700">
+    ${frame}
+    <rect x="16" y="16" width="112" height="3" rx="1.5" fill="${light}"/>
+    ${inputTag ? `<text x="72" y="32" text-anchor="middle" font-size="13" fill="#c1cbd0">${esc(inputTag)}</text>` : ""}
+    <text x="72" y="${inputTag ? 50 : 43}" text-anchor="middle" font-size="${inputTag || token.length > 5 ? 18 : 24}" fill="#f2f5f2">${esc(token)}</text>
+    <path d="${path}" ${inputTag ? 'transform="translate(0 8)"' : ""} fill="none" stroke="${light}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    ${active ? '<path d="M108 89l5 5 11-13" fill="none" stroke="#f2f5f2" stroke-width="4"/>' : ""}
+    ${caption}
+  </svg>`);
 }
 
 export function renderLevelKey({ label, value, level, muted, mode, mix }) {
-  label=esc(String(label).slice(0,12).toUpperCase());
+  const letters = Array.from(String(label).toUpperCase()).slice(0,12);
+  label=esc(letters.join(''));
   value=esc(value);
   level=Math.min(100, Math.max(0, Number(level)||0));
-  const accent= muted ? "#ff7079" : (mix ? "#f6c66a" : "#56caff");
+  const accent= muted ? "#ff5d69" : (mix ? "#f6c66a" : "#56caff");
   const thumb=101-level*.58;
   const ticks=Array.from({length:8}, (_,i) =>
     '<path d="M49 '+(47+i*8)+'h7 M88 '+(47+i*8)+'h7" stroke="#7794a8" stroke-width="1.2"/>').join('');
@@ -48,13 +67,13 @@ export function renderLevelKey({ label, value, level, muted, mode, mix }) {
     (i < Math.round(level/10) ? accent : "#1c3040") + '"/>').join('');
   const svg='<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144">'+frame+
     '<rect x="16" y="15" width="112" height="3" rx="1.5" fill="'+accent+'"/>'+
-    '<text x="72" y="33" text-anchor="middle" fill="#edf8ff" font-family="Arial,sans-serif" font-size="12" font-weight="750">'+label+'</text>'+
+    '<text x="72" y="33" text-anchor="middle" fill="#edf8ff" font-family="'+typeface+'" font-size="12" textLength="'+ (letters.length > 8 ? 112 : Math.max(12, letters.length * 9)) +'" lengthAdjust="spacingAndGlyphs" font-weight="750">'+label+'</text>'+
     '<rect x="66" y="44" width="12" height="62" rx="4" fill="#07121e" stroke="#3b5165"/>'+ticks+
     '<rect x="49" y="'+(thumb-7).toFixed(1)+'" width="46" height="14" rx="4" fill="url(#silver)" stroke="#0a1a26" stroke-width="1.5"/>'+
     '<path d="M54 '+thumb.toFixed(1)+'h36" stroke="#294557" stroke-width="2"/>'+leds+
     '<rect x="17" y="112" width="110" height="21" rx="6" fill="'+(muted ? "#60272c" : "#152b3b")+'" stroke="'+accent+'"/>'+
-    '<text x="72" y="127" text-anchor="middle" fill="#eff8ff" font-family="Arial,sans-serif" font-size="12" font-weight="800">'+value+'</text>'+
-    '<text x="22" y="103" fill="#d0dee7" font-family="Arial,sans-serif" font-size="10" font-weight="700">'+(mode==="up" ? "+" : mode==="down" ? "−" : "M")+'</text>'+
+    '<text x="72" y="127" text-anchor="middle" fill="#eff8ff" font-family="'+typeface+'" font-size="12" font-weight="800">'+value+'</text>'+
+    '<text x="22" y="103" fill="#d0dee7" font-family="'+typeface+'" font-size="10" font-weight="700">'+(mode==="up" ? "+" : mode==="down" ? "−" : "M")+'</text>'+
     '</svg>';
   return uri(svg);
 }

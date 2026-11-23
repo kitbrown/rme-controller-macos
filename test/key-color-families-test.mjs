@@ -36,10 +36,11 @@ const expectAccent=(context,expected)=>{
   assert(svg,"missing key image for "+context);
   const rectangle='<rect x="16" y="16" width="112" height="3" rx="1.5" fill="'+expected+'"/>';
   assert(svg.includes(rectangle),context+" incorrect family/status accent");
-  // Preserve current key design: same text display / status and proportions.
   assert(svg.includes('width="144" height="144"'),"changed key artwork size");
-  assert(svg.includes('<rect x="21" y="45" width="102" height="35"'),"changed key layout");
-  assert(svg.includes('<text x="72" y="126"'),"changed status caption layout");
+  assert(svg.includes('<text x="72" y="43"'),"missing top caption");
+  assert(svg.includes('<path d='),"missing center pictogram");
+  assert.equal(svg.includes('<text x="72" y="126"'), !context.startsWith("snap-"),
+    "bottom rail must be reserved for the native snapshot title");
 };
 const waitFor=async (predicate,message)=>{
   for(let i=0;i<70;i++){if(predicate())return;await sleep(15);}

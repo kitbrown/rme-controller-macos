@@ -1,0 +1,1 @@
+PASS: immutable v1.1.9.1 package; 40 source files match (manifest final-newline normalization only); SDK 3; six auto-install profiles; 21 retained artifacts verified

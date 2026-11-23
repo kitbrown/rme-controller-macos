@@ -79,14 +79,16 @@ assert(ws.sent.some(message =>
   message.context === "default-toggle" &&
   message.payload.title === ""
 ), "Control Toggle must suppress Stream Deck's overflowing title overlay");
+assert(ws.sent.some(message => message.context === "default-toggle" &&
+  message.event === "setImage" && message.payload.image.includes("SYNC")), "Unconfirmed state must show SYNC");
+feedback.send(encode("/output/0/mute", 0), RECEIVE_PORT, HOST);
+await sleep(30);
 assert(ws.sent.some(message =>
   message.event === "setImage" &&
   message.context === "default-toggle" &&
   message.payload.image.includes("MAIN") &&
   message.payload.image.includes("MUTE%20OFF")
 ), "Control Toggle must show that Main is available while its mute is off");
-feedback.send(encode("/output/0/mute", 0), RECEIVE_PORT, HOST);
-await sleep(30);
 ws.message({event: "keyDown", action: "com.fionetworks.rme-globalosc.toggle", context: "default-toggle", payload: {}});
 await sleep(50);
 assert(ws.sent.some(message =>

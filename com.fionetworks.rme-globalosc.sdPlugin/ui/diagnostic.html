@@ -6,7 +6,7 @@ label{display:block;margin:10px 0 4px;color:#c6d9e5}
 input{width:100%;box-sizing:border-box;color:#fff;background:#0e1821;border:1px solid #3b5364;border-radius:6px;padding:8px}
 p{font-size:11px;color:#a9bfce;line-height:1.5}
 .note{border-left:3px solid #58e6a9;padding:8px 10px;background:#122b27}
-</style></head><body>
+</style><link rel="stylesheet" href="console.css"></head><body>
 <section><h2>OSC Connection Monitor</h2><p>Green RX LIVE means recent OSC packets reached the configured local UDP port. It does not authenticate their sender or prove a specific TotalMix channel works.</p>
 <p class="note">Press the key to send a read-only <code>/sendall</code> request. If TotalMix replies, the key shows RX LIVE. Yellow NO DATA or STALE means no recent feedback.</p></section>
 <section><h3>Global OSC transport</h3><label>TotalMix host</label><input data-setting="host" value="127.0.0.1">

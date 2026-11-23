@@ -91,6 +91,8 @@ function updateVisibility() {
   const mode = document.querySelector("[data-setting='keyMode']")?.value;
   document.querySelectorAll("[data-show-mode]").forEach(el => { el.hidden = mode !== el.dataset.showMode; });
   document.querySelectorAll("[data-hide-mode]").forEach(el => { el.hidden = mode === el.dataset.hideMode; });
+  const frequency = document.querySelector("[data-setting='frequency']");
+  if (frequency) frequency.max = presetSelect?.value === "hpf" ? "500" : "20000";
   const keys=["eqEnable","dynEnable","lowcutEnable","autoLevelEnable"];
   document.querySelectorAll("[data-show-processing]").forEach(el => {
     el.hidden=!keys.includes(document.querySelector("[data-setting='preset']")?.value);
@@ -109,7 +111,7 @@ function updateVisibility() {
     }
   }
   document.querySelectorAll("[data-show-preset]").forEach(el => {
-    el.hidden = presetSelect?.value !== el.dataset.showPreset;
+    el.hidden = !el.dataset.showPreset.split(",").includes(presetSelect?.value);
   });
 }
 
@@ -128,6 +130,13 @@ function validate() {
   const errors = [];
   const fields = [...document.querySelectorAll("[data-setting]")];
   for (const el of fields) el.style.borderColor = "";
+
+  for (const field of fields) {
+    if (field.required && !field.closest("[hidden]") && !field.validity.valid) {
+      errors.push(field.parentElement.textContent.trim() + ": " + field.validationMessage);
+      field.style.borderColor = "#ff5d69";
+    }
+  }
 
   const host = document.querySelector("[data-setting='host']");
   if (host && !host.value.trim()) {
