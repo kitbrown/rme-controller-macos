@@ -1,6 +1,6 @@
 # State Ledger
 
-Updated: 2026-11-14. This is the current release authority; older candidate documents are historical.
+Updated: 2026-11-23 on the Stream Deck 8 compatibility branch. This is the current release authority; older candidate documents are historical.
 
 ## Current shipped baseline
 
@@ -10,6 +10,44 @@ Updated: 2026-11-14. This is the current release authority; older candidate docu
 - **USER-CONFIRMED release outcome, 2026-11-05:** Chris reported Elgato approval and the first paid Marketplace sale. Approval/publication were not independently read from Maker Console because browser checks were blocked by lock/sign-in. The approval monitor was deleted after that report. Do not treat the historical pending-review snapshot as current.
 - **UNKNOWN current account state:** price, exact publication timestamp, and current automatic-publication setting. No Marketplace/account changes are part of reconciliation.
 - v1.1.8 publication/capture/profile tasks are **SUPERSEDED by v1.1.9**, not unfinished submission work. Historical PRs #4/#5/#6 are closed as superseded and must not be merged over this baseline.
+
+## Stream Deck 8.0.0 beta compatibility work
+
+Branch `compat/streamdeck-8.0.0-beta` starts at GitHub main `488256a94fd2218f868dfb2b2096f23cd7d0e33c` with the shipped plugin 1.1.9.1. The 8.0.0 version identifies the Elgato host. The v1.1.10.4 candidate remains on [draft PR #8](https://github.com/kitbrown/rme-controller-macos/pull/8) at `09a601b21cb0a218ceb75e7d75a4ea0bad3bee3a` for the comparison below.
+
+**CONFIRMED offline on 2026-11-23.** The official macOS beta installer had SHA-256 `154eb9003882b7b62f780526a58b07e23da67c3407d8337640cf6019372342e2`. macOS reported a trusted notarization and Corsair installer signature. The extracted app reported bundle ID `com.elgato.StreamDeck`, version `8.0.0`, build `24357`. Inspection used the extracted files. The installed host reported 7.6.1. [Elgato beta changelog and installer](https://help.elgato.com/hc/en-us/articles/52924584789009-Stream-Deck-8-0-Beta-Changelog)
+
+All six packaged v1.1.9 starter profiles matched device model IDs and controller types present in the beta’s factory profiles. Every assigned action resolved to the plugin manifest or the host’s built-in page navigation manifest. The same independent check passed for the six starters and six workflow profiles in the v1.1.10.4 candidate archive. Negative checks detected a 7.6.1 host and a missing next-page action. These checks inspect packaged data. Actual import, upgrade behavior and rendering require a running 8.0.0 host.
+
+To repeat, download the macOS installer linked above. Use a fresh temporary directory for the expansion.
+
+```sh
+pkgutil --check-signature Stream_Deck_8.0.0.24357.pkg
+beta_dir=$(mktemp -d)
+pkgutil --expand-full Stream_Deck_8.0.0.24357.pkg "$beta_dir/expanded"
+beta_app="$beta_dir/expanded/Stream_Deck.pkg/Payload/Applications/Stream Deck.app"
+python3 tools/check-streamdeck-8-profiles.py "$beta_app"
+```
+
+From the repository root the checker defaults to the retained v1.1.9 package. Pass `--package "/path/to/candidate.streamDeckPlugin"` to check another archive. Separately, the eight shipped runtime suites passed with Node 24.22.1 using simulated Stream Deck and OSC events. All four profile tests, Elgato CLI manifest validation and the shipped-artifact verifier passed.
+
+### Running beta acceptance, November 23, 2026
+
+**CONFIRMED.** The native macOS 8.0.0 beta (24357) launched and registered the shipped RME 1.1.9.1 plugin and the separately packaged 1.1.10.4 candidate. Testing ran inside a disposable arm64 macOS 26.6.2 VM with the standard 15-key editor, USB passthrough disabled and no UCX II. Stream Deck provided its Node 24.22.1 runtime. The production Mac continued running 7.6.1 (23033) under the same process ID. Before/after hashes matched for its 16 profile manifests and 40 installed RME plugin files.
+
+| Native check | Observed result |
+| --- | --- |
+| Upgrade from 7.6.1 to 8.0.0 | Installed the shipped archive through the native 7.6.1 installer, accepted the starter and changed the key at column 5, row 2 from Snapshot 2 to Snapshot 3. After the guest host upgrade, the same action ID and OSC settings persisted. The reopened v8 inspector and key both showed Snapshot 3. |
+| Edit and restart | Changed the same key to Snapshot 6 in v8. Quit the host and verified process exit. A new host PID logged RME registration and retained Snapshot 6. |
+| Upgrade plugin under v8 | Opened the original candidate archive through the v8 installer. The host logged the expected stop for the update, a successful install and a new RME connection. All 49 installed candidate package members matched the archive bytes. The edited starter survived the plugin upgrade. |
+| Import and edit workflow | The standard model workflow imported with seven named pages and 41 RME key assignments. On Compression, changed EXP from input 1 to input 4 in the native inspector. Reopening the inspector kept input 4. Restarting the host reconnected the candidate and preserved both the new EXP target and the starter’s Snapshot 6. |
+| Live display with synthetic OSC | Input 1 feedback left the reassigned key at SYNC. Sending Dynamics enable 1, expander threshold −40 and ratio 2 to the guest plugin at UDP 9008 on input 4 produced a red ON key. Ratio 1 changed it to amber OFF. These packets entered the real plugin running inside v8. [ON](evidence/streamdeck-8.0.0-24357/exp-on.png) · [OFF](evidence/streamdeck-8.0.0-24357/exp-off.png) |
+| Fresh candidate install on v8 | Archived the guest’s test support directory and reset its Stream Deck preferences. With clean app data, the candidate registered, offered the starter during native installation, and added 16 RME key assignments across two pages after confirmation. The editor kept Default Profile selected until RME Starter was chosen. [Native starter](evidence/streamdeck-8.0.0-24357/starter.png) |
+| Importing the + XL workflow on the 15-key editor | The beta used the selected 15-key model even though the imported profile name still said + XL. The result had seven pages, 32 RME keypad assignments and zero encoders. Use the matching device profile. Actual + XL import and encoder rendering remain open. |
+
+**Optional v8 features.** In the guest, the beta’s built-in loopback MCP service listed all nine candidate action types. Every action returned `ai_ready: false`. The same query with `OnlyAiReady: true` returned zero. A separate recipe context request exceeded the eight-second client timeout. Native RME controls operated without this integration. AI-assisted setup could be a separate feature for assigning a preset, channel and label from a prompt. The public changelog describes Ideas and AI-assisted configuration. Marketplace Ideas placement and AI triggering were not tested. [Elgato beta changelog](https://help.elgato.com/hc/en-us/articles/52924584789009-Stream-Deck-8-0-Beta-Changelog) · [Elgato AI setup guide](https://www.elgato.com/us/en/explorer/products/stream-deck/sd-mcp-setup/)
+
+**Remaining hardware acceptance.** Test the model-matched + XL profile, six dials and touch strip on the physical Deck. Use the UCX II to check actual processing writes and readback, audible results, restoration of the spare input, and USB/sleep recovery. The VM checks covered native host operation and synthetic mixer feedback. The earlier shipped-release hardware checks remain tied to their original host.
 
 ## Completed evidence
 
