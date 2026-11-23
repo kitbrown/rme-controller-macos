@@ -35,7 +35,7 @@ const symbols = {
   STRIP: "M51 55v39 M72 55v39 M93 55v39 M44 66h14 M65 83h14 M86 72h14"
 };
 
-export function renderConsoleKey({ token, status, active, accent, symbol = token }) {
+export function renderConsoleKey({ token, status, active, accent, symbol = token, inputTag }) {
   const snapshot = /^S[1-8]$/.test(symbol);
   const path = snapshot ? symbols.SNAP : symbols[symbol] || symbols.STRIP;
   const light = active ? "#ff5d69" : /^#[0-9a-f]{6}$/i.test(accent) ? accent : "#56caff";
@@ -45,8 +45,9 @@ export function renderConsoleKey({ token, status, active, accent, symbol = token
   return uri(`<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144" viewBox="0 0 144 144" font-family="${typeface}" font-weight="700">
     ${frame}
     <rect x="16" y="16" width="112" height="3" rx="1.5" fill="${light}"/>
-    <text x="72" y="43" text-anchor="middle" font-size="${token.length > 5 ? 18 : 24}" fill="#f2f5f2">${esc(token)}</text>
-    <path d="${path}" fill="none" stroke="${light}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    ${inputTag ? `<text x="72" y="32" text-anchor="middle" font-size="13" fill="#c1cbd0">${esc(inputTag)}</text>` : ""}
+    <text x="72" y="${inputTag ? 50 : 43}" text-anchor="middle" font-size="${inputTag || token.length > 5 ? 18 : 24}" fill="#f2f5f2">${esc(token)}</text>
+    <path d="${path}" ${inputTag ? 'transform="translate(0 8)"' : ""} fill="none" stroke="${light}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
     ${active ? '<path d="M108 89l5 5 11-13" fill="none" stroke="#f2f5f2" stroke-width="4"/>' : ""}
     ${caption}
   </svg>`);

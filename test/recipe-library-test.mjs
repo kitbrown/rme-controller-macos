@@ -1,7 +1,7 @@
 // Exercise the settings actually delivered to Stream Deck, including enable-last ordering.
 import assert from "node:assert/strict";
 import {execFileSync} from "node:child_process";
-import {RecipeRunner} from "../com.fionetworks.rme-globalosc.sdPlugin/bin/processing-recipe.js";
+import {RecipeRunner, recipeCaption} from "../com.fionetworks.rme-globalosc.sdPlugin/bin/processing-recipe.js";
 
 const settings = JSON.parse(execFileSync("python3", ["-c", `
 from zipfile import ZipFile
@@ -34,6 +34,11 @@ for (const [key,...values] of [
 }
 assert.equal(settings.length,expected.size);
 for (const config of settings) {
+  assert.equal(config.keyLabel, undefined);
+  const reassigned = {...config, channel: 4};
+  const caption = recipeCaption(reassigned, "FALLBACK");
+  assert.equal([caption.inputTag,caption.token].filter(Boolean).join(" "), "IN 4 " + config.recipeName);
+  assert.deepEqual(recipeCaption({...reassigned,keyLabel:"TOM EXP"}, "EXP"), {token:"TOM EXP"});
   const runner = new RecipeRunner();
   const sent = [], states = [];
   const endpoint = {host:"127.0.0.1",receivePort:19188};
@@ -44,11 +49,11 @@ for (const config of settings) {
     assert.deepEqual([sent.length,states.at(-1)],[0,"SETUP"]);
     config.lowPassPosition = "3";
   }
-  const steps = expected.get(config.keyLabel).map(([suffix,value])=>["/input/0/"+suffix,value]);
+  const steps = expected.get(config.recipeName).map(([suffix,value])=>["/input/0/"+suffix,value]);
   start();
   for (const [path] of steps) feed(path,0);
   for (const [i,[path,value]] of steps.entries()) {
-    assert.deepEqual(sent[i+1],[path,value,!path.endsWith("/enable")],config.keyLabel);
+    assert.deepEqual(sent[i+1],[path,value,!path.endsWith("/enable")],config.recipeName);
     feed(path,value);
   }
   assert.deepEqual(sent.at(-1),["/sendchan/input/0",1,false]);

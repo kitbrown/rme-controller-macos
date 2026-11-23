@@ -5,7 +5,9 @@
 </style><link rel="stylesheet" href="console.css"></head><body>
 <section><h2>Apply input processing</h2>
 <label>Hardware input (1 = first input)<input required data-setting="channel" type="number" min="1" max="1000" value="1"></label>
-<label>Key label<input data-setting="keyLabel" maxlength="8" placeholder="Use processor name"></label>
+<input type="hidden" data-setting="recipeName"><input type="hidden" data-setting="recipeMode">
+<label>Custom key label (optional)<input data-setting="keyLabel" maxlength="8" placeholder="Automatic: input + recipe"></label>
+<p>Leave blank to follow the input number. A custom label such as TOM EXP stays fixed.</p>
 <label>Processor<select data-setting="preset"><option value="eq">Band 2 · bell</option><option value="hpf">HPF</option><option value="lowShelf">Band 1 · low shelf</option><option value="highShelf">Band 3 · high shelf</option><option value="lpf">LPF</option><option value="compressor">Compressor · keep timing</option><option value="timedComp">Compressor · set attack and release</option><option value="expander">Expander · drum bleed</option></select></label>
 <div data-show-preset="eq,hpf,lowShelf,highShelf,lpf">
 <label>Frequency (Hz)<input required data-setting="frequency" type="number" min="20" max="20000" value="250"></label></div>

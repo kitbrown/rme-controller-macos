@@ -8,6 +8,23 @@ function number(raw, fallback, low, high) {
   return n;
 }
 
+// Persisted keyLabel is always the user's override. Prepared profiles keep
+// their recipe name separately so reassigning the input updates the caption.
+export function recipeCaption(settings, symbol) {
+  const label = typeof settings.keyLabel === "string" ? settings.keyLabel.trim().slice(0,8) : "";
+  const legacyFilter = (settings.preset === "hpf" && label === "LOW CUT") ||
+                       (settings.preset === "lpf" && label === "HIGH CUT");
+  if (label) return {token: legacyFilter ? symbol : label};
+  const prepared = settings.recipeMode === settings.preset && typeof settings.recipeName === "string"
+    ? settings.recipeName.trim().slice(0,8) : "";
+  const channel = number(settings.channel, 1, 1, 1000);
+  const name = prepared || symbol;
+  if (!Number.isInteger(channel)) return {token: name};
+  const input = "IN " + channel;
+  const combined = input + " " + name;
+  return combined.length <= 8 ? {token: combined} : {token: name, inputTag: input};
+}
+
 export function recipePlan(settings) {
   const channel = number(settings.channel, 1, 1, 1000);
   if (!Number.isInteger(channel)) return null;
@@ -65,9 +82,7 @@ export function recipePlan(settings) {
     return null;
   }
   if (steps.some(step => !Number.isFinite(step.value))) return null;
-  const label = typeof settings.keyLabel === "string" ? settings.keyLabel.trim().slice(0,8) : "";
-  const legacyLabel = (mode === "hpf" && label === "LOW CUT") || (mode === "lpf" && label === "HIGH CUT");
-  return {channel, steps, bypass, query: "/sendchan" + prefix, token: legacyLabel ? symbol : label || symbol, symbol};
+  return {channel, steps, bypass, query: "/sendchan" + prefix, ...recipeCaption(settings, symbol), symbol};
 }
 
 const matches = (a, b) => Math.abs(a - b) < 0.0001;

@@ -1,4 +1,4 @@
-import {RecipeRunner, recipePlan, recipeState} from "./processing-recipe.js";
+import {RecipeRunner, recipePlan, recipeState, recipeCaption} from "./processing-recipe.js";
 import dgram from "node:dgram";
 import {readFileSync} from "node:fs";
 import {renderConsoleKey, renderLevelKey as drawLevelKey, renderStackKey} from "../ui/console-art.js";
@@ -291,7 +291,8 @@ function renderRecipe(inst, status) {
   if (inst.recipeCaption === status) return;
   inst.recipeCaption = status;
   const filterSetup = inst.settings.preset === "lpf";
-  setImage(inst.context, renderConsoleKey({token: plan?.token || (filterSetup ? "LPF" : "SETUP"),
+  const caption = plan || recipeCaption(inst.settings, filterSetup ? "LPF" : "SETUP");
+  setImage(inst.context, renderConsoleKey({token: caption.token, inputTag: caption.inputTag,
     symbol: plan?.symbol || (filterSetup ? "LPF" : "STRIP"),
     status, active: status === "ON", accent: "#f3be67"}));
 }

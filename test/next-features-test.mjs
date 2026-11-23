@@ -6,7 +6,7 @@ import {readFileSync} from "node:fs";
 
 const PLUGIN=process.argv[2];assert(PLUGIN);
 const M=JSON.parse(readFileSync("com.fionetworks.rme-globalosc.sdPlugin/manifest.json","utf8"));
-assert.equal(M.Version,"1.1.10.3");
+assert.equal(M.Version,"1.1.10.4");
 assert(M.Actions.some(a=>a.UUID.endsWith(".parameter")));
 assert(M.Actions.some(a=>a.UUID.endsWith(".diagnostic")));
 assert.equal(resolveParameter({paramKey:"eq1Gain",paramBus:"input",sourceIndex:1}).path,"/input/1/eq/band1gain");
@@ -138,7 +138,7 @@ assert.equal(writes().length,1,"late feedback restarted a timed-out run");
 
 ws.message({event:"didReceiveSettings",action:prefix+"processingrecipe",context:ctx,
   payload:{settings:settings({preset:"eq",channel:3,frequency:3000,gain:2})}});
-await until(()=>imageHas("SYNC") && imageHas("EQ LIFT"),"retarget missing");
+await until(()=>imageHas("SYNC") && imageHas("IN 3") && imageHas("EQ LIFT"),"retarget missing");
 press();
 const eqPrefix="/input/2/eq/";
 send(eqPrefix+"band2freq",250);send(eqPrefix+"band2gain",0);send(eqPrefix+"enable",0);
@@ -154,7 +154,7 @@ const expImage = () => decodeURIComponent(events(exp,"setImage").at(-1)?.payload
 const expState = (caption,active=false) => expImage().includes(">"+caption+"<") &&
   (expImage().includes("#ff5d69") === active);
 const dyn = "/input/1/dynamics/";
-await until(()=>expState("SYNC"),"expander startup");
+await until(()=>expState("SYNC") && expImage().includes(">IN 2 EXP<"),"expander startup");
 send(dyn+"enable",1); send(dyn+"expthres",-40); send(dyn+"expratio",2);
 await until(()=>expState("ON",true),"matching expander must light up");
 send(dyn+"expthres",-48);

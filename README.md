@@ -22,7 +22,7 @@ Monitor provides Main Mute, Dim, Mono, Phones Mute, a Main stereo peak meter and
 
 ### One-touch processing
 
-Open **EQ** or **Compression** in the optional workflow profile. The original **Recipes** page also has a 250 Hz low-mid cut, a presence lift and a gentle compressor. To add the new pages to an earlier installation, import a fresh copy of the workflow profile. Select a hardware input in the key settings. All presets start on input 1.
+Open **EQ** or **Compression** in the optional workflow profile. The original **Recipes** page also has a 250 Hz low-mid cut, a presence lift and a gentle compressor. To add the new pages to an earlier installation, import a fresh copy of the workflow profile. Select a hardware input in the key settings. All presets start on input 1. The upper key caption follows that assignment. For example, changing the expander to input 4 gives it the caption `IN 4 EXP`. Longer names such as `DEEP VOX` show the input on a separate line above the name. To use a fixed name such as `TOM EXP`, enter it in **Custom key label**. Existing custom labels stay fixed until cleared. The label describes the key. The hardware input setting selects its target.
 
 | EQ key | Starting setting |
 |---|---|

@@ -28,9 +28,13 @@ Final Marketplace photos/video, existing icon/thumbnail, descriptions/release no
 
 Owner: next authorized engineer with Chris and appropriate connected equipment. Record exact environment, actions, observations and restorations in the existing validation record; keep UNKNOWN where untested. No new hardware tests were performed during reconciliation.
 
-## v1.1.10.3 candidate checkpoint
+## v1.1.10.4 candidate checkpoint
 
-The active draft adds the EXP key and mixer-driven preset indicators in build **1.1.10.3**. The versioned package, visual evidence, and hardware checks are in the [current candidate record](NEXT-RELEASE-1.1.10.md). The prior 1.1.10.2 package is recoverable at `f892ca7`.
+The current draft includes input-aware recipe captions and three + XL gallery proofs. The [candidate record](NEXT-RELEASE-1.1.10.md) links the exact package checksum, page explorer and open hardware checks. Build 1.1.10.3 remains recoverable at `bfa4e32`.
+
+## Historical v1.1.10.3 candidate checkpoint
+
+This draft added the EXP key and mixer-driven preset indicators in build **1.1.10.3**. The versioned package, visual evidence, and hardware checks are in the [current candidate record](NEXT-RELEASE-1.1.10.md). The prior 1.1.10.2 package is recoverable at `f892ca7`.
 
 ## Historical v1.1.10 candidate checkpoint — 2026-11-23
 

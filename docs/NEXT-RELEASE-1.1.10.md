@@ -1,8 +1,18 @@
 # v1.1.10 preparation — Stream Deck 7.6.1
 
-## Current candidate 1.1.10.3
+## Current candidate 1.1.10.4
 
-The eighth key on Compression is EXP (−40 dB, 2:1). Press once to apply expansion and engage Dynamics. A fresh read confirming the preset is active makes the next press bypass expansion by changing only the expander ratio to 1:1. The UCX II shares compressor/expander timing. The preset retains both times and all compressor values. See the [guide](../README.md#one-touch-processing), [display preview](evidence/v1.1.10-candidate/processing-states.png) and [candidate checksum](../marketplace/v1.1.10/candidate/SHA256SUMS).
+The prepared keys show the assigned input alongside the EQ, compressor or expander name. The input number follows reassignment. Each existing manual label stays fixed. A fresh workflow import includes the new automatic captions. The six automatic starter profiles match v1.1.9 byte for byte.
+
+[Starter page](../marketplace/v1.1.10/gallery-preview/starter-plus-xl.png) · [Seven workflow pages](../marketplace/v1.1.10/gallery-preview/workflow-pages.png) · [Processing keys](../marketplace/v1.1.10/gallery-preview/processing-presets.png) · [Offline page explorer](../marketplace/v1.1.10/gallery-preview/profiles.html) · [Package checksum](../marketplace/v1.1.10/candidate/SHA256SUMS)
+
+The 1920 × 960 gallery proofs show the Stream Deck + XL. The starter has 16 assigned keys in a 9 × 4 grid and six assigned dials. On the optional profile, Monitor is the first of seven pages. The explorer reads both profile archives in saved order and presents the plugin’s key images, snapshot titles and dial values from one simulated mixer state. The device surround and encoder strip are illustrations. Run `python3 tools/render-profile-gallery.py` from the checkout with Node 24 and Chromium available (set `CHROME` to override the default macOS Chrome path). The generated HTML opens locally without a service.
+
+Ten Node suites and four profile checks passed locally. Coverage includes changing the channel, retaining custom captions, preserving OSC target paths and checking the unconfigured LPF. Chromium opened all eight archived layouts, both gallery overviews and the settings form. The Elgato CLI validated and packed the candidate. All 49 package members and the independent shipped v1.1.9 inventory passed verification. Physical key readability, native import, listening, mixer readback and restoration on the UCX II remain open. Include both a long two-line caption and a reassigned expander in the hardware legibility check.
+
+## Historical candidate 1.1.10.3
+
+The eighth key on Compression is EXP (−40 dB, 2:1). Press once to apply expansion and engage Dynamics. A fresh read confirming the preset is active makes the next press bypass expansion by changing only the expander ratio to 1:1. The UCX II shares compressor/expander timing. The preset retains both times and all compressor values. See the [guide](../README.md#one-touch-processing), [display preview](evidence/v1.1.10-candidate/processing-states.png) and [candidate checksum](https://github.com/kitbrown/rme-controller-macos/blob/bfa4e32/marketplace/v1.1.10/candidate/SHA256SUMS).
 
 HPF and LPF are the filter key labels. LPF retains its interface-specific setup. A matching, enabled processing key uses the same red and check as other engaged keys. Incoming values from the configured host and receive port update individual preset states. Other compressor presets can display READY while the matching one displays ON.
 

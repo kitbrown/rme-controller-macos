@@ -21,7 +21,7 @@ class StarterProfiles(unittest.TestCase):
             ['git', 'show', '9f0a413b5b7a5b6c8b61e7159c9764afff45eacd:com.fionetworks.rme-globalosc.sdPlugin/manifest.json'], cwd=ROOT))
         current = json.loads(json.dumps(MANIFEST))
         current.pop('Profiles')
-        self.assertEqual(current.pop('Version'), '1.1.10.3')
+        self.assertEqual(current.pop('Version'), '1.1.10.4')
         self.assertEqual(current.pop('SupportURL'), 'https://github.com/kitbrown/rme-controller-macos#install')
         snapshot = next(a for a in current['Actions'] if a['UUID'].endswith('.snapshot'))
         for state in snapshot['States']:
@@ -127,7 +127,7 @@ class StarterProfiles(unittest.TestCase):
                                                 recipes.append(tuple(settings.get(k) for k in (
                                                     'preset','frequency','gain','threshold','ratio')))
                                             else:
-                                                library[titles[-1]].append(settings['keyLabel'])
+                                                library[titles[-1]].append(settings['recipeName'])
                                         if kind == 'snapshot':
                                             snapshots.add(settings['snapshot'])
                                         if kind == 'levelkey':

@@ -49,7 +49,7 @@ def workflow_pages():
                ('processingrecipe', {'preset': 'eq', 'frequency': 3000, 'gain': 2, 'channel': 1}),
                ('processingrecipe', {'preset': 'compressor', 'threshold': -18, 'ratio': 2, 'channel': 1})]
     def recipe(label, mode, **settings):
-        return ('processingrecipe', {'channel': 1, 'keyLabel': label, 'preset': mode, **settings})
+        return ('processingrecipe', {'channel': 1, 'recipeName': label, 'recipeMode': mode, 'preset': mode, **settings})
 
     eq = [recipe('HPF', 'hpf', frequency=70),
           recipe('LOW BST', 'lowShelf', frequency=100, gain=2),
@@ -64,8 +64,8 @@ def workflow_pages():
                        ('KICK', -14, 4, 25, 120), ('GUITAR', -18, 2.5, 15, 160),
                        ('BASS', -18, 3, 25, 220)]]
     compression.append(recipe('EXP', 'expander', expThreshold=-40, expRatio=2))
-    recipes[0][1]['keyLabel'] = 'MID CUT'
-    recipes[1][1]['keyLabel'] = 'HI LIFT'
+    recipes[0][1].update(recipeName='MID CUT', recipeMode='eq')
+    recipes[1][1].update(recipeName='HI LIFT', recipeMode='eq')
     return [('Monitor', monitor), ('Mix', mix), ('Processing', processing),
             ('Snapshots', [('snapshot', {'snapshot': n}) for n in range(1, 9)]), ('Recipes', recipes),
             ('EQ', eq), ('Compression', compression)]
