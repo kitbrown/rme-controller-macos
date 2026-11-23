@@ -288,7 +288,8 @@ function diagnosticImage(inst) {
 }
 function renderRecipe(inst, status) {
   const plan = recipePlan(inst.settings);
-  setImage(inst.context, renderConsoleKey({token: plan?.token || "SETUP",
+  setImage(inst.context, renderConsoleKey({token: plan?.token || (inst.settings.preset === "lpf" ? "HIGH CUT" : "SETUP"),
+    symbol: plan?.symbol || "STRIP",
     status, active: false, accent: "#f3be67"}));
 }
 function renderDiagnostic(inst) {if(instances.has(inst.context))setImage(inst.context,diagnosticImage(inst));}

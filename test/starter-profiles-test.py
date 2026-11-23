@@ -21,7 +21,7 @@ class StarterProfiles(unittest.TestCase):
             ['git', 'show', '9f0a413b5b7a5b6c8b61e7159c9764afff45eacd:com.fionetworks.rme-globalosc.sdPlugin/manifest.json'], cwd=ROOT))
         current = json.loads(json.dumps(MANIFEST))
         current.pop('Profiles')
-        self.assertEqual(current.pop('Version'), '1.1.10.1')
+        self.assertEqual(current.pop('Version'), '1.1.10.2')
         self.assertEqual(current.pop('SupportURL'), 'https://github.com/kitbrown/rme-controller-macos#install')
         snapshot = next(a for a in current['Actions'] if a['UUID'].endswith('.snapshot'))
         for state in snapshot['States']:
@@ -84,6 +84,7 @@ class StarterProfiles(unittest.TestCase):
                     snapshots, toggles, presets = set(), set(), set()
                     titles = []
                     recipes = []
+                    library = {"EQ": [], "Compression": []}
                     for page_id in pages['Pages']:
                         page = json.loads(archive.read(root.rsplit('/', 1)[0] + '/Profiles/' + page_id.upper() + '/manifest.json'))
                         titles.append(page['Name'].split()[0])
@@ -119,10 +120,12 @@ class StarterProfiles(unittest.TestCase):
                                                 'eq1Gain','eq2Gain','eq3Gain','compThreshold','compRatio','makeupGain')[x])
                                             self.assertEqual((settings['paramBus'], settings['sourceIndex']), ('input', 0))
                                         if kind == 'processingrecipe':
-                                            self.assertEqual(titles[-1], 'Recipes')
                                             self.assertEqual(settings['channel'], 1)
-                                            recipes.append(tuple(settings.get(k) for k in (
-                                                'preset','frequency','gain','threshold','ratio')))
+                                            if titles[-1] == 'Recipes':
+                                                recipes.append(tuple(settings.get(k) for k in (
+                                                    'preset','frequency','gain','threshold','ratio')))
+                                            else:
+                                                library[titles[-1]].append(settings['keyLabel'])
                                         if kind == 'snapshot':
                                             snapshots.add(settings['snapshot'])
                                         if kind == 'levelkey':
@@ -142,7 +145,9 @@ class StarterProfiles(unittest.TestCase):
                                     self.assertIn(action['UUID'], ('com.elgato.streamdeck.page.next', 'com.elgato.streamdeck.page.previous'))
                     self.assertEqual(snapshots, set(range(1, 9)))
                     if workflow:
-                        self.assertEqual(list(dict.fromkeys(titles)), ['Monitor','Mix','Processing','Snapshots','Recipes'])
+                        self.assertEqual(list(dict.fromkeys(titles)), ['Monitor','Mix','Processing','Snapshots','Recipes','EQ','Compression'])
+                        self.assertEqual(library['EQ'], ['LOW CUT','LOW BST','1K CUT','HI LIFT','HI AIR','HIGH CUT'])
+                        self.assertEqual(library['Compression'], ['DEEP VOX','LITE VOX','OH DRUMS','MID TOMS','KICK','GUITAR','BASS'])
                         self.assertEqual(recipes, [('eq',250,-2,None,None), ('eq',3000,2,None,None),
                                                    ('compressor',None,None,-18,2)])
                         self.assertEqual(presets, {(p, m) for p in ('mic1','playback12','spdif') for m in ('down','up')})

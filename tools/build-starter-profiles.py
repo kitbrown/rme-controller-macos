@@ -48,8 +48,26 @@ def workflow_pages():
     recipes = [('processingrecipe', {'preset': 'eq', 'frequency': 250, 'gain': -2, 'channel': 1}),
                ('processingrecipe', {'preset': 'eq', 'frequency': 3000, 'gain': 2, 'channel': 1}),
                ('processingrecipe', {'preset': 'compressor', 'threshold': -18, 'ratio': 2, 'channel': 1})]
+    def recipe(label, mode, **settings):
+        return ('processingrecipe', {'channel': 1, 'keyLabel': label, 'preset': mode, **settings})
+
+    eq = [recipe('LOW CUT', 'hpf', frequency=70),
+          recipe('LOW BST', 'lowShelf', frequency=100, gain=2),
+          recipe('1K CUT', 'eq', frequency=1000, gain=-1.5),
+          recipe('HI LIFT', 'eq', frequency=3000, gain=2),
+          recipe('HI AIR', 'highShelf', frequency=12000, gain=2),
+          recipe('HIGH CUT', 'lpf', frequency=4500)]
+    compression = [recipe(label, 'timedComp', threshold=t, ratio=r, attack=a, release=ms)
+                   for label, t, r, a, ms in [
+                       ('DEEP VOX', -18, 3, 20, 180), ('LITE VOX', -16, 2, 15, 150),
+                       ('OH DRUMS', -14, 1.5, 30, 250), ('MID TOMS', -16, 3, 20, 180),
+                       ('KICK', -14, 4, 25, 120), ('GUITAR', -18, 2.5, 15, 160),
+                       ('BASS', -18, 3, 25, 220)]]
+    recipes[0][1]['keyLabel'] = 'MID CUT'
+    recipes[1][1]['keyLabel'] = 'HI LIFT'
     return [('Monitor', monitor), ('Mix', mix), ('Processing', processing),
-            ('Snapshots', [('snapshot', {'snapshot': n}) for n in range(1, 9)]), ('Recipes', recipes)]
+            ('Snapshots', [('snapshot', {'snapshot': n}) for n in range(1, 9)]), ('Recipes', recipes),
+            ('EQ', eq), ('Compression', compression)]
 
 
 def build():

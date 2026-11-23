@@ -13,7 +13,7 @@ if expected != [hashlib.sha256(package.read_bytes()).hexdigest(), package.name]:
     raise SystemExit('Candidate checksum mismatch')
 manifest = json.loads((plugin / 'manifest.json').read_bytes())
 if (manifest['Version'], manifest['SDKVersion'], manifest['UUID']) != (
-        '1.1.10.1', 3, 'com.fionetworks.rme-globalosc'):
+        '1.1.10.2', 3, 'com.fionetworks.rme-globalosc'):
     raise SystemExit('Candidate identity mismatch')
 files = {p.relative_to(root).as_posix(): p for p in plugin.rglob('*')
          if p.is_file() and p.name not in {'.sdignore', '.DS_Store'}}

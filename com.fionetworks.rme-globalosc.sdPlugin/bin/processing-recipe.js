@@ -12,23 +12,53 @@ export function recipePlan(settings) {
   const channel = number(settings.channel, 1, 1, 1000);
   if (!Number.isInteger(channel)) return null;
   const mode = settings.preset ?? "eq";
-  if (mode !== "eq" && mode !== "compressor") return null;
-  const eq = mode === "eq";
-  const targets = eq ? [
-    ["eq2Freq", settings.frequency, 250], ["eq2Gain", settings.gain, -2]
-  ] : [
-    ["compThreshold", settings.threshold, -18], ["compRatio", settings.ratio, 2]
-  ];
-  const steps = targets.map(([paramKey, raw, fallback]) => {
-    const {min, max} = PARAMETERS[paramKey];
-    const {path} = resolveParameter({paramKey, paramBus: "input", sourceIndex: channel - 1});
-    return {path, value: number(raw, fallback, min, max), float: true};
-  });
+  const sourceIndex = channel - 1;
+  const prefix = "/input/" + sourceIndex;
+  const steps = [];
+  const field = (name, fallback, min, max) => number(settings[name], fallback, min, max);
+  const add = (suffix, value, float = true) => steps.push({path: prefix + "/" + suffix, value, float});
+  function parameter(key, name, fallback) {
+    const {min, max} = PARAMETERS[key];
+    const {path} = resolveParameter({paramKey: key, paramBus: "input", sourceIndex});
+    steps.push({path, value: field(name, fallback, min, max), float: true});
+  }
+
+  let symbol;
+  if (mode === "compressor" || mode === "timedComp") {
+    parameter("compThreshold", "threshold", -18);
+    parameter("compRatio", "ratio", 2);
+    if (mode === "timedComp") {
+      add("dynamics/attack", field("attack", 15, 0, 200));
+      add("dynamics/release", field("release", 180, 100, 999));
+    }
+    add("dynamics/enable", 1, false);
+    symbol = "COMP";
+  } else if (mode === "hpf") {
+    add("lowcut/freq", field("frequency", 70, 20, 500));
+    add("lowcut/enable", 1, false);
+    symbol = "HPF";
+  } else if (mode === "lpf") {
+    // RME's type value is the zero-based position in this interface's menu.
+    // Require the user to identify Low Pass rather than select an unknown shape.
+    const index = {"3": 2, "4": 3}[settings.lowPassPosition];
+    if (index === undefined || typeof index !== "number") return null;
+    add("eq/band3type", index);
+    parameter("eq3Freq", "frequency", 4500);
+    add("eq/enable", 1, false);
+    symbol = "LPF";
+  } else if (["eq", "lowShelf", "highShelf"].includes(mode)) {
+    const band = {eq: 2, lowShelf: 1, highShelf: 3}[mode];
+    if (band !== 2) add("eq/band" + band + "type", 1); // Bell, then Shelf in RME's table.
+    parameter("eq" + band + "Freq", "frequency", {1:100, 2:250, 3:12000}[band]);
+    parameter("eq" + band + "Gain", "gain", band === 2 ? -2 : 2);
+    add("eq/enable", 1, false);
+    symbol = settings.gain < 0 || (band === 2 && settings.gain === undefined) ? "EQ CUT" : "EQ LIFT";
+  } else {
+    return null;
+  }
   if (steps.some(step => !Number.isFinite(step.value))) return null;
-  const prefix = "/input/" + (channel - 1);
-  steps.push({path: prefix + (eq ? "/eq/enable" : "/dynamics/enable"), value: 1, float: false});
-  return {channel, steps, query: "/sendchan" + prefix,
-    token: eq ? (steps[1].value < 0 ? "EQ CUT" : "EQ LIFT") : "COMP"};
+  const label = typeof settings.keyLabel === "string" ? settings.keyLabel.trim().slice(0,8) : "";
+  return {channel, steps, query: "/sendchan" + prefix, token: label || symbol, symbol};
 }
 
 const matches = (a, b) => Math.abs(a - b) < 0.0001;

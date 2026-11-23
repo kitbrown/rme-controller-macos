@@ -20,15 +20,17 @@ const symbols = {
   "EQ CUT": "M41 63c17 0 17 24 31 24s14-24 31-24",
   "EQ LIFT": "M41 85c17 0 17-24 31-24s14 24 31 24",
   EQ: "M43 85c14 0 14-26 27-26s13 21 31 21",
+  HPF: "M43 90l17-18q6-9 17-9h24",
+  LPF: "M43 63h23q11 0 17 9l17 18",
   COMP: "M47 93l25-25 25-7 M46 55v39h52",
   OSC: "M40 76h15l7-17 12 32 9-22 5 7h16",
   SNAP: "M50 54h36v29H50z M57 89h35V61 M64 95h34V68",
   STRIP: "M51 55v39 M72 55v39 M93 55v39 M44 66h14 M65 83h14 M86 72h14"
 };
 
-export function renderConsoleKey({ token, status, active, accent }) {
-  const snapshot = /^S[1-8]$/.test(token);
-  const path = snapshot ? symbols.SNAP : symbols[token] || symbols.STRIP;
+export function renderConsoleKey({ token, status, active, accent, symbol = token }) {
+  const snapshot = /^S[1-8]$/.test(symbol);
+  const path = snapshot ? symbols.SNAP : symbols[symbol] || symbols.STRIP;
   const light = active ? "#ff5d69" : /^#[0-9a-f]{6}$/i.test(accent) ? accent : "#56caff";
   // Stream Deck renders the native snapshot caption and its edited marker below the glyph.
   const caption = snapshot ? "" :

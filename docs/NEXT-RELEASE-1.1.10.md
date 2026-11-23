@@ -1,10 +1,20 @@
 # v1.1.10 preparation — Stream Deck 7.6.1
 
-## Current candidate 1.1.10.1 · November 22, 2026
+## Current candidate 1.1.10.2 · November 23, 2026
+
+Six EQ and seven timed compressor keys are included on model-sized workflow pages. [User guide and values](../README.md#one-touch-processing) · [candidate checksum](../marketplace/v1.1.10/candidate/SHA256SUMS). “Mid drums” is interpreted as mid toms. The compressor settings are FiO starting points. Each named compressor sets threshold, ratio, attack and release. Earlier custom compressor keys continue to preserve timing.
+
+The RME Global OSC protocol table dated 2026-07-21 lists channel Low Cut frequency, EQ band types and dynamics timing as float parameters. Type indices identify positions in the device's menus. RME’s earlier OscTableTotalMix_240722 lists Bell then Shelf and device-dependent pass filters. The [UCX II manual](https://rme-audio.de/downloads/fface_ucx2_e.pdf) documents a dedicated Low Cut and band 1/3 shapes. The earlier private UCX II readback contained the frequency, both type indices and dynamics timing paths. It did not identify the semantic meaning of every type value. The LPF key requires the interface's menu position before sending anything.
+
+**Offline verification.** The added test drives all 13 settings from an actual generated workflow archive, checking the target channel, write sequence, final enable, acknowledgement and full readback. All six model layouts are checked for page navigation, coordinates and the complete preset set. See the draft PR for CI.
+
+**Hardware session.** On a spare input record original Low Cut, bands 1–3 including types/Q, Dynamics enable, threshold, ratio, attack, release and expander settings. Verify Shelf and Low Pass menu positions, cutoff units and actual filter curves, timing readbacks and gain reduction at realistic levels. Check reapplying a key and restore the recorded settings. Also complete the native import, display and recovery checks below. All listening results remain open.
+
+## Historical candidate 1.1.10.1 · November 22, 2026
 
 The optional workflow profile for each model now ends with **Recipes**. The new **Apply Input Processing** action reads the selected input on each press, writes only changed values, waits for each acknowledgment and enables the processor last. A second read verifies the result after writes. Configuration and presets are described in the [setup guide](../README.md#one-touch-processing). The shipped starter profile files retain their original bytes.
 
-Local checks passed on Node 24.22.1: nine runtime suites, four profile tests including deterministic regeneration, browser settings form edit/validation, CLI validation and pack, [candidate checksum](../marketplace/v1.1.10/candidate/SHA256SUMS) and source parity for 49 files. The retained v1.1.9 package and inventory passed their independent check. Simulated feedback covered both EQ shapes, compressor write ordering and types, missing feedback, double presses, idempotence, timeout after a partial write, wrong source, competing recipe keys, disconnect, reconfiguration, removal and final readback disagreement.
+Local checks passed on Node 24.22.1: nine runtime suites, four profile tests including deterministic regeneration, browser settings form edit/validation, CLI validation and pack, [candidate checksum](https://github.com/kitbrown/rme-controller-macos/blob/6a2414f/marketplace/v1.1.10/candidate/SHA256SUMS) and source parity for 49 files. The retained v1.1.9 package and inventory passed their independent check. Simulated feedback covered both EQ shapes, compressor write ordering and types, missing feedback, double presses, idempotence, timeout after a partial write, wrong source, competing recipe keys, disconnect, reconfiguration, removal and final readback disagreement.
 
 **Hardware session.** Use a spare input. Record its band 2 frequency/gain/shape/width, EQ enable, compressor threshold/ratio and Dynamics enable before pressing a recipe. Observe each target in TotalMix, repeat for MATCHES, check unrelated settings and routes, audition at a suitable level, and restore the recorded values and switches. Confirm actual interface rounding, timeout behavior and available feedback. The native profile, display and recovery checks below also remain open. The earlier v1.1.10.0 package is recoverable from commit `1545d94`.
 

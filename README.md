@@ -22,17 +22,32 @@ Monitor provides Main Mute, Dim, Mono, Phones Mute, a Main stereo peak meter and
 
 ### One-touch processing
 
-Open **Recipes** in the optional RME Workflow profile. On an earlier candidate installation, import the updated workflow as a separate profile or drag **Apply Input Processing** onto a key. Select your hardware input in the action settings (1 is the first input).
+Open **EQ** or **Compression** in the optional workflow profile. The original **Recipes** page also has a 250 Hz low-mid cut, a presence lift and a gentle compressor. To add the new pages to an earlier installation, import a fresh copy of the workflow profile. Select a hardware input in the key settings. All presets start on input 1.
 
-| Key | What one press applies |
+| EQ key | Starting setting |
 |---|---|
-| EQ CUT | Band 2 at 250 Hz, −2 dB, then channel EQ on |
-| EQ LIFT | Band 2 at 3 kHz, +2 dB, then channel EQ on |
-| COMP | Compressor threshold −18 dB and ratio 2:1, then channel Dynamics on |
+| LOW CUT | Dedicated high-pass filter (HPF), 70 Hz, current slope |
+| LOW BST | Band 1 low shelf, +2 dB at 100 Hz |
+| 1K CUT | Band 2 bell, −1.5 dB at 1 kHz |
+| HI LIFT | Band 2 presence bell, +2 dB at 3 kHz |
+| HI AIR | Band 3 high shelf, +2 dB at 12 kHz |
+| HIGH CUT | Band 3 low-pass filter (LPF), 4.5 kHz, for auditioning a darker bass sound |
 
-These are editable starting points for hardware input 1. The two EQ keys are alternate settings for the same band. The channel’s existing EQ shape and width, or its existing dynamics timing, makeup gain and expander, also affect what you hear. Enabling a processor activates the whole section.
+**High Cut setup.** In TotalMix, open the input’s EQ band 3 Type menu. In the Stream Deck key settings, select the position where Low Pass appears. If your device does not list it in the supported positions, leave it unset. The key then shows SETUP and sends no commands. Recheck the position if switching interface models. Shelf keys target the second (Shelf) menu item. Each EQ key sets its own filter or band and keeps its current Q or slope. Keys using the same band replace that band’s prior setting. The 1 kHz dip is a tonal choice when a source sounds nasal.
 
-Each press requests fresh channel data from the configured TotalMix IPv4 host (localhost by default). **MATCHES** means all targets already matched. **APPLIED** reports a successful final readback for the last press. **NO DATA** means required feedback did not arrive before any write. **CHECK MIX** means a write was attempted and the final result could not be verified. Inspect the channel before retrying. To bypass a section, use its existing EQ or Dynamics toggle on **Processing**. Bypassing retains its parameter values.
+| Compressor | Threshold | Ratio | Attack | Release |
+|---|---:|---:|---:|---:|
+| Deep vocal | −18 dB | 3:1 | 20 ms | 180 ms |
+| Light vocal | −16 dB | 2:1 | 15 ms | 150 ms |
+| Drum overheads | −14 dB | 1.5:1 | 30 ms | 250 ms |
+| Mid toms | −16 dB | 3:1 | 20 ms | 180 ms |
+| Kick | −14 dB | 4:1 | 25 ms | 120 ms |
+| Guitar | −18 dB | 2.5:1 | 15 ms | 160 ms |
+| Bass | −18 dB | 3:1 | 25 ms | 220 ms |
+
+These FiO starting points are editable. Adjust the threshold against the actual performance and gain-reduction meter. Dynamics enables the whole section, including any configured expander and makeup gain. Attack and release are shared with the expander. For hardware details see [RME’s UCX II manual, sections 25.3.2 and 25.3.4](https://rme-audio.de/downloads/fface_ucx2_e.pdf).
+
+Each press requests fresh channel data from the configured TotalMix IPv4 host (localhost by default). **MATCHES** means all targets already matched. **APPLIED** reports a successful final readback for the last press. **NO DATA** means required feedback did not arrive before any write. **CHECK MIX** means a write was attempted and the final result could not be verified. Inspect the channel before retrying. To bypass a section, use its existing Low Cut, EQ or Dynamics toggle on **Processing**. Bypassing retains its parameter values.
 
 ## Encoder presets
 
