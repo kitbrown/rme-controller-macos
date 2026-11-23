@@ -31,11 +31,23 @@ python3 tools/check-streamdeck-8-profiles.py "$beta_app"
 
 From the repository root the checker defaults to the retained v1.1.9 package. Pass `--package "/path/to/candidate.streamDeckPlugin"` to check another archive. Separately, the eight shipped runtime suites passed with Node 24.22.1 using simulated Stream Deck and OSC events. All four profile tests, Elgato CLI manifest validation and the shipped-artifact verifier passed.
 
-**UNKNOWN in the running beta.** Next, use a separate macOS test environment or a backed-up test installation. Record the host and plugin builds for each run.
+### Running beta acceptance, November 23, 2026
 
-1. Start the beta with an existing v1.1.9 profile and verify assignments, saved settings and plugin registration after restart. On a clean test profile, verify that the starter installs and opens with the expected keys and dials.
-2. Open, edit and reopen a key and dial inspector. Check the saved target, snapshot captions and encoder strip against the profile. Capture startup errors or a rendering mismatch before changing anything.
-3. On the UCX II and + XL, verify physical actuation, meter feedback and recovery on the beta. To compare v1.1.10.4, use its workflow profile and spare-input restoration procedure in PR #8. Record results for each plugin build independently.
+**CONFIRMED.** The native macOS 8.0.0 beta (24357) launched and registered the shipped RME 1.1.9.1 plugin and the separately packaged 1.1.10.4 candidate. Testing ran inside a disposable arm64 macOS 26.6.2 VM with the standard 15-key editor, USB passthrough disabled and no UCX II. Stream Deck provided its Node 24.22.1 runtime. The production Mac continued running 7.6.1 (23033) under the same process ID. Before/after hashes matched for its 16 profile manifests and 40 installed RME plugin files.
+
+| Native check | Observed result |
+| --- | --- |
+| Upgrade from 7.6.1 to 8.0.0 | Installed the shipped archive through the native 7.6.1 installer, accepted the starter and changed the key at column 5, row 2 from Snapshot 2 to Snapshot 3. After the guest host upgrade, the same action ID and OSC settings persisted. The reopened v8 inspector and key both showed Snapshot 3. |
+| Edit and restart | Changed the same key to Snapshot 6 in v8. Quit the host and verified process exit. A new host PID logged RME registration and retained Snapshot 6. |
+| Upgrade plugin under v8 | Opened the original candidate archive through the v8 installer. The host logged the expected stop for the update, a successful install and a new RME connection. All 49 installed candidate package members matched the archive bytes. The edited starter survived the plugin upgrade. |
+| Import and edit workflow | The standard model workflow imported with seven named pages and 41 RME key assignments. On Compression, changed EXP from input 1 to input 4 in the native inspector. Reopening the inspector kept input 4. Restarting the host reconnected the candidate and preserved both the new EXP target and the starter’s Snapshot 6. |
+| Live display with synthetic OSC | Input 1 feedback left the reassigned key at SYNC. Sending Dynamics enable 1, expander threshold −40 and ratio 2 to the guest plugin at UDP 9008 on input 4 produced a red ON key. Ratio 1 changed it to amber OFF. These packets entered the real plugin running inside v8. [ON](evidence/streamdeck-8.0.0-24357/exp-on.png) · [OFF](evidence/streamdeck-8.0.0-24357/exp-off.png) |
+| Fresh candidate install on v8 | Archived the guest’s test support directory and reset its Stream Deck preferences. With clean app data, the candidate registered, offered the starter during native installation, and added 16 RME key assignments across two pages after confirmation. The editor kept Default Profile selected until RME Starter was chosen. [Native starter](evidence/streamdeck-8.0.0-24357/starter.png) |
+| Importing the + XL workflow on the 15-key editor | The beta used the selected 15-key model even though the imported profile name still said + XL. The result had seven pages, 32 RME keypad assignments and zero encoders. Use the matching device profile. Actual + XL import and encoder rendering remain open. |
+
+**Optional v8 features.** In the guest, the beta’s built-in loopback MCP service listed all nine candidate action types. Every action returned `ai_ready: false`. The same query with `OnlyAiReady: true` returned zero. A separate recipe context request exceeded the eight-second client timeout. Native RME controls operated without this integration. AI-assisted setup could be a separate feature for assigning a preset, channel and label from a prompt. The public changelog describes Ideas and AI-assisted configuration. Marketplace Ideas placement and AI triggering were not tested. [Elgato beta changelog](https://help.elgato.com/hc/en-us/articles/52924584789009-Stream-Deck-8-0-Beta-Changelog) · [Elgato AI setup guide](https://www.elgato.com/us/en/explorer/products/stream-deck/sd-mcp-setup/)
+
+**Remaining hardware acceptance.** Test the model-matched + XL profile, six dials and touch strip on the physical Deck. Use the UCX II to check actual processing writes and readback, audible results, restoration of the spare input, and USB/sleep recovery. The VM checks covered native host operation and synthetic mixer feedback. The earlier shipped-release hardware checks remain tied to their original host.
 
 ## Completed evidence
 
