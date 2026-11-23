@@ -22,6 +22,13 @@ const symbols = {
   EQ: "M43 85c14 0 14-26 27-26s13 21 31 21",
   HPF: "M43 90l17-18q6-9 17-9h24",
   LPF: "M43 63h23q11 0 17 9l17 18",
+  "LOW SHELF": "M40 61h16c12 0 13 19 28 19h19",
+  "HIGH SHELF": "M40 80h16c12 0 13-19 28-19h19",
+  AL: "M43 78h13l5-14 8 24 8-34 6 18h17 M44 53h15 M84 89h16",
+  REV: "M43 63l12 14 10-22 8 32 7-23 6 17 6-12 6 7",
+  ECHO: "M44 88V55l9 8v25 M62 88V62l8 6v20 M80 88V69l8 5v14 M96 88V77",
+  EXP: "M44 52v42h57 M58 92l10-24 24-24",
+  DYN: "M44 52v42h57 M52 90l14-25 15-9 16-4",
   COMP: "M47 93l25-25 25-7 M46 55v39h52",
   OSC: "M40 76h15l7-17 12 32 9-22 5 7h16",
   SNAP: "M50 54h36v29H50z M57 89h35V61 M64 95h34V68",
@@ -40,7 +47,7 @@ export function renderConsoleKey({ token, status, active, accent, symbol = token
     <rect x="16" y="16" width="112" height="3" rx="1.5" fill="${light}"/>
     <text x="72" y="43" text-anchor="middle" font-size="${token.length > 5 ? 18 : 24}" fill="#f2f5f2">${esc(token)}</text>
     <path d="${path}" fill="none" stroke="${light}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-    ${snapshot && active ? '<path d="M86 83l5 5 11-13" fill="none" stroke="#f2f5f2" stroke-width="4"/>' : ""}
+    ${active ? '<path d="M108 89l5 5 11-13" fill="none" stroke="#f2f5f2" stroke-width="4"/>' : ""}
     ${caption}
   </svg>`);
 }
@@ -50,7 +57,7 @@ export function renderLevelKey({ label, value, level, muted, mode, mix }) {
   label=esc(letters.join(''));
   value=esc(value);
   level=Math.min(100, Math.max(0, Number(level)||0));
-  const accent= muted ? "#ff7079" : (mix ? "#f6c66a" : "#56caff");
+  const accent= muted ? "#ff5d69" : (mix ? "#f6c66a" : "#56caff");
   const thumb=101-level*.58;
   const ticks=Array.from({length:8}, (_,i) =>
     '<path d="M49 '+(47+i*8)+'h7 M88 '+(47+i*8)+'h7" stroke="#7794a8" stroke-width="1.2"/>').join('');

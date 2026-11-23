@@ -1,4 +1,4 @@
-import {RecipeRunner, recipePlan} from "./processing-recipe.js";
+import {RecipeRunner, recipePlan, recipeState} from "./processing-recipe.js";
 import dgram from "node:dgram";
 import {readFileSync} from "node:fs";
 import {renderConsoleKey, renderLevelKey as drawLevelKey, renderStackKey} from "../ui/console-art.js";
@@ -112,7 +112,7 @@ function mixSpec(s = {}) {
 const PROCESSOR_SWITCHES = Object.freeze({
   eqEnable: {label:"EQ",suffix:"eq/enable"},
   dynEnable: {label:"Dynamics",suffix:"dynamics/enable"},
-  lowcutEnable: {label:"Low Cut",suffix:"lowcut/enable"},
+  lowcutEnable: {label:"HPF",suffix:"lowcut/enable"},
   autoLevelEnable: {label:"Auto Level",suffix:"autolevel/enable"},
   reverbEnable: {label:"Reverb",global:"/reverb/enable"},
   echoEnable: {label:"Echo",global:"/echo/enable"}
@@ -253,7 +253,7 @@ function keyToken(inst) {
     spdifOutMute: "SPDIF",
     phonesMute: "PHONES",
     mic48v: "48V",
-    talkback: "TALK", eqEnable:"EQ", dynEnable:"COMP", lowcutEnable:"LC",
+    talkback: "TALK", eqEnable:"EQ", dynEnable:"DYN", lowcutEnable:"HPF",
     autoLevelEnable:"AL", reverbEnable:"REV", echoEnable:"ECHO"
   })[preset] || "OSC";
 }
@@ -287,14 +287,51 @@ function diagnosticImage(inst) {
   return renderConsoleKey({token:"OSC",status,active:false,accent:age<5000?"#58e6a9":"#f3be67"});
 }
 function renderRecipe(inst, status) {
-  const plan = recipePlan(inst.settings);
-  setImage(inst.context, renderConsoleKey({token: plan?.token || (inst.settings.preset === "lpf" ? "HIGH CUT" : "SETUP"),
-    symbol: plan?.symbol || "STRIP",
-    status, active: false, accent: "#f3be67"}));
+  const plan = inst.recipePlan;
+  if (inst.recipeCaption === status) return;
+  inst.recipeCaption = status;
+  const filterSetup = inst.settings.preset === "lpf";
+  setImage(inst.context, renderConsoleKey({token: plan?.token || (filterSetup ? "LPF" : "SETUP"),
+    symbol: plan?.symbol || (filterSetup ? "LPF" : "STRIP"),
+    status, active: status === "ON", accent: "#f3be67"}));
 }
+
+function recipeResult(inst, result) {
+  if (result === "APPLIED" || result === "MATCHES") {
+    renderRecipe(inst, recipeState(inst.recipePlan, inst.recipeValues));
+  } else {
+    if (["READING", "NO DATA", "CHECK MIX", "OFFLINE"].includes(result)) inst.recipeValues.clear();
+    renderRecipe(inst, result);
+  }
+}
+
+function observeRecipes(port, peer, path, value) {
+  if (!Number.isFinite(value)) return;
+  if (path !== "/status/connection" && !/^\/input\/\d+\/(eq|dynamics|lowcut)\//.test(path)) return;
+  for (const inst of instances.values()) {
+    if (inst.action !== ACTION_RECIPE || !inst.recipePlan || inst.configuring) continue;
+    const endpoint = cfg(inst.settings);
+    if (endpoint.receivePort !== port || (endpoint.host === "localhost" ? "127.0.0.1" : endpoint.host) !== peer) continue;
+    if (path === "/status/connection") {
+      if (value === 0) {
+        inst.recipeValues.clear();
+        renderRecipe(inst, "OFFLINE");
+      } else if (inst.recipeCaption === "OFFLINE") {
+        renderRecipe(inst, "SYNC");
+        requestGlobalState(inst.settings);
+      }
+    } else if (inst.recipePlan.steps.some(step => step.path === path)) {
+      inst.recipeValues.set(path, value);
+      const state = recipeState(inst.recipePlan, inst.recipeValues);
+      if (inst.recipeCaption === "CHECK MIX" && inst.recipeValues.size < inst.recipePlan.steps.length) continue;
+      if (!recipes.runs.has(inst.context)) renderRecipe(inst, state);
+    }
+  }
+}
+
 function renderDiagnostic(inst) {if(instances.has(inst.context))setImage(inst.context,diagnosticImage(inst));}
-function keyImage(inst, active) {
-  return renderConsoleKey({token: keyToken(inst), status: keyStatus(inst, active), accent: keyAccent(inst), active});
+function keyImage(inst, active, status = keyStatus(inst, active)) {
+  return renderConsoleKey({token: keyToken(inst), status, accent: keyAccent(inst), active});
 }
 function levelKeyImage(inst) {
   if (isMeter(inst)) {
@@ -447,6 +484,7 @@ async function acquireReceiver(port) {
   socket.on("message", (packet, peer) => {
     try {
       for (const message of decodeOsc(packet)) {
+        observeRecipes(port, peer.address, message.address, message.args[0]);
         recipes.receive(port, peer.address, message.address, message.args[0]);
         handleOsc(port, message);
       }
@@ -608,7 +646,18 @@ function handleOsc(port, message) {
     }
   }
   if (message.address === "/status/connection" && typeof message.args[0] === "number") {
-    for (const inst of instances.values()) if (matchesReceiver(inst, port)) inst.connected = message.args[0] > 0.5;
+    for (const inst of instances.values()) {
+      if (!matchesReceiver(inst, port)) continue;
+      const wasOffline = inst.connected === false;
+      inst.connected = message.args[0] > 0.5;
+      if (inst.action !== ACTION_TOGGLE && inst.action !== ACTION_SNAPSHOT) continue;
+      if (!inst.connected) {
+        inst.toggleStates.clear();
+        inst.snapshotState = undefined;
+        setState(inst.context, 0);
+        setImage(inst.context, keyImage(inst, false, "OFFLINE"));
+      } else if (wasOffline) requestGlobalState(inst.settings);
+    }
     return;
   }
   if (typeof message.args[0] !== "number" || Number.isNaN(message.args[0])) return;
@@ -747,8 +796,11 @@ async function configureInstance(msg, replacing = false) {
   if (inst.action === ACTION_OUTPUT || inst.action === ACTION_MIX || inst.action===ACTION_PARAMETER) renderDial(inst, true);
   else if (inst.action === ACTION_RECIPE) {
     setTitle(inst.context, "");
-    const plan = recipePlan(settings);
-    renderRecipe(inst, plan ? "IN " + plan.channel : "SETUP");
+    inst.recipePlan = recipePlan(settings);
+    inst.recipeValues = new Map();
+    inst.recipeCaption = null;
+    renderRecipe(inst, inst.recipePlan ? "SYNC" : "SETUP");
+    if (inst.recipePlan) requestGlobalState(settings);
   } else if(inst.action===ACTION_DIAGNOSTIC) {
     setTitle(inst.context,"");renderDiagnostic(inst);
     clearInterval(inst.diagnosticTimer);inst.diagnosticTimer=setInterval(()=>renderDiagnostic(inst),1000);
@@ -758,7 +810,7 @@ async function configureInstance(msg, replacing = false) {
     renderLevelKey(inst, true);
   } else if (inst.action === ACTION_TOGGLE) {
     setTitle(inst.context, "");
-    setImage(inst.context, keyImage(inst, false));
+    setImage(inst.context, keyImage(inst, false, "SYNC"));
   } else if (inst.action === ACTION_SNAPSHOT) {
     setTitle(inst.context, `SNAP ${integer(settings.snapshot, 1, 1, 8)}`);
     setImage(inst.context, keyImage(inst, false));
@@ -842,9 +894,9 @@ function onKeyDown(msg) {
   const inst = instances.get(msg.context);
   if (!inst) return;
   if (inst.action === ACTION_RECIPE) {
-    if (!inst.configuring) recipes.start(inst.context, inst.settings, cfg(inst.settings),
+    if (!inst.configuring && inst.recipeValues) recipes.start(inst.context, inst.settings, cfg(inst.settings),
       (path, value, float) => sendPacket(inst.settings, path, value, float),
-      status => renderRecipe(inst, status));
+      status => recipeResult(inst, status));
     return;
   }
   if (inst.action === ACTION_DIAGNOSTIC) {requestGlobalState(inst.settings);return;}
@@ -920,6 +972,12 @@ function connectStreamDeck() {
   sd.addEventListener("error", error => console.error("Stream Deck WebSocket:", error.message || error));
   sd.addEventListener("close", () => {
     for (const context of recipes.runs.keys()) recipes.cancel(context);
+    for (const inst of instances.values()) {
+      if (inst.action === ACTION_RECIPE && inst.recipeValues) {
+        inst.recipeValues.clear();
+        inst.recipeCaption = null;
+      }
+    }
     if (shuttingDown) return;
     clearTimeout(reconnectTimer);
     const delay = Math.min(10000, 250 * (2 ** reconnectAttempt++));

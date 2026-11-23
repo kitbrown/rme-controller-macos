@@ -21,7 +21,7 @@ class StarterProfiles(unittest.TestCase):
             ['git', 'show', '9f0a413b5b7a5b6c8b61e7159c9764afff45eacd:com.fionetworks.rme-globalosc.sdPlugin/manifest.json'], cwd=ROOT))
         current = json.loads(json.dumps(MANIFEST))
         current.pop('Profiles')
-        self.assertEqual(current.pop('Version'), '1.1.10.2')
+        self.assertEqual(current.pop('Version'), '1.1.10.3')
         self.assertEqual(current.pop('SupportURL'), 'https://github.com/kitbrown/rme-controller-macos#install')
         snapshot = next(a for a in current['Actions'] if a['UUID'].endswith('.snapshot'))
         for state in snapshot['States']:
@@ -43,6 +43,8 @@ class StarterProfiles(unittest.TestCase):
                     actual = path.read_bytes()
                     if path.suffix == '.html':
                         actual = actual.replace(b'<link rel="stylesheet" href="console.css">', b'')
+                    if path.name == "toggle-advanced.html":
+                        old = old.replace(b"Channel Low Cut", b"Channel HPF")
                     self.assertEqual(actual, old, str(path))
 
     def test_new_icons_match_validated_ci_build(self):
@@ -146,8 +148,8 @@ class StarterProfiles(unittest.TestCase):
                     self.assertEqual(snapshots, set(range(1, 9)))
                     if workflow:
                         self.assertEqual(list(dict.fromkeys(titles)), ['Monitor','Mix','Processing','Snapshots','Recipes','EQ','Compression'])
-                        self.assertEqual(library['EQ'], ['LOW CUT','LOW BST','1K CUT','HI LIFT','HI AIR','HIGH CUT'])
-                        self.assertEqual(library['Compression'], ['DEEP VOX','LITE VOX','OH DRUMS','MID TOMS','KICK','GUITAR','BASS'])
+                        self.assertEqual(library['EQ'], ['HPF','LOW BST','1K CUT','HI LIFT','HI AIR','LPF'])
+                        self.assertEqual(library['Compression'], ['DEEP VOX','LITE VOX','OH DRUMS','MID TOMS','KICK','GUITAR','BASS','EXP'])
                         self.assertEqual(recipes, [('eq',250,-2,None,None), ('eq',3000,2,None,None),
                                                    ('compressor',None,None,-18,2)])
                         self.assertEqual(presets, {(p, m) for p in ('mic1','playback12','spdif') for m in ('down','up')})

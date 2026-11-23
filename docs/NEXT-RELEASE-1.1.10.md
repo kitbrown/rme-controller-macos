@@ -1,8 +1,18 @@
 # v1.1.10 preparation — Stream Deck 7.6.1
 
-## Current candidate 1.1.10.2 · November 23, 2026
+## Current candidate 1.1.10.3
 
-Six EQ and seven timed compressor keys are included on model-sized workflow pages. [User guide and values](../README.md#one-touch-processing) · [candidate checksum](../marketplace/v1.1.10/candidate/SHA256SUMS). “Mid drums” is interpreted as mid toms. The compressor settings are FiO starting points. Each named compressor sets threshold, ratio, attack and release. Earlier custom compressor keys continue to preserve timing.
+The eighth key on Compression is EXP (−40 dB, 2:1). Press once to apply expansion and engage Dynamics. A fresh read confirming the preset is active makes the next press bypass expansion by changing only the expander ratio to 1:1. The UCX II shares compressor/expander timing. The preset retains both times and all compressor values. See the [guide](../README.md#one-touch-processing), [display preview](evidence/v1.1.10-candidate/processing-states.png) and [candidate checksum](../marketplace/v1.1.10/candidate/SHA256SUMS).
+
+HPF and LPF are the filter key labels. LPF retains its interface-specific setup. A matching, enabled processing key uses the same red and check as other engaged keys. Incoming values from the configured host and receive port update individual preset states. Other compressor presets can display READY while the matching one displays ON.
+
+**Software verification.** Ten Node suites and four profile checks passed. Simulated TotalMix packets drove OFF, ON, READY and OFFLINE through the plugin entry point; a second EXP press sent only the ratio change and requested a fresh readback. Chromium checked the EXP inspector fields and range validation. Elgato packaged build 1.1.10.3, all 49 archive members matched the checkout, and the independent shipped-artifact check passed.
+
+**Hardware acceptance.** On a spare input, capture original expander threshold, ratio, compressor and Dynamics settings. With representative drum hits and bleed, audition the threshold and shared timing. Observe OFF, ON and READY while operating the Deck and editing in TotalMix. Confirm a second press changes only the ratio, including when compression is already working. Restore and verify the original settings. Physical legibility, native profile import, LPF type, reconnection and earlier hardware gaps remain open.
+
+## Historical candidate 1.1.10.2 · November 23, 2026
+
+Six EQ and seven timed compressor keys are included on model-sized workflow pages. [User guide and values](../README.md#one-touch-processing) · [candidate checksum](https://github.com/kitbrown/rme-controller-macos/blob/f892ca7/marketplace/v1.1.10/candidate/SHA256SUMS). “Mid drums” is interpreted as mid toms. The compressor settings are FiO starting points. Each named compressor sets threshold, ratio, attack and release. Earlier custom compressor keys continue to preserve timing.
 
 The RME Global OSC protocol table dated 2026-07-21 lists channel Low Cut frequency, EQ band types and dynamics timing as float parameters. Type indices identify positions in the device's menus. RME’s earlier OscTableTotalMix_240722 lists Bell then Shelf and device-dependent pass filters. The [UCX II manual](https://rme-audio.de/downloads/fface_ucx2_e.pdf) documents a dedicated Low Cut and band 1/3 shapes. The earlier private UCX II readback contained the frequency, both type indices and dynamics timing paths. It did not identify the semantic meaning of every type value. The LPF key requires the interface's menu position before sending anything.
 

@@ -51,18 +51,19 @@ def workflow_pages():
     def recipe(label, mode, **settings):
         return ('processingrecipe', {'channel': 1, 'keyLabel': label, 'preset': mode, **settings})
 
-    eq = [recipe('LOW CUT', 'hpf', frequency=70),
+    eq = [recipe('HPF', 'hpf', frequency=70),
           recipe('LOW BST', 'lowShelf', frequency=100, gain=2),
           recipe('1K CUT', 'eq', frequency=1000, gain=-1.5),
           recipe('HI LIFT', 'eq', frequency=3000, gain=2),
           recipe('HI AIR', 'highShelf', frequency=12000, gain=2),
-          recipe('HIGH CUT', 'lpf', frequency=4500)]
+          recipe('LPF', 'lpf', frequency=4500)]
     compression = [recipe(label, 'timedComp', threshold=t, ratio=r, attack=a, release=ms)
                    for label, t, r, a, ms in [
                        ('DEEP VOX', -18, 3, 20, 180), ('LITE VOX', -16, 2, 15, 150),
                        ('OH DRUMS', -14, 1.5, 30, 250), ('MID TOMS', -16, 3, 20, 180),
                        ('KICK', -14, 4, 25, 120), ('GUITAR', -18, 2.5, 15, 160),
                        ('BASS', -18, 3, 25, 220)]]
+    compression.append(recipe('EXP', 'expander', expThreshold=-40, expRatio=2))
     recipes[0][1]['keyLabel'] = 'MID CUT'
     recipes[1][1]['keyLabel'] = 'HI LIFT'
     return [('Monitor', monitor), ('Mix', mix), ('Processing', processing),

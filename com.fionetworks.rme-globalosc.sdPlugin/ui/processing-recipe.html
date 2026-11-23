@@ -6,16 +6,20 @@
 <section><h2>Apply input processing</h2>
 <label>Hardware input (1 = first input)<input required data-setting="channel" type="number" min="1" max="1000" value="1"></label>
 <label>Key label<input data-setting="keyLabel" maxlength="8" placeholder="Use processor name"></label>
-<label>Processor<select data-setting="preset"><option value="eq">Band 2 · bell</option><option value="hpf">Low Cut · high-pass filter</option><option value="lowShelf">Band 1 · low shelf</option><option value="highShelf">Band 3 · high shelf</option><option value="lpf">High Cut · low-pass filter</option><option value="compressor">Compressor · keep timing</option><option value="timedComp">Compressor · set attack and release</option></select></label>
+<label>Processor<select data-setting="preset"><option value="eq">Band 2 · bell</option><option value="hpf">HPF</option><option value="lowShelf">Band 1 · low shelf</option><option value="highShelf">Band 3 · high shelf</option><option value="lpf">LPF</option><option value="compressor">Compressor · keep timing</option><option value="timedComp">Compressor · set attack and release</option><option value="expander">Expander · drum bleed</option></select></label>
 <div data-show-preset="eq,hpf,lowShelf,highShelf,lpf">
 <label>Frequency (Hz)<input required data-setting="frequency" type="number" min="20" max="20000" value="250"></label></div>
 <div data-show-preset="eq,lowShelf,highShelf"><label>Gain (dB)<input required data-setting="gain" type="number" min="-20" max="20" step="0.1" value="-2"></label><p>Retains the band's existing Q. Enabling EQ activates the whole section.</p></div>
-<p data-show-preset="hpf" hidden>Use 20–500 Hz. The dedicated Low Cut retains its existing slope.</p>
-<div data-show-preset="lpf" hidden><label>Position of Low Pass in your TotalMix band 3 Type menu<select data-setting="lowPassPosition"><option value="">Check TotalMix first</option><option value="3">Third option</option><option value="4">Fourth option</option></select></label><p>Menu order depends on the interface. If Low Pass is absent, this preset is unavailable.</p></div>
+<p data-show-preset="hpf" hidden>Use 20–500 Hz. The HPF retains its existing slope.</p>
+<div data-show-preset="lpf" hidden><label>Position of LPF in your TotalMix band 3 Type menu<select data-setting="lowPassPosition"><option value="">Check TotalMix first</option><option value="3">Third option</option><option value="4">Fourth option</option></select></label><p>Menu order depends on the interface. If LPF is absent, this preset is unavailable.</p></div>
 <div data-show-preset="compressor,timedComp" hidden>
 <label>Threshold (dB)<input required data-setting="threshold" type="number" min="-80" max="0" step="0.1" value="-18"></label>
 <label>Ratio (:1)<input required data-setting="ratio" type="number" min="1" max="20" step="0.1" value="2"></label>
 <p>Dynamics also engages the existing makeup gain and expander settings. Adjust threshold while watching gain reduction.</p></div>
+<div data-show-preset="expander" hidden>
+<label>Expander threshold (dB)<input required data-setting="expThreshold" type="number" min="-99" max="-20" step="0.1" value="-40"></label>
+<label>Ratio (:1)<input required data-setting="expRatio" type="number" min="1.1" max="10" step="0.1" value="2"></label>
+<p>Press to apply. When ON, press again to bypass expansion. The compressor and expander share Dynamics, attack and release.</p></div>
 <div data-show-preset="timedComp" hidden>
 <label>Attack (ms)<input required data-setting="attack" type="number" min="0" max="200" value="15"></label>
 <label>Release (ms)<input required data-setting="release" type="number" min="100" max="999" value="180"></label>

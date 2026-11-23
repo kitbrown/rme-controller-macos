@@ -18,7 +18,7 @@ The plugin actions default to the matching host and ports.
 
 **v1.1.10 candidate.** To try the workflow pages with the candidate installed, open Stream Deck Settings → Profiles → Import and choose the matching `rme-workflow-*.streamDeckProfile` from the [profiles directory](com.fionetworks.rme-globalosc.sdPlugin/profiles). Select **RME Workflow** in the profile selector. Your editable starter is a separate profile. Use the page arrows on key-only models or swipe the touch strip on dial models.
 
-Monitor provides Main Mute, Dim, Mono, Phones Mute, a Main stereo peak meter and OSC diagnostics. Mix provides half-decibel down/up pairs for Mic 1, Core Audio and SPDIF feeding Main. Processing targets hardware input 1 by default. Check that assignment in the action settings before engaging EQ, dynamics, low cut or auto level. Processing dials on + models adjust EQ band gains and compressor settings. Snapshots recalls the eight existing TotalMix slots. Smaller devices split a group across pages when necessary.
+Monitor provides Main Mute, Dim, Mono, Phones Mute, a Main stereo peak meter and OSC diagnostics. Mix provides half-decibel down/up pairs for Mic 1, Core Audio and SPDIF feeding Main. Processing targets hardware input 1 by default. Check that assignment in the action settings before engaging EQ, dynamics, HPF or auto level. Processing dials on + models adjust EQ band gains and compressor settings. Snapshots recalls the eight existing TotalMix slots. Smaller devices split a group across pages when necessary.
 
 ### One-touch processing
 
@@ -26,14 +26,14 @@ Open **EQ** or **Compression** in the optional workflow profile. The original **
 
 | EQ key | Starting setting |
 |---|---|
-| LOW CUT | Dedicated high-pass filter (HPF), 70 Hz, current slope |
+| HPF | 70 Hz, current slope |
 | LOW BST | Band 1 low shelf, +2 dB at 100 Hz |
 | 1K CUT | Band 2 bell, −1.5 dB at 1 kHz |
 | HI LIFT | Band 2 presence bell, +2 dB at 3 kHz |
 | HI AIR | Band 3 high shelf, +2 dB at 12 kHz |
-| HIGH CUT | Band 3 low-pass filter (LPF), 4.5 kHz, for auditioning a darker bass sound |
+| LPF | Band 3, 4.5 kHz, for auditioning a darker bass sound |
 
-**High Cut setup.** In TotalMix, open the input’s EQ band 3 Type menu. In the Stream Deck key settings, select the position where Low Pass appears. If your device does not list it in the supported positions, leave it unset. The key then shows SETUP and sends no commands. Recheck the position if switching interface models. Shelf keys target the second (Shelf) menu item. Each EQ key sets its own filter or band and keeps its current Q or slope. Keys using the same band replace that band’s prior setting. The 1 kHz dip is a tonal choice when a source sounds nasal.
+**LPF setup.** In TotalMix, open the input’s EQ band 3 Type menu. In the Stream Deck key settings, select the position where Low Pass appears. If your device does not list it in the supported positions, leave it unset. The key then shows SETUP and sends no commands. Recheck the position if switching interface models. Shelf keys target the second (Shelf) menu item. Each EQ key sets its own filter or band and keeps its current Q or slope. Keys using the same band replace that band’s prior setting. The 1 kHz dip is a tonal choice when a source sounds nasal.
 
 | Compressor | Threshold | Ratio | Attack | Release |
 |---|---:|---:|---:|---:|
@@ -47,7 +47,11 @@ Open **EQ** or **Compression** in the optional workflow profile. The original **
 
 These FiO starting points are editable. Adjust the threshold against the actual performance and gain-reduction meter. Dynamics enables the whole section, including any configured expander and makeup gain. Attack and release are shared with the expander. For hardware details see [RME’s UCX II manual, sections 25.3.2 and 25.3.4](https://rme-audio.de/downloads/fface_ucx2_e.pdf).
 
-Each press requests fresh channel data from the configured TotalMix IPv4 host (localhost by default). **MATCHES** means all targets already matched. **APPLIED** reports a successful final readback for the last press. **NO DATA** means required feedback did not arrive before any write. **CHECK MIX** means a write was attempted and the final result could not be verified. Inspect the channel before retrying. To bypass a section, use its existing Low Cut, EQ or Dynamics toggle on **Processing**. Bypassing retains its parameter values.
+**EXP** on the Compression page reduces quieter drum bleed. Its editable starting point is −40 dB, 2:1. Press to apply. When the key shows **ON**, press again to bypass expansion at 1:1. Enabling EXP engages channel Dynamics; bypassing EXP leaves the compressor running if it was running. Both operations preserve the shared timing, compressor parameters and makeup gain.
+
+**Reading the keys.** A red curve and check mark mean the function is active. Recipe keys show **ON** when the mixer reports the preset values and an enabled processor, **OFF** when bypassed, or **READY** when the processor is on with different values. Changes reported by TotalMix update the keys. Pressing an already matched EQ or compressor preset keeps it applied. Use the HPF, EQ or DYN switch on Processing to bypass a whole section.
+
+**SYNC** waits for mixer values. Each press requests a fresh read before writing. **NO DATA** means the key received insufficient feedback to start. **CHECK MIX** means a write was attempted and its result could not be verified. Inspect the channel before retrying.
 
 ## Encoder presets
 

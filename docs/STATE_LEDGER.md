@@ -28,7 +28,11 @@ Final Marketplace photos/video, existing icon/thumbnail, descriptions/release no
 
 Owner: next authorized engineer with Chris and appropriate connected equipment. Record exact environment, actions, observations and restorations in the existing validation record; keep UNKNOWN where untested. No new hardware tests were performed during reconciliation.
 
-## v1.1.10 candidate checkpoint — 2026-11-23
+## v1.1.10.3 candidate checkpoint
+
+The active draft adds the EXP key and mixer-driven preset indicators in build **1.1.10.3**. The versioned package, visual evidence, and hardware checks are in the [current candidate record](NEXT-RELEASE-1.1.10.md). The prior 1.1.10.2 package is recoverable at `f892ca7`.
+
+## Historical v1.1.10 candidate checkpoint — 2026-11-23
 
 Build **1.1.10.2** adds the EQ and Compression pages. [Current package details and open hardware checks](NEXT-RELEASE-1.1.10.md). Build 1.1.10.1 remains recoverable at `6a2414f`.
 
