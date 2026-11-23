@@ -1,6 +1,6 @@
 # State Ledger
 
-Updated: 2026-11-14. This is the current release authority; older candidate documents are historical.
+Updated: 2026-11-23 on the Stream Deck 8 compatibility branch. This is the current release authority; older candidate documents are historical.
 
 ## Current shipped baseline
 
@@ -10,6 +10,32 @@ Updated: 2026-11-14. This is the current release authority; older candidate docu
 - **USER-CONFIRMED release outcome, 2026-11-05:** Chris reported Elgato approval and the first paid Marketplace sale. Approval/publication were not independently read from Maker Console because browser checks were blocked by lock/sign-in. The approval monitor was deleted after that report. Do not treat the historical pending-review snapshot as current.
 - **UNKNOWN current account state:** price, exact publication timestamp, and current automatic-publication setting. No Marketplace/account changes are part of reconciliation.
 - v1.1.8 publication/capture/profile tasks are **SUPERSEDED by v1.1.9**, not unfinished submission work. Historical PRs #4/#5/#6 are closed as superseded and must not be merged over this baseline.
+
+## Stream Deck 8.0.0 beta compatibility work
+
+Branch `compat/streamdeck-8.0.0-beta` starts at GitHub main `488256a94fd2218f868dfb2b2096f23cd7d0e33c` with the shipped plugin 1.1.9.1. The 8.0.0 version identifies the Elgato host. The v1.1.10.4 candidate remains on [draft PR #8](https://github.com/kitbrown/rme-controller-macos/pull/8) at `09a601b21cb0a218ceb75e7d75a4ea0bad3bee3a` for the comparison below.
+
+**CONFIRMED offline on 2026-11-23.** The official macOS beta installer had SHA-256 `154eb9003882b7b62f780526a58b07e23da67c3407d8337640cf6019372342e2`. macOS reported a trusted notarization and Corsair installer signature. The extracted app reported bundle ID `com.elgato.StreamDeck`, version `8.0.0`, build `24357`. Inspection used the extracted files. The installed host reported 7.6.1. [Elgato beta changelog and installer](https://help.elgato.com/hc/en-us/articles/52924584789009-Stream-Deck-8-0-Beta-Changelog)
+
+All six packaged v1.1.9 starter profiles matched device model IDs and controller types present in the beta’s factory profiles. Every assigned action resolved to the plugin manifest or the host’s built-in page navigation manifest. The same independent check passed for the six starters and six workflow profiles in the v1.1.10.4 candidate archive. Negative checks detected a 7.6.1 host and a missing next-page action. These checks inspect packaged data. Actual import, upgrade behavior and rendering require a running 8.0.0 host.
+
+To repeat, download the macOS installer linked above. Use a fresh temporary directory for the expansion.
+
+```sh
+pkgutil --check-signature Stream_Deck_8.0.0.24357.pkg
+beta_dir=$(mktemp -d)
+pkgutil --expand-full Stream_Deck_8.0.0.24357.pkg "$beta_dir/expanded"
+beta_app="$beta_dir/expanded/Stream_Deck.pkg/Payload/Applications/Stream Deck.app"
+python3 tools/check-streamdeck-8-profiles.py "$beta_app"
+```
+
+From the repository root the checker defaults to the retained v1.1.9 package. Pass `--package "/path/to/candidate.streamDeckPlugin"` to check another archive. Separately, the eight shipped runtime suites passed with Node 24.22.1 using simulated Stream Deck and OSC events. All four profile tests, Elgato CLI manifest validation and the shipped-artifact verifier passed.
+
+**UNKNOWN in the running beta.** Next, use a separate macOS test environment or a backed-up test installation. Record the host and plugin builds for each run.
+
+1. Start the beta with an existing v1.1.9 profile and verify assignments, saved settings and plugin registration after restart. On a clean test profile, verify that the starter installs and opens with the expected keys and dials.
+2. Open, edit and reopen a key and dial inspector. Check the saved target, snapshot captions and encoder strip against the profile. Capture startup errors or a rendering mismatch before changing anything.
+3. On the UCX II and + XL, verify physical actuation, meter feedback and recovery on the beta. To compare v1.1.10.4, use its workflow profile and spare-input restoration procedure in PR #8. Record results for each plugin build independently.
 
 ## Completed evidence
 
